@@ -407,7 +407,7 @@ const McqPreviewCard: React.FC<McqCardProps> = ({
             className={cn(
               "space-y-2 p-3 rounded-2xl transition-all",
               (mcq.statements ?? []).length < 3 &&
-                "bg-destructive/5 border border-destructive/20 ring-1 ring-destructive/10",
+              "bg-destructive/5 border border-destructive/20 ring-1 ring-destructive/10",
             )}
           >
             <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 flex items-center justify-between">
@@ -463,7 +463,7 @@ const McqPreviewCard: React.FC<McqCardProps> = ({
           className={cn(
             "space-y-2 p-3 rounded-2xl transition-all",
             mcq.options.length < 4 &&
-              "bg-destructive/5 border border-destructive/20 ring-1 ring-destructive/10",
+            "bg-destructive/5 border border-destructive/20 ring-1 ring-destructive/10",
           )}
         >
           <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 flex items-center justify-between">
@@ -795,9 +795,19 @@ export const ImportMcqView: React.FC = () => {
       toast.error("Please select Subject and Chapter first");
       return;
     }
-    setParseError(null);
     try {
-      const parsed = JSON.parse(jsonInput);
+      let parsed;
+      try {
+        parsed = JSON.parse(jsonInput);
+      } catch (e) {
+        // If regular JSON parse fails, attempt to fix common KaTeX issues
+        // Users often paste single backslashes for math delimiters (e.g., \(, \))
+        // We escape backslashes that aren't already part of a valid JSON escape
+        // but carefully avoid \" to not break string boundaries.
+        const sanitized = jsonInput.replace(/\\(?!")/g, "\\\\");
+        parsed = JSON.parse(sanitized);
+      }
+
       const arr = Array.isArray(parsed) ? parsed : [parsed];
       const processed = arr.map(buildEntry);
       setImportedMcqs(processed);
