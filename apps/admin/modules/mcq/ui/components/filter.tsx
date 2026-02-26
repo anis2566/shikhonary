@@ -4,6 +4,7 @@ import {
   BookOpen,
   Download,
   FilterIcon,
+  Pencil,
   Plus,
   Search,
   Upload,
@@ -26,6 +27,7 @@ import { useDebounce } from "@workspace/ui/hooks/use-debounce";
 import {
   useMCQFilters,
   useAcademicSubjectsForSelection,
+  useAcademicChaptersForSelection,
 } from "@workspace/api-client";
 
 import {
@@ -46,11 +48,20 @@ export const Filter = ({ setSelectedIds, isLoading }: FilterProps) => {
 
   const [filters, setFilters] = useMCQFilters();
   const { data: subjects } = useAcademicSubjectsForSelection();
+  const { data: chapters } = useAcademicChaptersForSelection(
+    filters.subjectId || undefined,
+  );
 
   const SUBJECT_OPTIONS =
     subjects?.map((s: { id: string; displayName: string }) => ({
       value: s.id,
       label: s.displayName,
+    })) || [];
+
+  const CHAPTER_OPTIONS =
+    chapters?.map((c: { id: string; displayName: string }) => ({
+      value: c.id,
+      label: c.displayName,
     })) || [];
 
   useEffect(() => {
@@ -59,7 +70,13 @@ export const Filter = ({ setSelectedIds, isLoading }: FilterProps) => {
   }, [debounceValue, setFilters, setSelectedIds]);
 
   const handleSubjectChange = (value: string) => {
-    setFilters({ ...filters, subjectId: value });
+    // reset chapter when subject changes
+    setFilters({ ...filters, subjectId: value, chapterId: null });
+    setSelectedIds([]);
+  };
+
+  const handleChapterChange = (value: string) => {
+    setFilters({ ...filters, chapterId: value });
     setSelectedIds([]);
   };
 
@@ -70,6 +87,7 @@ export const Filter = ({ setSelectedIds, isLoading }: FilterProps) => {
 
   const hasActiveFilters =
     !!filters.subjectId ||
+    !!filters.chapterId ||
     !!filters.type ||
     !!filters.search ||
     filters.limit !== DEFAULT_PAGE_SIZE ||
@@ -144,6 +162,29 @@ export const Filter = ({ setSelectedIds, isLoading }: FilterProps) => {
               </SelectContent>
             </Select>
 
+            {/* Chapter Filter */}
+            <Select
+              value={filters.chapterId || ""}
+              onValueChange={(v) => handleChapterChange(v)}
+              disabled={isLoading || !filters.subjectId}
+            >
+              <SelectTrigger className="h-10 min-w-[130px] bg-background/50 backdrop-blur-sm border-border/50 rounded-xl hover:bg-muted/50 transition-all shadow-soft font-medium disabled:opacity-50">
+                <BookOpen className="h-4 w-4 mr-2 text-primary/50" />
+                <SelectValue placeholder="Chapter" />
+              </SelectTrigger>
+              <SelectContent>
+                {CHAPTER_OPTIONS.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={option.value}
+                    className="rounded-lg"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
             {/* Type Filter */}
             <Select
               value={filters.type || ""}
@@ -203,6 +244,18 @@ export const Filter = ({ setSelectedIds, isLoading }: FilterProps) => {
           >
             <Link href="/mcqs/import">
               <Upload className="h-4 w-4" />
+            </Link>
+          </Button>
+
+          <Button
+            asChild
+            variant="outline"
+            disabled={isLoading}
+            className="h-10 px-4 border-border/50 bg-background/50 backdrop-blur-sm rounded-xl hover:bg-muted transition-all shadow-soft font-bold"
+          >
+            <Link href="/mcqs/edit-list">
+              <Pencil className="h-4 w-4 mr-2" />
+              Edit MCQs
             </Link>
           </Button>
 
