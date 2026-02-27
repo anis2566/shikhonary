@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ArrowUpDown,
   BookOpen,
   Download,
   FilterIcon,
@@ -34,7 +35,9 @@ import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
   MCQ_TYPE,
+  SORT,
   mcqTypeOptions,
+  sortOptions,
 } from "@workspace/utils/constants";
 
 interface FilterProps {
@@ -85,10 +88,16 @@ export const Filter = ({ setSelectedIds, isLoading }: FilterProps) => {
     setSelectedIds([]);
   };
 
+  const handleSortChange = (value: SORT) => {
+    setFilters({ ...filters, sort: value });
+    setSelectedIds([]);
+  };
+
   const hasActiveFilters =
     !!filters.subjectId ||
     !!filters.chapterId ||
     !!filters.type ||
+    !!filters.sort ||
     !!filters.search ||
     filters.limit !== DEFAULT_PAGE_SIZE ||
     filters.page !== DEFAULT_PAGE;
@@ -105,6 +114,7 @@ export const Filter = ({ setSelectedIds, isLoading }: FilterProps) => {
       subtopicId: null,
       type: null,
       isMath: null,
+      sort: null,
       sortBy: null,
       sortOrder: null,
     });
@@ -197,6 +207,29 @@ export const Filter = ({ setSelectedIds, isLoading }: FilterProps) => {
               </SelectTrigger>
               <SelectContent>
                 {mcqTypeOptions.map((option) => (
+                  <SelectItem
+                    key={option.value}
+                    value={String(option.value)}
+                    className="rounded-lg"
+                  >
+                    {option.label}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+
+            {/* Sort Filter */}
+            <Select
+              value={filters.sort || ""}
+              onValueChange={(v) => handleSortChange(v as SORT)}
+              disabled={isLoading}
+            >
+              <SelectTrigger className="h-10 min-w-[110px] bg-background/50 backdrop-blur-sm border-border/50 rounded-xl hover:bg-muted/50 transition-all shadow-soft font-medium">
+                <ArrowUpDown className="h-4 w-4 mr-2 text-primary/70" />
+                <SelectValue placeholder="Sort" />
+              </SelectTrigger>
+              <SelectContent align="end">
+                {sortOptions.map((option) => (
                   <SelectItem
                     key={option.value}
                     value={String(option.value)}

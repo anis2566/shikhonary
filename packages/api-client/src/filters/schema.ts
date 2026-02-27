@@ -8,6 +8,7 @@ import {
   DEFAULT_PAGE,
   DEFAULT_PAGE_SIZE,
   ACADEMIC_LEVEL,
+  SORT,
   SORT_WITH_POSITION,
   TENANT_TYPE,
   MCQ_TYPE,
@@ -127,6 +128,9 @@ export const mcqFilterSchema = {
     clearOnDefault: true,
   }),
   isMath: parseAsBoolean.withOptions({ clearOnDefault: true }),
+  sort: parseAsStringEnum(Object.values(SORT)).withOptions({
+    clearOnDefault: true,
+  }),
 };
 
 /**

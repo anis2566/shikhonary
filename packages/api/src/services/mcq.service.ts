@@ -26,6 +26,7 @@ export class McqService {
     search?: string;
     sortBy?: string;
     sortOrder?: "asc" | "desc";
+    sort?: string;
     subjectId?: string;
     chapterId?: string;
     type?: string;
