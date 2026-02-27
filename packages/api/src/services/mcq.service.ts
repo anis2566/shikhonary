@@ -18,7 +18,7 @@ import {
 } from "../shared/pagination";
 
 export class McqService {
-  constructor(private db: PrismaClient) {}
+  constructor(private db: PrismaClient) { }
 
   async list(input: {
     page: number;
@@ -43,10 +43,17 @@ export class McqService {
       const orderBy = buildOrderBy(input);
       const pagination = buildPagination(input);
 
+      // Use an array orderBy so that the primary sort is followed by a
+      // deterministic tiebreaker (id). Without this, rows that share the
+      // same createdAt (e.g. bulk-imported) can shuffle after an update.
+      const stableOrderBy = Array.isArray(orderBy)
+        ? [...orderBy, { id: "asc" as const }]
+        : [orderBy, { id: "asc" as const }];
+
       const [items, total] = await Promise.all([
         this.db.mcq.findMany({
           where,
-          orderBy,
+          orderBy: stableOrderBy,
           ...pagination,
           include: { subject: true, chapter: true },
         }),
@@ -79,7 +86,16 @@ export class McqService {
   async create(input: MCQ): Promise<MCQ | undefined> {
     try {
       const data = mcqFormSchema.parse(input);
-      const item = await this.db.mcq.create({ data: data as any });
+
+      // Normalise optional FK fields: empty strings → null
+      const sanitised: Record<string, unknown> = { ...data };
+      for (const fk of ["topicId", "subTopicId"] as const) {
+        if (fk in sanitised && (sanitised[fk] === "" || sanitised[fk] === undefined)) {
+          sanitised[fk] = null;
+        }
+      }
+
+      const item = await this.db.mcq.create({ data: sanitised as any });
       return item as unknown as MCQ;
     } catch (error) {
       handlePrismaError(error);
@@ -90,9 +106,19 @@ export class McqService {
     try {
       const validatedId = uuidSchema.parse(id);
       const data = updateMCQSchema.parse(input);
+
+      // Normalise optional FK fields: empty strings → null so Prisma
+      // doesn't try to look up a record with id = "".
+      const sanitised: Record<string, unknown> = { ...data };
+      for (const fk of ["topicId", "subTopicId"] as const) {
+        if (fk in sanitised && (sanitised[fk] === "" || sanitised[fk] === undefined)) {
+          sanitised[fk] = null;
+        }
+      }
+
       const item = await this.db.mcq.update({
         where: { id: validatedId },
-        data: data as any,
+        data: sanitised as any,
       });
       return item as unknown as MCQ;
     } catch (error) {

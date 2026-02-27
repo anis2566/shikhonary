@@ -76,8 +76,8 @@ function buildEditable(raw: RawMcq): EditableMcq {
     answer: (raw.answer as string) ?? "",
     chapterId: (raw.chapterId as string) ?? "",
     subjectId: (raw.subjectId as string) ?? "",
-    topicId: (raw.topicId as string) ?? "",
-    subTopicId: (raw.subTopicId as string) ?? "",
+    topicId: (raw.topicId as string) || undefined,
+    subTopicId: (raw.subTopicId as string) || undefined,
     options: (raw.options as string[]) ?? [],
     type: (raw.type as MCQ_TYPE) ?? MCQ_TYPE.SINGLE,
     isMath: (raw.isMath as boolean) ?? false,
@@ -194,7 +194,7 @@ const EditableField: React.FC<EditableFieldProps> = ({
       className={cn(
         "rounded-lg px-2 py-1 min-h-[28px] transition-colors border border-transparent",
         !disabled &&
-          "cursor-pointer hover:bg-primary/5 hover:border-primary/20",
+        "cursor-pointer hover:bg-primary/5 hover:border-primary/20",
         isEmpty && "text-muted-foreground/50 italic",
         className,
       )}
@@ -432,7 +432,7 @@ const InlineMcqCard: React.FC<InlineMcqCardProps> = ({
             className={cn(
               "space-y-2 p-3 rounded-2xl transition-all",
               (mcq.statements ?? []).length < 3 &&
-                "bg-destructive/5 border border-destructive/20",
+              "bg-destructive/5 border border-destructive/20",
             )}
           >
             <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 flex items-center justify-between">
@@ -490,7 +490,7 @@ const InlineMcqCard: React.FC<InlineMcqCardProps> = ({
           className={cn(
             "space-y-2 p-3 rounded-2xl transition-all",
             mcq.options.length < 4 &&
-              "bg-destructive/5 border border-destructive/20",
+            "bg-destructive/5 border border-destructive/20",
           )}
         >
           <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 flex items-center justify-between">
