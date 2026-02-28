@@ -795,26 +795,50 @@ export const ImportMcqView: React.FC = () => {
       toast.error("Please select Subject and Chapter first");
       return;
     }
+    setParseError(null);
+
     try {
-      let parsed;
+      let parsed: any;
       try {
+        // 1. Try standard JSON parse
         parsed = JSON.parse(jsonInput);
       } catch (e) {
-        // If regular JSON parse fails, attempt to fix common KaTeX issues
-        // Users often paste single backslashes for math delimiters (e.g., \(, \))
-        // We escape backslashes that aren't already part of a valid JSON escape
-        // but carefully avoid \" to not break string boundaries.
-        const sanitized = jsonInput.replace(/\\(?!")/g, "\\\\");
-        parsed = JSON.parse(sanitized);
+        // 2. If it fails, attempt common sanitizations for MCQ/KaTeX content
+        try {
+          let sanitized = jsonInput;
+
+          // Fix backslashes that aren't valid JSON escapes (preserving \", \\, \n)
+          // This helps with KaTeX strings like \(, \sum, \frac etc.
+          sanitized = sanitized.replace(/\\(?![\\"/n])/g, "\\\\");
+
+          // Fix common doubled double-quotes occurring inside string values (common in CSV/Excel exports)
+          // e.g. "question": ""AIDS"..." -> "question": "\"AIDS\"..."
+          sanitized = sanitized.replace(/([^:\s,\[{])""/g, '$1\\"');
+          sanitized = sanitized.replace(/""([^,\s\]}])/g, '\\"$1');
+
+          // Try to fix "Smart Quotes" (curly quotes) if present
+          sanitized = sanitized.replace(/[\u201C\u201D\u201E\u201F]/g, '\\"');
+
+          parsed = JSON.parse(sanitized);
+        } catch (e2) {
+          // 3. Rethrow with helpful error if it still fails
+          let msg = e2 instanceof Error ? e2.message : "Invalid JSON";
+          if (msg.includes("Expected ',' or '}'")) {
+            msg += " — This often means you have unescaped double quotes (\") inside a question or option. Try using single quotes (') or escaping them as \\\"";
+          }
+          throw new Error(msg);
+        }
       }
 
       const arr = Array.isArray(parsed) ? parsed : [parsed];
       const processed = arr.map(buildEntry);
+
       setImportedMcqs(processed);
       setStep("preview");
-      const valid = processed.filter((m) => m._isValid).length;
+
+      const validCount = processed.filter((m) => m._isValid).length;
       toast.success(
-        `Parsed ${processed.length} MCQs — ${valid} valid, ${processed.length - valid} with issues`,
+        `Parsed ${processed.length} MCQs — ${validCount} valid, ${processed.length - validCount} with issues`,
       );
     } catch (err: unknown) {
       setParseError(err instanceof Error ? err.message : "Invalid JSON");
