@@ -86,6 +86,9 @@ importers:
       install:
         specifier: ^0.13.0
         version: 0.13.0
+      jsonrepair:
+        specifier: ^3.13.2
+        version: 3.13.2
       katex:
         specifier: ^0.16.32
         version: 0.16.32
@@ -4049,6 +4052,10 @@ packages:
   json5@2.2.3:
     resolution: {integrity: sha512-XmOWe7eyHYH14cLdVPoyg+GOH3rYX++KpzrylJwSW98t3Nk+U8XOl8FWKOgwtzdb8lXGf6zYwDUzeHMWfxasyg==}
     engines: {node: '>=6'}
+    hasBin: true
+
+  jsonrepair@3.13.2:
+    resolution: {integrity: sha512-Leuly0nbM4R+S5SVJk3VHfw1oxnlEK9KygdZvfUtEtTawNDyzB4qa1xWTmFt1aeoA7sXZkVTRuIixJ8bAvqVUg==}
     hasBin: true
 
   jsx-ast-utils@3.3.5:
@@ -8813,6 +8820,8 @@ snapshots:
   json-stable-stringify-without-jsonify@1.0.1: {}
 
   json5@2.2.3: {}
+
+  jsonrepair@3.13.2: {}
 
   jsx-ast-utils@3.3.5:
     dependencies:

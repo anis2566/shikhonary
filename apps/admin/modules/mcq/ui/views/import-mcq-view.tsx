@@ -1,4 +1,5 @@
 "use client";
+import { jsonrepair } from "jsonrepair";
 
 import React, { useCallback, useState } from "react";
 import {
@@ -407,7 +408,7 @@ const McqPreviewCard: React.FC<McqCardProps> = ({
             className={cn(
               "space-y-2 p-3 rounded-2xl transition-all",
               (mcq.statements ?? []).length < 3 &&
-              "bg-destructive/5 border border-destructive/20 ring-1 ring-destructive/10",
+                "bg-destructive/5 border border-destructive/20 ring-1 ring-destructive/10",
             )}
           >
             <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 flex items-center justify-between">
@@ -463,7 +464,7 @@ const McqPreviewCard: React.FC<McqCardProps> = ({
           className={cn(
             "space-y-2 p-3 rounded-2xl transition-all",
             mcq.options.length < 4 &&
-            "bg-destructive/5 border border-destructive/20 ring-1 ring-destructive/10",
+              "bg-destructive/5 border border-destructive/20 ring-1 ring-destructive/10",
           )}
         >
           <label className="text-[10px] font-black uppercase tracking-widest text-muted-foreground/60 flex items-center justify-between">
@@ -795,56 +796,133 @@ export const ImportMcqView: React.FC = () => {
       toast.error("Please select Subject and Chapter first");
       return;
     }
-    setParseError(null);
 
-    try {
-      let parsed: any;
-      try {
-        // 1. Try standard JSON parse
-        parsed = JSON.parse(jsonInput);
-      } catch (e) {
-        // 2. If it fails, attempt common sanitizations for MCQ/KaTeX content
-        try {
-          let sanitized = jsonInput;
-
-          // Fix backslashes that aren't valid JSON escapes (preserving \", \\, \n)
-          // This helps with KaTeX strings like \(, \sum, \frac etc.
-          sanitized = sanitized.replace(/\\(?![\\"/n])/g, "\\\\");
-
-          // Fix common doubled double-quotes occurring inside string values (common in CSV/Excel exports)
-          // e.g. "question": ""AIDS"..." -> "question": "\"AIDS\"..."
-          sanitized = sanitized.replace(/([^:\s,\[{])""/g, '$1\\"');
-          sanitized = sanitized.replace(/""([^,\s\]}])/g, '\\"$1');
-
-          // Try to fix "Smart Quotes" (curly quotes) if present
-          sanitized = sanitized.replace(/[\u201C\u201D\u201E\u201F]/g, '\\"');
-
-          parsed = JSON.parse(sanitized);
-        } catch (e2) {
-          // 3. Rethrow with helpful error if it still fails
-          let msg = e2 instanceof Error ? e2.message : "Invalid JSON";
-          if (msg.includes("Expected ',' or '}'")) {
-            msg += " — This often means you have unescaped double quotes (\") inside a question or option. Try using single quotes (') or escaping them as \\\"";
+    // ── Sanitizer: fixes unescaped backslashes + literal newlines inside strings ──
+    const sanitizeBackslashes = (raw: string): string => {
+      let result = "";
+      let inString = false;
+      let i = 0;
+      while (i < raw.length) {
+        const ch = raw[i];
+        if (inString) {
+          if (ch === "\\") {
+            const next = raw[i + 1];
+            if (next === '"') {
+              // \" — escaped quote that keeps us inside the string; preserve.
+              result += '\\"';
+              i += 2;
+            } else {
+              // All other backslashes (LaTeX \frac, \text, \(, \), \%, etc.)
+              // must be doubled to form valid JSON escape sequences.
+              result += "\\\\";
+              i += 1;
+            }
+          } else if (ch === '"') {
+            inString = false;
+            result += ch;
+            i += 1;
+          } else if (ch === "\n") {
+            result += "\\n";
+            i += 1;
+          } else if (ch === "\r") {
+            result += "\\r";
+            i += 1;
+          } else {
+            result += ch;
+            i += 1;
           }
-          throw new Error(msg);
+        } else {
+          if (ch === '"') inString = true;
+          result += ch;
+          i += 1;
         }
       }
+      return result;
+    };
 
+    let parsed: unknown;
+    let lastErr: Error | null = null;
+
+    // ── Attempt 1: raw parse ────────────────────────────────────────────────────
+    try {
+      parsed = JSON.parse(jsonInput);
+    } catch (e1) {
+      lastErr = e1 instanceof Error ? e1 : new Error(String(e1));
+
+      // ── Attempt 2: fix backslashes ──────────────────────────────────────────
+      try {
+        parsed = JSON.parse(sanitizeBackslashes(jsonInput));
+        lastErr = null;
+      } catch (e2) {
+        lastErr = e2 instanceof Error ? e2 : new Error(String(e2));
+
+        // ── Attempt 3: fix backslashes + strip trailing commas ────────────────
+        // (Common in AI-generated or hand-edited JSON)
+        try {
+          const fixed = sanitizeBackslashes(jsonInput).replace(
+            /,(\s*[}\]])/g,
+            "$1",
+          );
+          parsed = JSON.parse(fixed);
+          lastErr = null;
+        } catch (e3) {
+          lastErr = e3 instanceof Error ? e3 : new Error(String(e3));
+
+          // ── Attempt 4: jsonrepair — handles unclosed strings, missing commas,
+          //    smart quotes, and virtually every other JSON syntax issue ────────
+          try {
+            parsed = JSON.parse(jsonrepair(jsonInput));
+            lastErr = null;
+          } catch (e4) {
+            lastErr = e4 instanceof Error ? e4 : new Error(String(e4));
+          }
+        }
+      }
+    }
+
+    // ── All attempts failed — show rich diagnostic error ────────────────────────
+    // Use the RAW parse error (e1) position for the snippet because it maps
+    // correctly to the original jsonInput (no position shift from sanitization).
+    if (lastErr !== null) {
+      // Re-parse the original to get e1's position for the snippet
+      let snippetPos = -1;
+      try {
+        JSON.parse(jsonInput);
+      } catch (e1raw) {
+        const m = (e1raw instanceof Error ? e1raw.message : "").match(
+          /position (\d+)/,
+        );
+        if (m) snippetPos = parseInt(m[1] || "0", 10);
+      }
+
+      const msg = lastErr.message;
+      let snippet = "";
+      if (snippetPos >= 0 && snippetPos < jsonInput.length) {
+        const start = Math.max(0, snippetPos - 40);
+        const end = Math.min(jsonInput.length, snippetPos + 40);
+        const before = jsonInput.slice(start, snippetPos).replace(/\n/g, "↵");
+        const after = jsonInput.slice(snippetPos, end).replace(/\n/g, "↵");
+        snippet = `  ➤ …${before}❌${after}…`;
+      }
+
+      setParseError(snippet ? `${msg}\n${snippet}` : msg);
+      return;
+    }
+
+    // ── Parse succeeded ─────────────────────────────────────────────────────────
+    try {
       const arr = Array.isArray(parsed) ? parsed : [parsed];
-      const processed = arr.map(buildEntry);
-
+      const processed = (arr as Record<string, unknown>[]).map(buildEntry);
       setImportedMcqs(processed);
       setStep("preview");
-
-      const validCount = processed.filter((m) => m._isValid).length;
+      const valid = processed.filter((m) => m._isValid).length;
       toast.success(
-        `Parsed ${processed.length} MCQs — ${validCount} valid, ${processed.length - validCount} with issues`,
+        `Parsed ${processed.length} MCQs — ${valid} valid, ${processed.length - valid} with issues`,
       );
     } catch (err: unknown) {
-      setParseError(err instanceof Error ? err.message : "Invalid JSON");
+      setParseError(err instanceof Error ? err.message : "Unknown error");
     }
   };
-
   const updateMcq = (tempId: string, updates: Partial<ImportedMcq>) => {
     setImportedMcqs((prev) =>
       prev.map((m) => {
@@ -1093,9 +1171,9 @@ export const ImportMcqView: React.FC = () => {
             {parseError && (
               <div className="flex items-start gap-2.5 bg-destructive/10 border border-destructive/20 rounded-2xl p-4">
                 <AlertCircle className="h-4 w-4 text-destructive shrink-0 mt-0.5" />
-                <p className="text-sm text-destructive font-semibold">
+                <pre className="text-sm text-destructive font-semibold whitespace-pre-wrap break-all font-mono">
                   Parse error: {parseError}
-                </p>
+                </pre>
               </div>
             )}
 
