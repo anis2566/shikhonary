@@ -18,7 +18,7 @@ import {
 } from "../shared/pagination";
 
 export class McqService {
-  constructor(private db: PrismaClient) { }
+  constructor(private db: PrismaClient) {}
 
   async list(input: {
     page: number;
@@ -91,7 +91,10 @@ export class McqService {
       // Normalise optional FK fields: empty strings → null
       const sanitised: Record<string, unknown> = { ...data };
       for (const fk of ["topicId", "subTopicId"] as const) {
-        if (fk in sanitised && (sanitised[fk] === "" || sanitised[fk] === undefined)) {
+        if (
+          fk in sanitised &&
+          (sanitised[fk] === "" || sanitised[fk] === undefined)
+        ) {
           sanitised[fk] = null;
         }
       }
@@ -112,7 +115,10 @@ export class McqService {
       // doesn't try to look up a record with id = "".
       const sanitised: Record<string, unknown> = { ...data };
       for (const fk of ["topicId", "subTopicId"] as const) {
-        if (fk in sanitised && (sanitised[fk] === "" || sanitised[fk] === undefined)) {
+        if (
+          fk in sanitised &&
+          (sanitised[fk] === "" || sanitised[fk] === undefined)
+        ) {
           sanitised[fk] = null;
         }
       }
@@ -146,6 +152,7 @@ export class McqService {
             ...item,
             topicId: (item as any).topicId || null,
             subTopicId: (item as any).subTopicId || null,
+            source: "Guide",
           })),
         });
       });
