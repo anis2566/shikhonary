@@ -149,3 +149,37 @@ export type SystemSetting = Prisma.SystemSettingModel
  * 
  */
 export type Notification = Prisma.NotificationModel
+/**
+ * Model PdfIngestionJob
+ * Tracks a single Inngest-driven PDF extraction job for one Book.
+ */
+export type PdfIngestionJob = Prisma.PdfIngestionJobModel
+/**
+ * Model Book
+ * A textbook registered in the system (e.g. NCTB Class 9 Physics — Bangla version).
+ */
+export type Book = Prisma.BookModel
+/**
+ * Model Chapter
+ * A chapter extracted from a Book's PDF.
+ */
+export type Chapter = Prisma.ChapterModel
+/**
+ * Model ContentBlock
+ * A single logical unit of content within a chapter.
+ * type: "heading" | "paragraph" | "figure" | "formula" | "table"
+ */
+export type ContentBlock = Prisma.ContentBlockModel
+/**
+ * Model ContentBlockMedia
+ * One cropped image belonging to a ContentBlock.
+ * A single "figure" ContentBlock can have multiple rows here
+ * (e.g. a compound figure with sub-diagrams 3.1a, 3.1b, 3.1c).
+ */
+export type ContentBlockMedia = Prisma.ContentBlockMediaModel
+/**
+ * Model AudioCache
+ * Caches TTS-generated .mp3 files to avoid duplicate API calls.
+ * textHash (SHA-256 of the text) is the deduplication key.
+ */
+export type AudioCache = Prisma.AudioCacheModel

@@ -11,12 +11,15 @@
     "check-types": "tsc --noEmit"
   },
   "dependencies": {
+    "@google/generative-ai": "^0.24.1",
     "@trpc/server": "^11.0.0-rc.666",
-    "superjson": "^2.2.2",
-    "zod": "^3.24.0",
-    "@workspace/db": "workspace:*",
     "@workspace/auth": "workspace:*",
-    "@workspace/schema": "workspace:*"
+    "@workspace/db": "workspace:*",
+    "@workspace/schema": "workspace:*",
+    "pdf-to-img": "^5.0.0",
+    "sharp": "^0.34.5",
+    "superjson": "^2.2.2",
+    "zod": "^3.24.0"
   },
   "devDependencies": {
     "@workspace/eslint-config": "workspace:*",

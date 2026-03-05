@@ -405,7 +405,13 @@ export const ModelName = {
   Cq: 'Cq',
   AuditLog: 'AuditLog',
   SystemSetting: 'SystemSetting',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  PdfIngestionJob: 'PdfIngestionJob',
+  Book: 'Book',
+  Chapter: 'Chapter',
+  ContentBlock: 'ContentBlock',
+  ContentBlockMedia: 'ContentBlockMedia',
+  AudioCache: 'AudioCache'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -421,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "tenant" | "tenantMember" | "tenantInvitation" | "subscriptionPlan" | "subscription" | "subscriptionHistory" | "invoice" | "academicClass" | "academicSubject" | "academicClassSubject" | "academicChapter" | "academicTopic" | "academicSubTopic" | "mcq" | "cq" | "auditLog" | "systemSetting" | "notification"
+    modelProps: "user" | "session" | "account" | "verification" | "tenant" | "tenantMember" | "tenantInvitation" | "subscriptionPlan" | "subscription" | "subscriptionHistory" | "invoice" | "academicClass" | "academicSubject" | "academicClassSubject" | "academicChapter" | "academicTopic" | "academicSubTopic" | "mcq" | "cq" | "auditLog" | "systemSetting" | "notification" | "pdfIngestionJob" | "book" | "chapter" | "contentBlock" | "contentBlockMedia" | "audioCache"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2053,6 +2059,450 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    PdfIngestionJob: {
+      payload: Prisma.$PdfIngestionJobPayload<ExtArgs>
+      fields: Prisma.PdfIngestionJobFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PdfIngestionJobFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PdfIngestionJobFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>
+        }
+        findFirst: {
+          args: Prisma.PdfIngestionJobFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PdfIngestionJobFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>
+        }
+        findMany: {
+          args: Prisma.PdfIngestionJobFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>[]
+        }
+        create: {
+          args: Prisma.PdfIngestionJobCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>
+        }
+        createMany: {
+          args: Prisma.PdfIngestionJobCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PdfIngestionJobCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>[]
+        }
+        delete: {
+          args: Prisma.PdfIngestionJobDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>
+        }
+        update: {
+          args: Prisma.PdfIngestionJobUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>
+        }
+        deleteMany: {
+          args: Prisma.PdfIngestionJobDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PdfIngestionJobUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PdfIngestionJobUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>[]
+        }
+        upsert: {
+          args: Prisma.PdfIngestionJobUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PdfIngestionJobPayload>
+        }
+        aggregate: {
+          args: Prisma.PdfIngestionJobAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePdfIngestionJob>
+        }
+        groupBy: {
+          args: Prisma.PdfIngestionJobGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PdfIngestionJobGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PdfIngestionJobCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PdfIngestionJobCountAggregateOutputType> | number
+        }
+      }
+    }
+    Book: {
+      payload: Prisma.$BookPayload<ExtArgs>
+      fields: Prisma.BookFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BookFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BookFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>
+        }
+        findFirst: {
+          args: Prisma.BookFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BookFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>
+        }
+        findMany: {
+          args: Prisma.BookFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>[]
+        }
+        create: {
+          args: Prisma.BookCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>
+        }
+        createMany: {
+          args: Prisma.BookCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BookCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>[]
+        }
+        delete: {
+          args: Prisma.BookDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>
+        }
+        update: {
+          args: Prisma.BookUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>
+        }
+        deleteMany: {
+          args: Prisma.BookDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BookUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BookUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>[]
+        }
+        upsert: {
+          args: Prisma.BookUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BookPayload>
+        }
+        aggregate: {
+          args: Prisma.BookAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBook>
+        }
+        groupBy: {
+          args: Prisma.BookGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BookGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BookCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BookCountAggregateOutputType> | number
+        }
+      }
+    }
+    Chapter: {
+      payload: Prisma.$ChapterPayload<ExtArgs>
+      fields: Prisma.ChapterFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ChapterFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ChapterFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>
+        }
+        findFirst: {
+          args: Prisma.ChapterFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ChapterFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>
+        }
+        findMany: {
+          args: Prisma.ChapterFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>[]
+        }
+        create: {
+          args: Prisma.ChapterCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>
+        }
+        createMany: {
+          args: Prisma.ChapterCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ChapterCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>[]
+        }
+        delete: {
+          args: Prisma.ChapterDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>
+        }
+        update: {
+          args: Prisma.ChapterUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>
+        }
+        deleteMany: {
+          args: Prisma.ChapterDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ChapterUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ChapterUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>[]
+        }
+        upsert: {
+          args: Prisma.ChapterUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ChapterPayload>
+        }
+        aggregate: {
+          args: Prisma.ChapterAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateChapter>
+        }
+        groupBy: {
+          args: Prisma.ChapterGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChapterGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ChapterCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ChapterCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContentBlock: {
+      payload: Prisma.$ContentBlockPayload<ExtArgs>
+      fields: Prisma.ContentBlockFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContentBlockFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContentBlockFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>
+        }
+        findFirst: {
+          args: Prisma.ContentBlockFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContentBlockFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>
+        }
+        findMany: {
+          args: Prisma.ContentBlockFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>[]
+        }
+        create: {
+          args: Prisma.ContentBlockCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>
+        }
+        createMany: {
+          args: Prisma.ContentBlockCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContentBlockCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>[]
+        }
+        delete: {
+          args: Prisma.ContentBlockDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>
+        }
+        update: {
+          args: Prisma.ContentBlockUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContentBlockDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContentBlockUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContentBlockUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContentBlockUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockPayload>
+        }
+        aggregate: {
+          args: Prisma.ContentBlockAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContentBlock>
+        }
+        groupBy: {
+          args: Prisma.ContentBlockGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentBlockGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContentBlockCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentBlockCountAggregateOutputType> | number
+        }
+      }
+    }
+    ContentBlockMedia: {
+      payload: Prisma.$ContentBlockMediaPayload<ExtArgs>
+      fields: Prisma.ContentBlockMediaFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.ContentBlockMediaFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.ContentBlockMediaFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>
+        }
+        findFirst: {
+          args: Prisma.ContentBlockMediaFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.ContentBlockMediaFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>
+        }
+        findMany: {
+          args: Prisma.ContentBlockMediaFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>[]
+        }
+        create: {
+          args: Prisma.ContentBlockMediaCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>
+        }
+        createMany: {
+          args: Prisma.ContentBlockMediaCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.ContentBlockMediaCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>[]
+        }
+        delete: {
+          args: Prisma.ContentBlockMediaDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>
+        }
+        update: {
+          args: Prisma.ContentBlockMediaUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>
+        }
+        deleteMany: {
+          args: Prisma.ContentBlockMediaDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.ContentBlockMediaUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.ContentBlockMediaUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>[]
+        }
+        upsert: {
+          args: Prisma.ContentBlockMediaUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$ContentBlockMediaPayload>
+        }
+        aggregate: {
+          args: Prisma.ContentBlockMediaAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateContentBlockMedia>
+        }
+        groupBy: {
+          args: Prisma.ContentBlockMediaGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentBlockMediaGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.ContentBlockMediaCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.ContentBlockMediaCountAggregateOutputType> | number
+        }
+      }
+    }
+    AudioCache: {
+      payload: Prisma.$AudioCachePayload<ExtArgs>
+      fields: Prisma.AudioCacheFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AudioCacheFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AudioCacheFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>
+        }
+        findFirst: {
+          args: Prisma.AudioCacheFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AudioCacheFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>
+        }
+        findMany: {
+          args: Prisma.AudioCacheFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>[]
+        }
+        create: {
+          args: Prisma.AudioCacheCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>
+        }
+        createMany: {
+          args: Prisma.AudioCacheCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AudioCacheCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>[]
+        }
+        delete: {
+          args: Prisma.AudioCacheDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>
+        }
+        update: {
+          args: Prisma.AudioCacheUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>
+        }
+        deleteMany: {
+          args: Prisma.AudioCacheDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AudioCacheUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AudioCacheUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>[]
+        }
+        upsert: {
+          args: Prisma.AudioCacheUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AudioCachePayload>
+        }
+        aggregate: {
+          args: Prisma.AudioCacheAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAudioCache>
+        }
+        groupBy: {
+          args: Prisma.AudioCacheGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AudioCacheGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AudioCacheCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AudioCacheCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2497,6 +2947,111 @@ export const NotificationScalarFieldEnum = {
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
 
 
+export const PdfIngestionJobScalarFieldEnum = {
+  id: 'id',
+  bookId: 'bookId',
+  status: 'status',
+  fileName: 'fileName',
+  fileUrl: 'fileUrl',
+  fileSizeBytes: 'fileSizeBytes',
+  totalPages: 'totalPages',
+  processedPages: 'processedPages',
+  chaptersFound: 'chaptersFound',
+  blocksExtracted: 'blocksExtracted',
+  figuresCropped: 'figuresCropped',
+  inngestEventId: 'inngestEventId',
+  geminiModel: 'geminiModel',
+  errorMessage: 'errorMessage',
+  uploadedById: 'uploadedById',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PdfIngestionJobScalarFieldEnum = (typeof PdfIngestionJobScalarFieldEnum)[keyof typeof PdfIngestionJobScalarFieldEnum]
+
+
+export const BookScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  classLevel: 'classLevel',
+  version: 'version',
+  coverUrl: 'coverUrl',
+  description: 'description',
+  isActive: 'isActive',
+  academicClassId: 'academicClassId',
+  academicSubjectId: 'academicSubjectId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BookScalarFieldEnum = (typeof BookScalarFieldEnum)[keyof typeof BookScalarFieldEnum]
+
+
+export const ChapterScalarFieldEnum = {
+  id: 'id',
+  bookId: 'bookId',
+  chapterNo: 'chapterNo',
+  chapterName: 'chapterName',
+  pageStart: 'pageStart',
+  pageEnd: 'pageEnd',
+  position: 'position',
+  academicChapterId: 'academicChapterId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChapterScalarFieldEnum = (typeof ChapterScalarFieldEnum)[keyof typeof ChapterScalarFieldEnum]
+
+
+export const ContentBlockScalarFieldEnum = {
+  id: 'id',
+  chapterId: 'chapterId',
+  type: 'type',
+  rawText: 'rawText',
+  aiDescription: 'aiDescription',
+  orderIndex: 'orderIndex',
+  pageNumber: 'pageNumber',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContentBlockScalarFieldEnum = (typeof ContentBlockScalarFieldEnum)[keyof typeof ContentBlockScalarFieldEnum]
+
+
+export const ContentBlockMediaScalarFieldEnum = {
+  id: 'id',
+  blockId: 'blockId',
+  mediaPath: 'mediaPath',
+  mimeType: 'mimeType',
+  caption: 'caption',
+  altText: 'altText',
+  pageNumber: 'pageNumber',
+  boundingBox: 'boundingBox',
+  position: 'position',
+  widthPx: 'widthPx',
+  heightPx: 'heightPx',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContentBlockMediaScalarFieldEnum = (typeof ContentBlockMediaScalarFieldEnum)[keyof typeof ContentBlockMediaScalarFieldEnum]
+
+
+export const AudioCacheScalarFieldEnum = {
+  id: 'id',
+  blockId: 'blockId',
+  textHash: 'textHash',
+  vpsPath: 'vpsPath',
+  duration: 'duration',
+  language: 'language',
+  createdAt: 'createdAt'
+} as const
+
+export type AudioCacheScalarFieldEnum = (typeof AudioCacheScalarFieldEnum)[keyof typeof AudioCacheScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2744,6 +3299,12 @@ export type GlobalOmitConfig = {
   auditLog?: Prisma.AuditLogOmit
   systemSetting?: Prisma.SystemSettingOmit
   notification?: Prisma.NotificationOmit
+  pdfIngestionJob?: Prisma.PdfIngestionJobOmit
+  book?: Prisma.BookOmit
+  chapter?: Prisma.ChapterOmit
+  contentBlock?: Prisma.ContentBlockOmit
+  contentBlockMedia?: Prisma.ContentBlockMediaOmit
+  audioCache?: Prisma.AudioCacheOmit
 }
 
 /* Types for Logging */

@@ -11,7 +11,12 @@
         "TENANT_DATABASE_URL",
         "RESEND_API_KEY",
         "BETTER_AUTH_SECRET",
-        "BETTER_AUTH_URL"
+        "BETTER_AUTH_URL",
+        "GEMINI_API_KEY",
+        "INNGEST_EVENT_KEY",
+        "INNGEST_SIGNING_KEY",
+        "GOOGLE_TTS_API_KEY",
+        "NODE_ENV"
       ]
     },
     "lint": {
@@ -26,7 +31,12 @@
         "TENANT_DATABASE_URL",
         "RESEND_API_KEY",
         "BETTER_AUTH_SECRET",
-        "BETTER_AUTH_URL"
+        "BETTER_AUTH_URL",
+        "GEMINI_API_KEY",
+        "INNGEST_EVENT_KEY",
+        "INNGEST_SIGNING_KEY",
+        "GOOGLE_TTS_API_KEY",
+        "NODE_ENV"
       ],
       "dependsOn": ["^db:generate"],
       "cache": false,

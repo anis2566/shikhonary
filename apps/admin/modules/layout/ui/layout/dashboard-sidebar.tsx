@@ -99,6 +99,16 @@ const questionBankGroup: NavGroup = {
   items: [
     { title: "MCQs", url: "/mcqs", icon: HelpCircle },
     { title: "CQs", url: "/cqs", icon: FileText },
+    { title: "Paper Builder", url: "/question-papers", icon: Sparkles },
+  ],
+};
+
+const digitalLibraryGroup: NavGroup = {
+  title: "Digital Library",
+  icon: BookOpen,
+  items: [
+    { title: "Books", url: "/books", icon: BookOpen },
+    { title: "Upload PDF", url: "/books/new", icon: PlusCircle },
   ],
 };
 
@@ -123,6 +133,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
   const [billingOpen, setBillingOpen] = useState(true);
   const [academicOpen, setAcademicOpen] = useState(true);
   const [questionBankOpen, setQuestionBankOpen] = useState(true);
+  const [digitalLibraryOpen, setDigitalLibraryOpen] = useState(true);
 
   const handleLogout = async () => {
     router.push("/auth");
@@ -135,6 +146,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
     ...billingGroup.items.map((i) => i.url),
     ...academicGroup.items.map((i) => i.url),
     ...questionBankGroup.items.map((i) => i.url),
+    ...digitalLibraryGroup.items.map((i) => i.url),
     ...bottomItems.map((i) => i.url),
   ];
 
@@ -304,6 +316,19 @@ const SidebarContent: React.FC<SidebarContentProps> = ({
               questionBankGroup,
               questionBankOpen,
               setQuestionBankOpen,
+            )}
+          </div>
+        </div>
+
+        <div>
+          <div className="px-3 mb-2 text-[11px] font-bold uppercase tracking-wider text-muted-foreground/60">
+            {!collapsed ? "Digital Library" : "•••"}
+          </div>
+          <div className="space-y-1">
+            {renderNavGroup(
+              digitalLibraryGroup,
+              digitalLibraryOpen,
+              setDigitalLibraryOpen,
             )}
           </div>
         </div>

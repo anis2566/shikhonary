@@ -14,6 +14,9 @@ export * from "./academic-subtopic";
 export * from "./mcq";
 export * from "./cq";
 
+// Paper Builder Schemas
+export * from "./question-paper";
+
 // Entity Schemas
 export * from "./student";
 export * from "./batch";

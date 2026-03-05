@@ -596,3 +596,188 @@ model Notification {
     @@index([userId])
     @@map("notification")
 }
+
+// ---------------------------------------------------------------------------
+// PDF Ingestion & Content Pipeline
+// Book → Chapter → ContentBlock → ContentBlockMedia (images)
+//                               → AudioCache        (TTS mp3)
+// PdfIngestionJob tracks the Inngest-driven extraction workflow per Book.
+// ---------------------------------------------------------------------------
+
+/// Tracks a single Inngest-driven PDF extraction job for one Book.
+model PdfIngestionJob {
+    id     String @id @default(uuid())
+    bookId String @unique
+    book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+    /// PENDING | PROCESSING | COMPLETED | FAILED
+    status String @default("PENDING")
+
+    fileName      String
+    fileUrl       String
+    fileSizeBytes Int
+
+    totalPages      Int?
+    processedPages  Int  @default(0)
+    chaptersFound   Int  @default(0)
+    blocksExtracted Int  @default(0)
+    figuresCropped  Int  @default(0)
+
+    /// Inngest event ID — used for tracing in the Inngest dashboard
+    inngestEventId String?
+    /// Which Gemini model was used, e.g. "gemini-2.0-flash"
+    geminiModel    String?
+    errorMessage   String?
+    uploadedById   String?
+
+    startedAt   DateTime?
+    completedAt DateTime?
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+
+    @@index([status])
+    @@map("pdf_ingestion_job")
+}
+
+/// A textbook registered in the system (e.g. NCTB Class 9 Physics — Bangla version).
+model Book {
+    id          String  @id @default(uuid())
+    title       String
+    /// e.g. 9, 10, 11
+    classLevel  Int
+    /// "Bangla" | "English"
+    version     String
+    coverUrl    String?
+    description String?
+    isActive    Boolean @default(true)
+
+    /// Optional links into the existing academic hierarchy
+    academicClassId   String?
+    academicSubjectId String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    chapters     Chapter[]
+    ingestionJob PdfIngestionJob?
+
+    @@index([classLevel])
+    @@index([academicClassId])
+    @@index([academicSubjectId])
+    @@map("book")
+}
+
+/// A chapter extracted from a Book's PDF.
+model Chapter {
+    id     String @id @default(uuid())
+    bookId String
+    book   Book   @relation(fields: [bookId], references: [id], onDelete: Cascade)
+
+    chapterNo   Int
+    chapterName String
+    pageStart   Int?
+    pageEnd     Int?
+    /// Display ordering within the book
+    position    Int    @default(0)
+
+    /// Optional link to the existing AcademicChapter node (set manually by admin)
+    academicChapterId String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    blocks ContentBlock[]
+
+    @@unique([bookId, chapterNo])
+    @@index([bookId])
+    @@index([academicChapterId])
+    @@map("chapter")
+}
+
+/// A single logical unit of content within a chapter.
+/// type: "heading" | "paragraph" | "figure" | "formula" | "table"
+model ContentBlock {
+    id        String  @id @default(uuid())
+    chapterId String
+    chapter   Chapter @relation(fields: [chapterId], references: [id], onDelete: Cascade)
+
+    /// "heading" | "paragraph" | "figure" | "formula" | "table"
+    type String
+
+    /// Extracted Bangla/English text (all types except pure figure blocks)
+    rawText       String?
+    /// Gemini-generated Bangla description for figures — used by TTS voice feature
+    aiDescription String?
+
+    /// Fractional index so blocks can be re-ordered without renumbering (midpoint algorithm)
+    orderIndex Float
+    pageNumber Int
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    /// Zero-to-many cropped images (supports compound figures like Fig 3.1a, 3.1b, 3.1c)
+    media      ContentBlockMedia[]
+    audioCache AudioCache[]
+
+    @@index([chapterId])
+    @@index([chapterId, orderIndex])
+    @@index([type])
+    @@index([pageNumber])
+    @@map("content_block")
+}
+
+/// One cropped image belonging to a ContentBlock.
+/// A single "figure" ContentBlock can have multiple rows here
+/// (e.g. a compound figure with sub-diagrams 3.1a, 3.1b, 3.1c).
+model ContentBlockMedia {
+    id      String       @id @default(uuid())
+    blockId String
+    block   ContentBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+    /// Relative VPS path: /uploads/images/diagrams/{uuid}.png
+    mediaPath String
+    mimeType  String @default("image/png")
+
+    /// e.g. "চিত্র ৩.১ক — ঘর্ষণ বল"
+    caption String?
+    /// Per-image Gemini description (separate from block-level aiDescription)
+    altText String?
+
+    pageNumber  Int?
+    /// PDF coordinate bounding box used for the crop: { x, y, width, height }
+    boundingBox Json?
+    /// Ordering within the block (0 = first sub-image)
+    position    Int   @default(0)
+
+    widthPx  Int?
+    heightPx Int?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([blockId])
+    @@map("content_block_media")
+}
+
+/// Caches TTS-generated .mp3 files to avoid duplicate API calls.
+/// textHash (SHA-256 of the text) is the deduplication key.
+model AudioCache {
+    id      String       @id @default(uuid())
+    blockId String
+    block   ContentBlock @relation(fields: [blockId], references: [id], onDelete: Cascade)
+
+    /// SHA-256 of rawText or aiDescription — same text = same cached file
+    textHash String @unique
+    /// Relative VPS path: /uploads/audio/{hash}.mp3
+    vpsPath  String
+    /// Audio duration in seconds
+    duration Int?
+    language String @default("bn")
+
+    createdAt DateTime @default(now())
+
+    @@index([blockId])
+    @@index([textHash])
+    @@map("audio_cache")
+}

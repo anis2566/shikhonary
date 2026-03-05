@@ -72,7 +72,13 @@ export const ModelName = {
   Cq: 'Cq',
   AuditLog: 'AuditLog',
   SystemSetting: 'SystemSetting',
-  Notification: 'Notification'
+  Notification: 'Notification',
+  PdfIngestionJob: 'PdfIngestionJob',
+  Book: 'Book',
+  Chapter: 'Chapter',
+  ContentBlock: 'ContentBlock',
+  ContentBlockMedia: 'ContentBlockMedia',
+  AudioCache: 'AudioCache'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -494,6 +500,111 @@ export const NotificationScalarFieldEnum = {
 } as const
 
 export type NotificationScalarFieldEnum = (typeof NotificationScalarFieldEnum)[keyof typeof NotificationScalarFieldEnum]
+
+
+export const PdfIngestionJobScalarFieldEnum = {
+  id: 'id',
+  bookId: 'bookId',
+  status: 'status',
+  fileName: 'fileName',
+  fileUrl: 'fileUrl',
+  fileSizeBytes: 'fileSizeBytes',
+  totalPages: 'totalPages',
+  processedPages: 'processedPages',
+  chaptersFound: 'chaptersFound',
+  blocksExtracted: 'blocksExtracted',
+  figuresCropped: 'figuresCropped',
+  inngestEventId: 'inngestEventId',
+  geminiModel: 'geminiModel',
+  errorMessage: 'errorMessage',
+  uploadedById: 'uploadedById',
+  startedAt: 'startedAt',
+  completedAt: 'completedAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type PdfIngestionJobScalarFieldEnum = (typeof PdfIngestionJobScalarFieldEnum)[keyof typeof PdfIngestionJobScalarFieldEnum]
+
+
+export const BookScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  classLevel: 'classLevel',
+  version: 'version',
+  coverUrl: 'coverUrl',
+  description: 'description',
+  isActive: 'isActive',
+  academicClassId: 'academicClassId',
+  academicSubjectId: 'academicSubjectId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BookScalarFieldEnum = (typeof BookScalarFieldEnum)[keyof typeof BookScalarFieldEnum]
+
+
+export const ChapterScalarFieldEnum = {
+  id: 'id',
+  bookId: 'bookId',
+  chapterNo: 'chapterNo',
+  chapterName: 'chapterName',
+  pageStart: 'pageStart',
+  pageEnd: 'pageEnd',
+  position: 'position',
+  academicChapterId: 'academicChapterId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ChapterScalarFieldEnum = (typeof ChapterScalarFieldEnum)[keyof typeof ChapterScalarFieldEnum]
+
+
+export const ContentBlockScalarFieldEnum = {
+  id: 'id',
+  chapterId: 'chapterId',
+  type: 'type',
+  rawText: 'rawText',
+  aiDescription: 'aiDescription',
+  orderIndex: 'orderIndex',
+  pageNumber: 'pageNumber',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContentBlockScalarFieldEnum = (typeof ContentBlockScalarFieldEnum)[keyof typeof ContentBlockScalarFieldEnum]
+
+
+export const ContentBlockMediaScalarFieldEnum = {
+  id: 'id',
+  blockId: 'blockId',
+  mediaPath: 'mediaPath',
+  mimeType: 'mimeType',
+  caption: 'caption',
+  altText: 'altText',
+  pageNumber: 'pageNumber',
+  boundingBox: 'boundingBox',
+  position: 'position',
+  widthPx: 'widthPx',
+  heightPx: 'heightPx',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type ContentBlockMediaScalarFieldEnum = (typeof ContentBlockMediaScalarFieldEnum)[keyof typeof ContentBlockMediaScalarFieldEnum]
+
+
+export const AudioCacheScalarFieldEnum = {
+  id: 'id',
+  blockId: 'blockId',
+  textHash: 'textHash',
+  vpsPath: 'vpsPath',
+  duration: 'duration',
+  language: 'language',
+  createdAt: 'createdAt'
+} as const
+
+export type AudioCacheScalarFieldEnum = (typeof AudioCacheScalarFieldEnum)[keyof typeof AudioCacheScalarFieldEnum]
 
 
 export const SortOrder = {
