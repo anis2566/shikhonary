@@ -78,7 +78,9 @@ export const ModelName = {
   Chapter: 'Chapter',
   ContentBlock: 'ContentBlock',
   ContentBlockMedia: 'ContentBlockMedia',
-  AudioCache: 'AudioCache'
+  AudioCache: 'AudioCache',
+  QuestionPaper: 'QuestionPaper',
+  QuestionPaperQuestion: 'QuestionPaperQuestion'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -605,6 +607,38 @@ export const AudioCacheScalarFieldEnum = {
 } as const
 
 export type AudioCacheScalarFieldEnum = (typeof AudioCacheScalarFieldEnum)[keyof typeof AudioCacheScalarFieldEnum]
+
+
+export const QuestionPaperScalarFieldEnum = {
+  id: 'id',
+  title: 'title',
+  examName: 'examName',
+  description: 'description',
+  className: 'className',
+  subjectName: 'subjectName',
+  chapterName: 'chapterName',
+  settings: 'settings',
+  status: 'status',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt',
+  deletedAt: 'deletedAt'
+} as const
+
+export type QuestionPaperScalarFieldEnum = (typeof QuestionPaperScalarFieldEnum)[keyof typeof QuestionPaperScalarFieldEnum]
+
+
+export const QuestionPaperQuestionScalarFieldEnum = {
+  id: 'id',
+  questionPaperId: 'questionPaperId',
+  mcqId: 'mcqId',
+  orderIndex: 'orderIndex',
+  overrides: 'overrides',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuestionPaperQuestionScalarFieldEnum = (typeof QuestionPaperQuestionScalarFieldEnum)[keyof typeof QuestionPaperQuestionScalarFieldEnum]
 
 
 export const SortOrder = {

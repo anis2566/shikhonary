@@ -6,6 +6,7 @@ const nextConfig = {
     "@workspace/db",
     "@workspace/auth",
     "@workspace/api",
+    "@workspace/api-client",
     "@workspace/schema",
     "@workspace/utils",
   ],

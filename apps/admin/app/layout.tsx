@@ -34,16 +34,16 @@ export default function RootLayout({
       <body
         className={`${fontSans.variable} ${fontMono.variable} font-sans antialiased `}
       >
-        <TRPCReactProvider>
-          <NuqsAdapter>
+        <NuqsAdapter>
+          <TRPCReactProvider>
             <Providers>
               {children}
               <NextTopLoader showSpinner={false} />
               <Toaster position="top-right" />
               <DeleteConfirmModal />
             </Providers>
-          </NuqsAdapter>
-        </TRPCReactProvider>
+          </TRPCReactProvider>
+        </NuqsAdapter>
       </body>
     </html>
   );

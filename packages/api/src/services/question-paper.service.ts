@@ -18,7 +18,7 @@ import {
 } from "../shared/pagination";
 
 export class QuestionPaperService {
-  constructor(private db: PrismaClient) {}
+  constructor(private masterDb: PrismaClient) {}
 
   // ─────────────────────────────────────────────────────────────── LIST ────
 
@@ -35,6 +35,9 @@ export class QuestionPaperService {
     try {
       const where = buildWhere(input, ["title", "examName", "description"]);
       if (input.status) where.status = input.status;
+      // Always exclude soft-deleted papers
+      where.isActive = true;
+      where.deletedAt = null;
 
       const orderBy = buildOrderBy(input);
       const pagination = buildPagination(input);
@@ -44,7 +47,7 @@ export class QuestionPaperService {
         : [orderBy, { id: "asc" as const }];
 
       const [items, total] = await Promise.all([
-        (this.db as any).questionPaper.findMany({
+        (this.masterDb as any).questionPaper.findMany({
           where,
           orderBy: stableOrderBy,
           ...pagination,
@@ -52,7 +55,7 @@ export class QuestionPaperService {
             _count: { select: { questions: true } },
           },
         }),
-        (this.db as any).questionPaper.count({ where }),
+        (this.masterDb as any).questionPaper.count({ where }),
       ]);
 
       return createPaginatedResponse(items, total, input.page, input.limit);
@@ -66,17 +69,11 @@ export class QuestionPaperService {
   async getById(id: string): Promise<any | null | undefined> {
     try {
       const validatedId = uuidSchema.parse(id);
-      return await (this.db as any).questionPaper.findUnique({
+      return await (this.masterDb as any).questionPaper.findUnique({
         where: { id: validatedId },
         include: {
           questions: {
             orderBy: { orderIndex: "asc" as const },
-            include: {
-              // We can't do a cross-db join here – mcqId is stored.
-              // The MCQ data will be fetched separately or via a raw join.
-              // For now we return the mcqId and let the client fetch MCQs,
-              // OR we batch-fetch MCQs by id below.
-            },
           },
         },
       });
@@ -86,42 +83,28 @@ export class QuestionPaperService {
   }
 
   /**
-   * Returns the paper with MCQ data fully resolved (batch lookup).
+   * Returns the paper with MCQ data fully resolved.
    */
   async getByIdWithMcqs(id: string): Promise<any | null | undefined> {
     try {
       const validatedId = uuidSchema.parse(id);
 
-      const paper = await (this.db as any).questionPaper.findUnique({
+      return await (this.masterDb as any).questionPaper.findUnique({
         where: { id: validatedId },
         include: {
           questions: {
             orderBy: { orderIndex: "asc" as const },
+            include: {
+              mcq: {
+                include: {
+                  subject: true,
+                  chapter: true,
+                },
+              },
+            },
           },
         },
       });
-
-      if (!paper) return null;
-
-      // Batch-fetch MCQs from the tenant DB
-      const mcqIds = paper.questions.map((q: any) => q.mcqId);
-      const mcqs =
-        mcqIds.length > 0
-          ? await (this.db as any).mcq.findMany({
-              where: { id: { in: mcqIds } },
-              include: { subject: true, chapter: true },
-            })
-          : [];
-
-      const mcqMap = new Map(mcqs.map((m: any) => [m.id, m]));
-
-      return {
-        ...paper,
-        questions: paper.questions.map((q: any) => ({
-          ...q,
-          mcq: mcqMap.get(q.mcqId) ?? null,
-        })),
-      };
     } catch (error) {
       handlePrismaError(error);
     }
@@ -132,7 +115,7 @@ export class QuestionPaperService {
   async create(input: unknown): Promise<any | undefined> {
     try {
       const data = questionPaperFormSchema.parse(input);
-      return await (this.db as any).questionPaper.create({ data });
+      return await (this.masterDb as any).questionPaper.create({ data });
     } catch (error) {
       handlePrismaError(error);
     }
@@ -144,7 +127,7 @@ export class QuestionPaperService {
     try {
       const validatedId = uuidSchema.parse(id);
       const data = updateQuestionPaperSchema.parse(input);
-      return await (this.db as any).questionPaper.update({
+      return await (this.masterDb as any).questionPaper.update({
         where: { id: validatedId },
         data,
       });
@@ -161,7 +144,7 @@ export class QuestionPaperService {
   ): Promise<any | undefined> {
     try {
       const validatedId = uuidSchema.parse(questionPaperId);
-      return await (this.db as any).questionPaper.update({
+      return await (this.masterDb as any).questionPaper.update({
         where: { id: validatedId },
         data: { settings },
       });
@@ -176,7 +159,7 @@ export class QuestionPaperService {
     try {
       const validatedId = uuidSchema.parse(id);
       // Soft-delete
-      return await (this.db as any).questionPaper.update({
+      return await (this.masterDb as any).questionPaper.update({
         where: { id: validatedId },
         data: { deletedAt: new Date(), isActive: false },
       });
@@ -194,14 +177,14 @@ export class QuestionPaperService {
 
       // If no orderIndex provided, auto-assign to end
       let resolvedIndex = orderIndex;
-      if (resolvedIndex === 0) {
-        const count = await (this.db as any).questionPaperQuestion.count({
+      if (resolvedIndex === undefined || resolvedIndex === null) {
+        const count = await (this.masterDb as any).questionPaperQuestion.count({
           where: { questionPaperId },
         });
         resolvedIndex = count;
       }
 
-      return await (this.db as any).questionPaperQuestion.upsert({
+      return await (this.masterDb as any).questionPaperQuestion.upsert({
         where: { questionPaperId_mcqId: { questionPaperId, mcqId } },
         create: { questionPaperId, mcqId, orderIndex: resolvedIndex },
         update: { orderIndex: resolvedIndex },
@@ -214,7 +197,7 @@ export class QuestionPaperService {
   async removeMcq(questionPaperQuestionId: string): Promise<any | undefined> {
     try {
       const validatedId = uuidSchema.parse(questionPaperQuestionId);
-      return await (this.db as any).questionPaperQuestion.delete({
+      return await (this.masterDb as any).questionPaperQuestion.delete({
         where: { id: validatedId },
       });
     } catch (error) {
@@ -235,9 +218,9 @@ export class QuestionPaperService {
         items,
       });
 
-      await (this.db as any).$transaction(
+      await (this.masterDb as any).$transaction(
         parsed.items.map((item: { id: string; orderIndex: number }) =>
-          (this.db as any).questionPaperQuestion.update({
+          (this.masterDb as any).questionPaperQuestion.update({
             where: { id: item.id },
             data: { orderIndex: item.orderIndex },
           }),

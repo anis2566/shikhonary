@@ -39,6 +39,7 @@ export const getTenantClient = (connectionString: string) => {
   const pool = new pg.Pool({
     connectionString,
     max: 10, // Limit connections per tenant
+    ssl: { rejectUnauthorized: false },
   });
   const adapter = new PrismaPg(pool);
 

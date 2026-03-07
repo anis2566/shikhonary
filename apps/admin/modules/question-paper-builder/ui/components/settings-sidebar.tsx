@@ -494,7 +494,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   <span className="font-medium">পেজ সেটআপ</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 pb-4">
+              <AccordionContent className="space-y-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 {/* Paper Size */}
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground uppercase tracking-wider">
@@ -595,7 +595,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   <span className="font-medium">হেডার দৃশ্যমানতা</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="space-y-2 pb-4">
+              <AccordionContent className="space-y-2 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 {[
                   { key: "showClassName", label: "শ্রেণির নাম" },
                   { key: "showSubjectName", label: "বিষয়ের নাম" },
@@ -645,7 +645,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   <span className="font-medium">টাইপোগ্রাফি</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="space-y-4 pb-4">
+              <AccordionContent className="space-y-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 {/* Font Family */}
                 <div className="space-y-2">
                   <Label className="text-xs text-muted-foreground uppercase tracking-wider">
@@ -844,7 +844,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   <span className="font-medium">শাফল ও টুলস</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="space-y-2 pb-4">
+              <AccordionContent className="space-y-2 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 <ToggleItem
                   label="প্রশ্ন শাফল করুন"
                   description="প্রশ্নের ক্রম এলোমেলো করে দেবে"
@@ -886,7 +886,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   <span className="font-medium">ব্র্যান্ডিং</span>
                 </div>
               </AccordionTrigger>
-              <AccordionContent className="space-y-3 pb-4">
+              <AccordionContent className="space-y-3 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 <ToggleItem
                   label="ঠিকানা দেখান"
                   checked={settings.showAddress}

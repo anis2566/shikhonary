@@ -490,6 +490,8 @@ model Mcq {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
+    questionPapers QuestionPaperQuestion[]
+
     @@index([chapterId])
     @@index([chapterId, type])
     @@index([isMath])
@@ -780,4 +782,48 @@ model AudioCache {
     @@index([blockId])
     @@index([textHash])
     @@map("audio_cache")
+}
+
+model QuestionPaper {
+    id          String    @id @default(uuid())
+    title       String
+    examName    String?
+    description String?
+    className   String?
+    subjectName String?
+    chapterName String?
+    // Stores the full PaperSettings JSON (layout, typography, header toggles, etc.)
+    settings    Json      @default("{}")
+    status      String    @default("Draft") // Draft | Published
+    isActive    Boolean   @default(true)
+    createdAt   DateTime  @default(now())
+    updatedAt   DateTime  @updatedAt
+    deletedAt   DateTime?
+
+    questions QuestionPaperQuestion[]
+
+    @@index([status])
+    @@index([isActive])
+    @@index([createdAt])
+    @@map("question_paper")
+}
+
+model QuestionPaperQuestion {
+    id              String        @id @default(uuid())
+    questionPaperId String
+    questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+    mcqId           String
+    mcq             Mcq           @relation(fields: [mcqId], references: [id], onDelete: Cascade)
+
+    // Position of the question within the paper (0-based)
+    orderIndex Int      @default(0)
+    // Optional per-question style overrides stored as JSON
+    overrides  Json     @default("{}")
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
+
+    @@unique([questionPaperId, mcqId])
+    @@index([questionPaperId])
+    @@index([mcqId])
+    @@map("question_paper_question")
 }

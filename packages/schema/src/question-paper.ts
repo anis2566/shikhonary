@@ -14,7 +14,7 @@ export const questionPaperFormSchema = z.object({
   className: z.string().optional().or(z.literal("")),
   subjectName: z.string().optional().or(z.literal("")),
   chapterName: z.string().optional().or(z.literal("")),
-  status: z.enum(["Draft", "Published"]).default("Draft"),
+  status: z.enum(["Draft", "Published"]),
 });
 
 export type QuestionPaperFormValues = z.infer<typeof questionPaperFormSchema>;
@@ -50,7 +50,7 @@ export type QuestionPaper = z.infer<typeof questionPaperSchema>;
 export const assignMcqSchema = z.object({
   questionPaperId: uuidSchema,
   mcqId: uuidSchema,
-  orderIndex: z.number().int().min(0).default(0),
+  orderIndex: z.number().int().min(0).optional(),
 });
 
 export type AssignMcqInput = z.infer<typeof assignMcqSchema>;

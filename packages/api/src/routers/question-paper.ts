@@ -7,6 +7,10 @@ import {
 } from "../trpc/index";
 import { QuestionPaperService } from "../services/question-paper.service";
 import { baseListInputSchema, zNullishString } from "../shared/filters";
+import {
+  questionPaperFormSchema,
+  updateQuestionPaperSchema,
+} from "@workspace/schema";
 
 export const questionPaperRouter = createTRPCRouter({
   // ─── Queries ────────────────────────────────────────────────────────────
@@ -34,7 +38,7 @@ export const questionPaperRouter = createTRPCRouter({
   // ─── Mutations ──────────────────────────────────────────────────────────
 
   create: baseMutationProcedure
-    .input(z.any())
+    .input(questionPaperFormSchema)
     .mutation(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
       const data = await service.create(input);
@@ -46,7 +50,7 @@ export const questionPaperRouter = createTRPCRouter({
     }),
 
   update: baseMutationProcedure
-    .input(z.object({ id: z.string(), data: z.any() }))
+    .input(z.object({ id: z.string(), data: updateQuestionPaperSchema }))
     .mutation(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
       const data = await service.update(input.id, input.data);
@@ -101,10 +105,7 @@ export const questionPaperRouter = createTRPCRouter({
     )
     .mutation(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
-      const data = await service.assignMcq({
-        ...input,
-        orderIndex: input.orderIndex ?? 0,
-      });
+      const data = await service.assignMcq(input);
       return {
         success: true,
         message: "MCQ assigned to paper",
@@ -141,4 +142,4 @@ export const questionPaperRouter = createTRPCRouter({
         message: "Questions reordered",
       };
     }),
-} satisfies TRPCRouterRecord);
+});

@@ -15,7 +15,7 @@ export interface PaperQuestion {
   contextStyle?: ElementStyle;
   statements?: string[];
   statementStyles?: ElementStyle[];
-  type: "single" | "multiple" | "assertion" | "statement";
+  type: "single" | "multiple" | "assertion" | "statement" | "contextual";
 }
 
 export interface HeaderStyles {

@@ -98,7 +98,7 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
     <div
       ref={toolbarRef}
       className={cn(
-        "fixed z-[100] bg-popover border shadow-lg rounded-lg p-2 flex items-center gap-2 animate-in fade-in-0 zoom-in-95 duration-200",
+        "fixed z-[100] bg-popover/95 backdrop-blur-xl border shadow-xl rounded-xl p-2 flex items-center gap-2 animate-in fade-in-0 zoom-in-95 duration-200",
       )}
       style={{
         top: position.top,

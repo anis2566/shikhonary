@@ -78,6 +78,8 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
   const measureFirstQuestionsRef = useRef<HTMLDivElement>(null);
   const measureRestQuestionsRef = useRef<HTMLDivElement>(null);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
+  // Track how many questions go on page 1 so the rest-container only renders remaining
+  const [firstPageEnd, setFirstPageEnd] = useState(questions.length);
 
   // DnD sensors
   const sensors = useSensors(
@@ -218,9 +220,8 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
 
     const restPages: PaperQuestion[][] = [];
     remainingQuestions.forEach((q, idx) => {
-      // Map the remaining question to its index in the "rest" measurement container
-      const globalIdx = computedFirstEnd + idx;
-      const pageIndex = restIndices[globalIdx] ?? 0;
+      // Use local index — the rest container only renders remainingQuestions
+      const pageIndex = restIndices[idx] ?? 0;
       if (!restPages[pageIndex]) restPages[pageIndex] = [];
       restPages[pageIndex].push(q);
     });
@@ -234,6 +235,7 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
     // Defer the state update to satisfy the "synchronous cascading render" warning
     // and only update if the content has actually changed to prevent loops.
     requestAnimationFrame(() => {
+      setFirstPageEnd(computedFirstEnd);
       setPages((prev) => {
         // Simple heuristic to check if pages changed: count and first item of each page
         if (prev.length === finalPages.length) {
@@ -264,8 +266,10 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
     settings.showSubjectName,
     settings.showChapterName,
     settings.showSetCode,
+    settings.showExamName,
     computePageIndicesFromColumnOverflow,
     getPaperDimensions,
+    firstPageEnd,
   ]);
 
   // Calculate auto-scale to fit paper in container
@@ -797,7 +801,7 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
               overflow: "visible",
             }}
           >
-            {questions.map((question, idx) => (
+            {questions.slice(firstPageEnd).map((question, idx) => (
               <div
                 key={question.id}
                 data-question-index={idx}
@@ -809,12 +813,8 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
                   onUpdate={onUpdateQuestion}
                   onDelete={onDeleteQuestion}
                   onDuplicate={onDuplicateQuestion}
-                  isEditing={isEditing}
+                  isEditing={false}
                   isDraggable={false}
-                  onFocus={(e, type, index, style) =>
-                    handleQuestionFocus(e, question.id, type, index, style)
-                  }
-                  onBlur={handleBlur}
                 />
               </div>
             ))}

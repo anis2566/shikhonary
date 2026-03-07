@@ -183,3 +183,13 @@ export type ContentBlockMedia = Prisma.ContentBlockMediaModel
  * textHash (SHA-256 of the text) is the deduplication key.
  */
 export type AudioCache = Prisma.AudioCacheModel
+/**
+ * Model QuestionPaper
+ * 
+ */
+export type QuestionPaper = Prisma.QuestionPaperModel
+/**
+ * Model QuestionPaperQuestion
+ * 
+ */
+export type QuestionPaperQuestion = Prisma.QuestionPaperQuestionModel

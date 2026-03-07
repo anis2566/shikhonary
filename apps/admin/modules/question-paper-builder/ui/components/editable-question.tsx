@@ -211,6 +211,18 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
         </div>
       )}
 
+      {/* Question type badge — visible in edit mode, hidden in PDF export */}
+      {isEditing && (
+        <div className="page-indicator absolute -right-2 -top-1 z-10">
+          <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-muted/60 text-muted-foreground border border-border/30">
+            {question.type === "statement"
+              ? "Statement"
+              : question.type === "multiple"
+                ? "Multi"
+                : "MCQ"}
+          </span>
+        </div>
+      )}
       <div className="flex gap-2">
         <span
           className="font-medium shrink-0"

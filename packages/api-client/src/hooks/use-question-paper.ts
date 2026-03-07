@@ -189,13 +189,24 @@ export function useRemoveMcqFromQuestionPaper() {
     onError: (error: any) => {
       toast.error(error.message || "Failed to remove question");
     },
-    onSuccess: async (data: any, variables: any) => {
+    onSuccess: async (data: any) => {
       if (data.success) {
         toast.success(data.message);
-        // We need the paperId to invalidate — caller should pass it via context
-        // or we do a broad invalidation
+        // Targeted invalidation using the paperId from the deleted record
+        const paperId = data.data?.questionPaperId;
+        if (paperId) {
+          await queryClient.invalidateQueries({
+            queryKey: trpc.questionPaper.getById.queryKey({ id: paperId }),
+          });
+        } else {
+          // Fallback: invalidate all getById queries
+          await queryClient.invalidateQueries({
+            queryKey: trpc.questionPaper.getById.queryKey(),
+          });
+        }
+        // Also refresh the list to update question counts
         await queryClient.invalidateQueries({
-          queryKey: trpc.questionPaper.getById.queryKey(),
+          queryKey: trpc.questionPaper.list.queryKey(),
         });
       } else {
         toast.error(data.message);
