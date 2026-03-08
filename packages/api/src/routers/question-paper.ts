@@ -142,4 +142,24 @@ export const questionPaperRouter = createTRPCRouter({
         message: "Questions reordered",
       };
     }),
+
+  updateQuestionOverrides: baseMutationProcedure
+    .input(
+      z.object({
+        id: z.string(),
+        overrides: z.record(z.any()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = new QuestionPaperService(ctx.db);
+      const data = await service.updateQuestionOverrides(
+        input.id,
+        input.overrides,
+      );
+      return {
+        success: true,
+        message: "Question style updated",
+        data,
+      };
+    }),
 });

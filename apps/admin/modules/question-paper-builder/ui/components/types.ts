@@ -2,6 +2,7 @@ export interface ElementStyle {
   fontSize?: number;
   fontFamily?: string;
   textAlign?: "left" | "center" | "right";
+  fontWeight?: string | number;
 }
 
 export interface PaperQuestion {
@@ -16,6 +17,7 @@ export interface PaperQuestion {
   statements?: string[];
   statementStyles?: ElementStyle[];
   type: "single" | "multiple" | "assertion" | "statement" | "contextual";
+  optionsColumns?: 1 | 2;
 }
 
 export interface HeaderStyles {
@@ -83,6 +85,8 @@ export interface PaperSettings {
   shuffleOptions: boolean;
 
   // Branding
+  showLogo: boolean;
+  logoUrl: string;
   showAddress: boolean;
   address: string;
   showWatermark: boolean;
@@ -103,4 +107,5 @@ export interface ActiveElementContext {
   optionIndex?: number;
   statementIndex?: number;
   currentStyle: ElementStyle;
+  optionsColumns?: 1 | 2;
 }

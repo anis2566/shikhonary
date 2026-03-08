@@ -8,6 +8,8 @@ import {
   Minus,
   Plus,
   Type,
+  Columns,
+  Rows,
 } from "lucide-react";
 
 import { Button } from "@workspace/ui/components/button";
@@ -26,11 +28,13 @@ import { cn } from "@workspace/ui/lib/utils";
 import { ElementStyle } from "./types";
 
 interface FloatingToolbarProps {
-  targetRef: React.RefObject<HTMLElement | null>;
+  target: HTMLElement | null;
   isVisible: boolean;
   currentStyle: ElementStyle;
   onStyleChange: (style: ElementStyle) => void;
   showAlignment?: boolean;
+  optionsColumns?: 1 | 2;
+  onOptionsColumnsChange?: (cols: 1 | 2) => void;
   onInteractionStart?: () => void;
   onInteractionEnd?: () => void;
 }
@@ -42,16 +46,27 @@ const fontOptions = [
   { value: "Arial", label: "Arial" },
 ];
 
-export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
-  targetRef,
-  isVisible,
-  currentStyle,
-  onStyleChange,
-  showAlignment = true,
-  onInteractionStart,
-  onInteractionEnd,
-}) => {
-  const [position, setPosition] = useState({ top: 0, left: 0 });
+export const FloatingToolbar = React.forwardRef<
+  HTMLDivElement,
+  FloatingToolbarProps
+>(function FloatingToolbar(
+  {
+    target,
+    isVisible,
+    currentStyle,
+    onStyleChange,
+    showAlignment = true,
+    optionsColumns,
+    onOptionsColumnsChange,
+    onInteractionStart,
+    onInteractionEnd,
+  },
+  ref,
+) {
+  const [position, setPosition] = useState<{
+    top: number;
+    left: number;
+  } | null>(null);
   const [fontPopoverOpen, setFontPopoverOpen] = useState(false);
   const toolbarRef = useRef<HTMLDivElement>(null);
 
@@ -60,27 +75,42 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
   const textAlign = currentStyle.textAlign || "left";
 
   useEffect(() => {
-    if (isVisible && targetRef.current && toolbarRef.current) {
-      const targetRect = targetRef.current.getBoundingClientRect();
-      const toolbarRect = toolbarRef.current.getBoundingClientRect();
+    if (!isVisible || !target) {
+      setPosition(null);
+      return;
+    }
 
-      // Position above the element
-      let top = targetRect.top - toolbarRect.height - 8;
-      let left = targetRect.left + targetRect.width / 2 - toolbarRect.width / 2;
+    const calcPosition = () => {
+      const el = toolbarRef.current;
+      const targetRect = target.getBoundingClientRect();
 
-      // Keep within viewport
+      // Use measured dimensions if available, fall back to estimates
+      const toolbarWidth = el ? el.offsetWidth : 320;
+      const toolbarHeight = el ? el.offsetHeight : 44;
+
+      let top = targetRect.top - toolbarHeight - 8;
+      let left = targetRect.left + targetRect.width / 2 - toolbarWidth / 2;
+
       if (left < 10) left = 10;
-      if (left + toolbarRect.width > window.innerWidth - 10) {
-        left = window.innerWidth - toolbarRect.width - 10;
+      if (left + toolbarWidth > window.innerWidth - 10) {
+        left = window.innerWidth - toolbarWidth - 10;
       }
+      // Not enough space above → show below
       if (top < 60) {
-        // Position below if not enough space above
         top = targetRect.bottom + 8;
       }
 
       setPosition({ top, left });
-    }
-  }, [isVisible, targetRef, currentStyle]);
+    };
+
+    // First pass — positions using estimated or current toolbar dimensions
+    calcPosition();
+
+    // Second pass — after browser paints the toolbar, remeasure with actual
+    // toolbar size and correct the position if needed (fixes first-mount offset)
+    const rafId = requestAnimationFrame(calcPosition);
+    return () => cancelAnimationFrame(rafId);
+  }, [isVisible, target, currentStyle]);
 
   if (!isVisible) return null;
 
@@ -96,13 +126,21 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
 
   return (
     <div
-      ref={toolbarRef}
+      ref={(node) => {
+        (toolbarRef as React.MutableRefObject<HTMLDivElement | null>).current =
+          node;
+        if (typeof ref === "function") ref(node);
+        else if (ref)
+          (ref as React.MutableRefObject<HTMLDivElement | null>).current = node;
+      }}
       className={cn(
         "fixed z-[100] bg-popover/95 backdrop-blur-xl border shadow-xl rounded-xl p-2 flex items-center gap-2 animate-in fade-in-0 zoom-in-95 duration-200",
       )}
       style={{
-        top: position.top,
-        left: position.left,
+        top: position?.top ?? -9999,
+        left: position?.left ?? -9999,
+        // Hidden until position is calculated to avoid flash at (0,0)
+        visibility: position ? "visible" : "hidden",
       }}
       onMouseDown={(e) => {
         e.preventDefault();
@@ -115,7 +153,7 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
         }
       }}
     >
-      {/* Font Family - Using Popover instead of Select */}
+      {/* Font Family */}
       <Popover
         open={fontPopoverOpen}
         onOpenChange={(open) => {
@@ -206,6 +244,41 @@ export const FloatingToolbar: React.FC<FloatingToolbarProps> = ({
           </ToggleGroup>
         </>
       )}
+
+      {onOptionsColumnsChange && (
+        <>
+          <div className="w-px h-6 bg-border" />
+
+          {/* Option Columns Control */}
+          <ToggleGroup
+            type="single"
+            value={optionsColumns?.toString() || "0"}
+            onValueChange={(v) =>
+              v && onOptionsColumnsChange(parseInt(v) as 1 | 2)
+            }
+            className="gap-0"
+          >
+            <ToggleGroupItem
+              value="1"
+              size="sm"
+              className="h-7 w-7 p-0"
+              title="1 Column Options"
+            >
+              <Rows className="w-3 h-3" />
+            </ToggleGroupItem>
+            <ToggleGroupItem
+              value="2"
+              size="sm"
+              className="h-7 w-7 p-0"
+              title="2 Column Options"
+            >
+              <Columns className="w-3 h-3" />
+            </ToggleGroupItem>
+          </ToggleGroup>
+        </>
+      )}
     </div>
   );
-};
+});
+
+FloatingToolbar.displayName = "FloatingToolbar";

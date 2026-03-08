@@ -54,13 +54,17 @@ import {
   DialogTitle,
 } from "@workspace/ui/components/dialog";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
+import { toJpeg } from "html-to-image";
 
 import { cn } from "@workspace/ui/lib/utils";
 import { PaperPreview } from "../components/paper-preview";
 import { SettingsSidebar } from "../components/settings-sidebar";
 import { McqPicker } from "../components/mcq-picker";
-import { PaperQuestion, PaperSettings } from "../components/types";
+import {
+  PaperQuestion,
+  PaperSettings,
+  ElementStyle,
+} from "../components/types";
 import { defaultPaperSettings } from "../components/mock-data";
 import { QuestionReorderList } from "../components/question-reorder-list";
 
@@ -70,6 +74,7 @@ import {
   useUpdateQuestionPaperSettings,
   useRemoveMcqFromQuestionPaper,
   useReorderQuestionPaperQuestions,
+  useUpdateQuestionOverrides,
 } from "@workspace/api-client";
 import { type MCQ } from "@workspace/schema";
 import { MCQ_TYPE } from "@workspace/utils";
@@ -78,10 +83,18 @@ interface QuestionPaperBuilderViewProps {
   paperId: string;
 }
 
+interface QuestionOverrides {
+  questionStyle?: ElementStyle;
+  options?: { style?: ElementStyle }[];
+  statementStyles?: ElementStyle[];
+  optionsColumns?: 1 | 2;
+}
+
 interface PQ {
   id: string;
   mcqId: string;
   mcq: MCQ;
+  overrides?: QuestionOverrides;
 }
 
 /**
@@ -101,14 +114,20 @@ const mapMcqToPaperQuestion = (pq: PQ, index: number): PaperQuestion => {
 
   const optionLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"];
 
+  const overrides = pq.overrides || {};
+
   return {
     id: pq.id, // We use the Join table ID so we can identify the relation
     number: index + 1,
     question: mcq.question,
+    questionStyle: overrides.questionStyle,
     options: (mcq.options || []).map((text: string, i: number) => ({
       label: optionLabels[i] || String.fromCharCode(65 + i),
       text,
+      style: overrides.options?.[i]?.style,
     })),
+    statementStyles: overrides.statementStyles,
+    optionsColumns: overrides.optionsColumns,
     correctAnswer: mcq.answer,
     context: mcq.context,
     statements: mcq.statements,
@@ -134,6 +153,7 @@ export const QuestionPaperBuilderView: React.FC<
   const { mutate: updateSettings } = useUpdateQuestionPaperSettings();
   const { mutateAsync: removeMcq } = useRemoveMcqFromQuestionPaper();
   const { mutateAsync: reorder } = useReorderQuestionPaperQuestions();
+  const { mutate: updateOverrides } = useUpdateQuestionOverrides();
 
   // Local State
   const [isEditing, setIsEditing] = useState(true);
@@ -153,40 +173,43 @@ export const QuestionPaperBuilderView: React.FC<
   );
   const saveStatusTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Synchronize paper settings with component state
   const [settings, setSettings] = useState<PaperSettings>(defaultPaperSettings);
+  const [questions, setQuestions] = useState<PaperQuestion[]>([]);
+  const isInitialSyncRef = useRef(true);
 
   useEffect(() => {
-    if (paper?.settings && Object.keys(paper.settings).length > 0) {
-      // Merge defaults with DB settings to ensure all fields exist
-      setSettings(() => ({
+    if (!paper) return;
+
+    // We only sync from DB on initial load or if the paper object itself changes significantly
+    // (like after a publish/status change), but we avoid overwriting user's active local edits.
+    if (isInitialSyncRef.current) {
+      const dbSettings = (paper.settings as unknown as PaperSettings) || {};
+
+      setSettings({
         ...defaultPaperSettings,
-        ...paper.settings,
-        // Always sync metadata from paper record
-        institutionName: paper.settings.institutionName || "My Institution",
-        className: paper.className || paper.settings.className || "",
-        subjectName: paper.subjectName || paper.settings.subjectName || "",
-        chapterName: paper.chapterName || paper.settings.chapterName || "",
-        examName: paper.examName || paper.settings.examName || "",
-      }));
-    } else if (paper) {
-      // If no settings in DB, partially populate from paper metadata
-      setSettings((prev) => ({
-        ...prev,
-        className: paper.className || "",
-        subjectName: paper.subjectName || "",
-        chapterName: paper.chapterName || "",
-        examName: paper.examName || "",
-      }));
+        ...dbSettings,
+        // Sync with top-level fields but maintain priority for settings JSON if existed
+        className: paper.className || dbSettings.className || "",
+        subjectName: paper.subjectName || dbSettings.subjectName || "",
+        chapterName: paper.chapterName || dbSettings.chapterName || "",
+        examName: paper.examName || dbSettings.examName || "",
+        institutionName: dbSettings.institutionName || "My Institution",
+        setCode: dbSettings.setCode || "ক",
+      });
+      isInitialSyncRef.current = false;
     }
   }, [paper]);
 
-  // Transform DB questions to local runtime format
-  const questions = useMemo(() => {
-    return (paper?.questions || []).map((q: PQ, i: number) =>
-      mapMcqToPaperQuestion(q, i),
-    );
+  useEffect(() => {
+    if (paper?.questions) {
+      const mapped = paper.questions.map((q: PQ, i: number) =>
+        mapMcqToPaperQuestion(q, i),
+      );
+      setQuestions(mapped);
+    }
   }, [paper?.questions]);
 
   // Process questions based on shuffle settings
@@ -237,9 +260,6 @@ export const QuestionPaperBuilderView: React.FC<
     shuffleSeed,
   ]);
 
-  // Debounced settings save — prevents API flooding on every keystroke/slider move
-  const saveTimerRef = useRef<NodeJS.Timeout | null>(null);
-
   const handleSettingsChange = useCallback(
     (newSettings: PaperSettings) => {
       if (
@@ -248,35 +268,11 @@ export const QuestionPaperBuilderView: React.FC<
       ) {
         setShuffleSeed(Date.now());
       }
-      setSettings(newSettings);
 
-      // Debounced auto-save to DB (1 second)
-      if (saveTimerRef.current) {
-        clearTimeout(saveTimerRef.current);
-      }
-      setSaveStatus("saving");
-      saveTimerRef.current = setTimeout(() => {
-        updateSettings(
-          {
-            questionPaperId: paperId,
-            settings: newSettings as unknown as Record<string, unknown>,
-          },
-          {
-            onSuccess: () => {
-              setSaveStatus("saved");
-              if (saveStatusTimerRef.current)
-                clearTimeout(saveStatusTimerRef.current);
-              saveStatusTimerRef.current = setTimeout(
-                () => setSaveStatus("idle"),
-                2000,
-              );
-            },
-            onError: () => setSaveStatus("idle"),
-          },
-        );
-      }, 1000);
+      setSettings(newSettings);
+      setHasUnsavedChanges(true);
     },
-    [settings, paperId, updateSettings],
+    [settings],
   );
 
   // Show confirmation dialog before deleting
@@ -306,42 +302,176 @@ export const QuestionPaperBuilderView: React.FC<
 
   const handleReorderQuestions = useCallback(
     async (reorderedQuestions: PaperQuestion[]) => {
-      // Map back to DB IDs and new order
-      const items = reorderedQuestions.map((q, idx) => ({
+      setQuestions(reorderedQuestions);
+      setHasUnsavedChanges(true);
+    },
+    [],
+  );
+
+  const handleUpdateQuestion = useCallback((updated: PaperQuestion) => {
+    // Instant UI update
+    setQuestions((prev) =>
+      prev.map((q) => (q.id === updated.id ? updated : q)),
+    );
+    setHasUnsavedChanges(true);
+  }, []);
+
+  const handleGlobalSave = useCallback(async () => {
+    setSaveStatus("saving");
+    try {
+      // 1. Update the settings JSON
+      await updateSettings({
+        questionPaperId: paperId,
+        settings: settings as unknown as Record<string, unknown>,
+      });
+
+      // 2. Clear out top-level metadata
+      await updateQuestionPaper({
+        id: paperId,
+        data: {
+          className: settings.className,
+          subjectName: settings.subjectName,
+          chapterName: settings.chapterName,
+          examName: settings.examName,
+        },
+      });
+
+      // 3. Save overrides for every question that has them
+      // In a real app we'd want a bulk endpoint here.
+      const savePromises = questions.map((q) => {
+        const overrides = {
+          questionStyle: q.questionStyle,
+          options: q.options.map((opt) => ({ style: opt.style })),
+          statementStyles: q.statementStyles,
+          optionsColumns: q.optionsColumns,
+        };
+        return updateOverrides({
+          id: q.id,
+          overrides: overrides as Record<string, unknown>,
+        });
+      });
+
+      // 4. Save the order
+      const orderItems = questions.map((q, idx) => ({
         id: q.id,
         orderIndex: idx,
       }));
-      try {
-        await reorder({ questionPaperId: paperId, items });
-      } catch (e) {
-        console.error(e);
-        toast.error("Failed to save order");
-      }
-    },
-    [paperId, reorder],
-  );
+      const reorderPromise = reorder({
+        questionPaperId: paperId,
+        items: orderItems,
+      });
+
+      await Promise.all([...savePromises, reorderPromise]);
+
+      setSaveStatus("saved");
+      setHasUnsavedChanges(false);
+      toast.success("All changes saved successfully");
+
+      if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
+      saveStatusTimerRef.current = setTimeout(
+        () => setSaveStatus("idle"),
+        2000,
+      );
+    } catch (e) {
+      console.error(e);
+      setSaveStatus("idle");
+      toast.error("Failed to save changes");
+    }
+  }, [
+    paperId,
+    settings,
+    questions,
+    updateSettings,
+    updateQuestionPaper,
+    updateOverrides,
+    reorder,
+  ]);
 
   // PDF Export Logic
   const handleExportPdf = useCallback(async () => {
+    if (isExporting) return;
+
     setIsExporting(true);
+    setSaveStatus("saving");
+
+    const originalZoom = zoom;
+    const originalIsEditing = isEditing;
+    setZoom(1);
+    setIsEditing(false);
+
+    // LIVE DOCUMENT CSS OVERRIDE:
+    // html-to-image reads computed styles from the browser's CSSOM.
+    // Chrome computes oklch/oklab values and returns them as lab() from getComputedStyle,
+    // which html-to-image's SVG serializer can't handle.
+    // FIX: Override all CSS custom properties with plain hex values IN THE LIVE DOCUMENT
+    // before capture. This forces the browser to compute standard rgb() values.
+    const safeStyleEl = document.createElement("style");
+    safeStyleEl.id = "pdf-export-color-override";
+    safeStyleEl.textContent = `
+      :root, .dark, [data-theme] {
+        --background: #ffffff !important;
+        --foreground: #000000 !important;
+        --card: #ffffff !important;
+        --card-foreground: #000000 !important;
+        --popover: #ffffff !important;
+        --popover-foreground: #000000 !important;
+        --primary: #0a7ea4 !important;
+        --primary-foreground: #ffffff !important;
+        --secondary: #f1f5f9 !important;
+        --secondary-foreground: #0f172a !important;
+        --muted: #f1f5f9 !important;
+        --muted-foreground: #64748b !important;
+        --accent: #f1f5f9 !important;
+        --accent-foreground: #0f172a !important;
+        --destructive: #ef4444 !important;
+        --destructive-foreground: #ffffff !important;
+        --border: #e2e8f0 !important;
+        --input: #e2e8f0 !important;
+        --ring: #0a7ea4 !important;
+        --sidebar: #f8fafc !important;
+        --sidebar-foreground: #0f172a !important;
+        --sidebar-primary: #0a7ea4 !important;
+        --sidebar-primary-foreground: #ffffff !important;
+        --sidebar-accent: #f1f5f9 !important;
+        --sidebar-accent-foreground: #0f172a !important;
+        --sidebar-border: #e2e8f0 !important;
+        --sidebar-ring: #0a7ea4 !important;
+        --shadow-soft: none !important;
+        --shadow-medium: none !important;
+        --shadow-glow: none !important;
+        --gradient-primary: none !important;
+        --gradient-accent: none !important;
+        --gradient-background: none !important;
+        --gradient-card: none !important;
+      }
+    `;
+    document.head.appendChild(safeStyleEl);
+
     try {
+      // Allow extra time for UI re-renders
+      await new Promise((resolve) => setTimeout(resolve, 1100));
       await document.fonts.ready;
+
       const pageElements = document.querySelectorAll(
         '[id^="paper-preview-page-"]',
       );
-      if (pageElements.length === 0)
-        throw new Error("Preview element not found");
 
-      // Hide editing UI elements before capture
-      const pageIndicators = document.querySelectorAll(".page-indicator");
-      pageIndicators.forEach((el) => {
-        (el as HTMLElement).style.display = "none";
-      });
+      if (!pageElements.length) {
+        throw new Error(
+          "No pages found. Make sure the paper preview is rendered.",
+        );
+      }
 
       const pdf = new jsPDF({
         orientation: settings.paperOrientation,
         unit: "mm",
-        format: settings.paperSize.toLowerCase() as "a4" | "letter" | "legal",
+        format: settings.paperSize.toLowerCase() as
+          | "a3"
+          | "a4"
+          | "a5"
+          | "letter"
+          | "legal",
+        compress: true,
       });
 
       const pageWidth = pdf.internal.pageSize.getWidth();
@@ -349,30 +479,65 @@ export const QuestionPaperBuilderView: React.FC<
 
       for (let i = 0; i < pageElements.length; i++) {
         const element = pageElements[i] as HTMLElement;
-        const canvas = await html2canvas(element, {
-          scale: 2,
-          useCORS: true,
+        element.scrollIntoView({ block: "center" });
+        await new Promise((resolve) => setTimeout(resolve, 100));
+
+        const imgData = await toJpeg(element, {
+          quality: 1.0, // Max quality
+          pixelRatio: 4, // Ultra-high resolution
           backgroundColor: "#ffffff",
+          style: {
+            boxShadow: "none",
+            border: "none",
+          },
+          filter: (node) => {
+            if (node instanceof HTMLElement) {
+              const cls = node.className;
+              if (
+                typeof cls === "string" &&
+                (cls.includes("page-indicator") ||
+                  cls.includes("no-print") ||
+                  cls.includes("group-hover")) // Hide drag/delete handles
+              ) {
+                return false;
+              }
+            }
+            return true;
+          },
         });
-        const imgData = canvas.toDataURL("image/png");
+
         if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, "PNG", 0, 0, pageWidth, pageHeight);
+        pdf.addImage(
+          imgData,
+          "JPEG",
+          0,
+          0,
+          pageWidth,
+          pageHeight,
+          undefined,
+          "SLOW",
+        );
       }
 
-      pdf.save(`${paper?.title || "question-paper"}-${Date.now()}.pdf`);
-      toast.success("PDF exported successfully!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Failed to export PDF");
+      const safeTitle = (paper?.title || "question-paper")
+        .replace(/[^a-z0-9]/gi, "_")
+        .toLowerCase();
+      pdf.save(`${safeTitle}-${Date.now()}.pdf`);
+      toast.success("PDF saved successfully!");
+    } catch (error: unknown) {
+      console.error("PDF Export Error:", error);
+      toast.error(
+        `Export failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     } finally {
-      // Restore page indicators
-      const pageIndicators = document.querySelectorAll(".page-indicator");
-      pageIndicators.forEach((el) => {
-        (el as HTMLElement).style.display = "";
-      });
+      // Remove the CSS override and restore zoom
+      document.getElementById("pdf-export-color-override")?.remove();
+      setZoom(originalZoom);
+      setIsEditing(originalIsEditing);
       setIsExporting(false);
+      setSaveStatus("idle");
     }
-  }, [settings, paper?.title]);
+  }, [settings, paper?.title, zoom, isEditing, isExporting]);
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -571,6 +736,26 @@ export const QuestionPaperBuilderView: React.FC<
 
             <Button
               size="sm"
+              variant={hasUnsavedChanges ? "default" : "outline"}
+              onClick={handleGlobalSave}
+              disabled={saveStatus === "saving"}
+              className={cn(
+                "h-9 px-4 rounded-xl font-bold text-xs transition-all",
+                hasUnsavedChanges &&
+                  "shadow-glow bg-emerald-600 hover:bg-emerald-700 text-white border-0",
+                !hasUnsavedChanges && "border-border/50",
+              )}
+            >
+              {saveStatus === "saving" ? (
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+              ) : (
+                <Check className="w-4 h-4 mr-2" />
+              )}
+              {hasUnsavedChanges ? "Save Changes" : "Saved"}
+            </Button>
+
+            <Button
+              size="sm"
               variant="outline"
               onClick={() => {
                 setSidebarTab("picker");
@@ -661,7 +846,7 @@ export const QuestionPaperBuilderView: React.FC<
               <PaperPreview
                 questions={processedQuestions}
                 settings={settings}
-                onUpdateQuestion={() => {}} // Not implemented for DB questions yet
+                onUpdateQuestion={handleUpdateQuestion}
                 onDeleteQuestion={handleDeleteQuestion}
                 onDuplicateQuestion={() => {}}
                 onReorderQuestions={handleReorderQuestions}

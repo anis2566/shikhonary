@@ -125,20 +125,20 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
   const renderOptionLabel = (label: string) => {
     switch (settings.optionStyle) {
       case "dot":
-        return <span className="shrink-0 text-muted-foreground">{label}.</span>;
+        return <span className="shrink-0">{label}.</span>;
       case "bracket":
-        return <span className="shrink-0 text-muted-foreground">{label})</span>;
+        return <span className="shrink-0">{label})</span>;
       case "round":
         return (
           <span
-            className="shrink-0 rounded-full border border-current font-medium inline-block text-center"
+            className="shrink-0 rounded-full border border-current font-medium inline-block text-center mr-0"
             style={{
-              width: "1.125rem",
-              height: "1.125rem",
-              fontSize: "0.65rem",
-              lineHeight: "1rem",
-              verticalAlign: "text-bottom",
-              paddingTop: "1px",
+              width: "0.875rem",
+              height: "0.875rem",
+              fontSize: "0.55rem",
+              lineHeight: "0.8rem",
+              verticalAlign: "middle",
+              paddingTop: "0px",
             }}
           >
             {label}
@@ -146,9 +146,7 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
         );
       case "parentheses":
       default:
-        return (
-          <span className="shrink-0 text-muted-foreground">({label})</span>
-        );
+        return <span className="shrink-0">({label})</span>;
     }
   };
 
@@ -251,6 +249,7 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
+                lineHeight: settings.lineHeight,
                 textAlign:
                   questionStyle.textAlign as React.CSSProperties["textAlign"],
               }}
@@ -262,6 +261,7 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
+                lineHeight: settings.lineHeight,
                 textAlign:
                   questionStyle.textAlign as React.CSSProperties["textAlign"],
               }}
@@ -338,9 +338,31 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
           {/* Options Grid */}
           <div
             className={cn(
-              "mt-1 gap-x-4 gap-y-0",
-              settings.columns === 1 ? "flex flex-col" : "grid grid-cols-2",
+              "mt-0 gap-x-4 gap-y-0",
+              (() => {
+                if (localQuestion.optionsColumns === 1) return "flex flex-col";
+                if (localQuestion.optionsColumns === 2)
+                  return "grid grid-cols-2";
+
+                const maxLen = Math.max(
+                  ...localQuestion.options.map((o) => o.text.length),
+                  0,
+                );
+
+                // Baseline: 50 chars for 1-col, 24 for 2-col at standard 14px font
+                // Scale threshold based on font size (bigger font = smaller threshold)
+                const baseThreshold = settings.columns === 1 ? 50 : 24;
+                const threshold = Math.floor(
+                  baseThreshold * (14 / settings.fontSize),
+                );
+
+                if (maxLen > threshold || settings.columns >= 3) {
+                  return "flex flex-col";
+                }
+                return "grid grid-cols-2";
+              })(),
             )}
+            style={{ lineHeight: settings.lineHeight }}
           >
             {localQuestion.options.map((option, idx) => {
               const optionStyle = getOptionStyle(idx);
@@ -348,7 +370,7 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
                 <div
                   key={idx}
                   className={cn(
-                    "flex items-center gap-2",
+                    "flex items-center gap-2 mb-1",
                     settings.optionStyle === "round" && "gap-2",
                   )}
                   style={{

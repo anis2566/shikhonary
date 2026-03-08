@@ -37,6 +37,7 @@
     "better-auth": "^1.4.12",
     "date-fns": "^4.1.0",
     "framer-motion": "^12.34.0",
+    "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "inngest": "^3.52.6",
     "install": "^0.13.0",

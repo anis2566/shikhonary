@@ -5,10 +5,11 @@ const defaultHeaderStyles: HeaderStyles = {
     fontSize: 20,
     fontFamily: "SolaimanLipi",
     textAlign: "center",
+    fontWeight: "bold",
   },
   className: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "center" },
   subjectName: {
-    fontSize: 16,
+    fontSize: 14,
     fontFamily: "SolaimanLipi",
     textAlign: "center",
   },
@@ -18,10 +19,15 @@ const defaultHeaderStyles: HeaderStyles = {
     textAlign: "center",
   },
   setCode: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "center" },
-  examName: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "center" },
+  examName: {
+    fontSize: 16,
+    fontFamily: "SolaimanLipi",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
   time: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "left" },
   totalMarks: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "right" },
-  instructions: { fontSize: 12, fontFamily: "SolaimanLipi", textAlign: "left" },
+  instructions: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "left" },
 };
 
 const defaultMargins: MarginSettings = {
@@ -42,7 +48,7 @@ export const defaultPaperSettings: PaperSettings = {
   examName: "Model Test",
   showInstructions: true,
   instructions:
-    "প্রতিটি প্রশ্নের সঠিক উত্তর শুধু একটি। উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসমূহলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।",
+    "[প্রতিটি প্রশ্নের সঠিক উত্তর শুধু একটি। উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসমূহলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।]",
   showNoMarkingNote: true,
   showTime: true,
   time: "৩০ মিনিট",
@@ -66,7 +72,7 @@ export const defaultPaperSettings: PaperSettings = {
   fontFamily: "SolaimanLipi",
   fontSize: 14,
   fontWeight: "normal",
-  lineHeight: 1.1,
+  lineHeight: 1.4,
   textAlign: "left",
 
   // Tools
@@ -76,6 +82,8 @@ export const defaultPaperSettings: PaperSettings = {
   shuffleOptions: false,
 
   // Branding
+  showLogo: true,
+  logoUrl: "/placeholder-logo.png",
   showAddress: false,
   address: "",
   showWatermark: false,

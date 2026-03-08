@@ -238,3 +238,27 @@ export function useReorderQuestionPaperQuestions() {
     },
   });
 }
+
+/**
+ * Update per-question style overrides
+ */
+export function useUpdateQuestionOverrides() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.questionPaper.updateQuestionOverrides.mutationOptions(),
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update question style");
+    },
+    onSuccess: async (data: any) => {
+      if (data.success && data.data?.questionPaperId) {
+        await queryClient.invalidateQueries({
+          queryKey: trpc.questionPaper.getById.queryKey({
+            id: data.data.questionPaperId,
+          }),
+        });
+      }
+    },
+  });
+}

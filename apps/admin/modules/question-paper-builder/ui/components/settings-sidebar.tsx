@@ -61,6 +61,345 @@ interface SettingsSidebarProps {
   isExporting: boolean;
 }
 
+// Sub-components moved outside to avoid re-creation on render
+const MarginPreview = ({
+  orientation,
+  margins,
+}: {
+  orientation: string;
+  margins: { top: number; bottom: number; left: number; right: number };
+}) => {
+  const scale = 0.15;
+  const pageW = orientation === "portrait" ? 60 : 80;
+  const pageH = orientation === "portrait" ? 80 : 60;
+
+  return (
+    <div className="flex justify-center py-2">
+      <div
+        className="relative border-2 border-primary/30 bg-background rounded shadow-sm"
+        style={{ width: pageW, height: pageH }}
+      >
+        <div
+          className="absolute bg-primary/10 border border-dashed border-primary/40 rounded-sm"
+          style={{
+            top: margins.top * scale,
+            left: margins.left * scale,
+            right: margins.right * scale,
+            bottom: margins.bottom * scale,
+          }}
+        >
+          <div className="p-1 space-y-0.5">
+            <div className="h-0.5 bg-primary/20 rounded w-full" />
+            <div className="h-0.5 bg-primary/20 rounded w-3/4" />
+            <div className="h-0.5 bg-primary/20 rounded w-5/6" />
+          </div>
+        </div>
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-[8px] text-muted-foreground">
+          {margins.top}
+        </div>
+        <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] text-muted-foreground">
+          {margins.bottom}
+        </div>
+        <div className="absolute top-1/2 -left-4 -translate-y-1/2 text-[8px] text-muted-foreground">
+          {margins.left}
+        </div>
+        <div className="absolute top-1/2 -right-4 -translate-y-1/2 text-[8px] text-muted-foreground">
+          {margins.right}
+        </div>
+      </div>
+    </div>
+  );
+};
+
+const MarginInput = ({
+  label,
+  value,
+  onAdjust,
+  icon,
+}: {
+  label: string;
+  value: number;
+  onAdjust: (delta: number) => void;
+  icon?: React.ReactNode;
+}) => (
+  <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
+    <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
+      {icon}
+      {label}
+    </span>
+    <div className="flex items-center gap-1">
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6"
+        onClick={() => onAdjust(-5)}
+      >
+        <Minus className="h-3 w-3" />
+      </Button>
+      <span className="w-8 text-center text-sm font-medium">{value}</span>
+      <Button
+        variant="ghost"
+        size="icon"
+        className="h-6 w-6"
+        onClick={() => onAdjust(5)}
+      >
+        <Plus className="h-3 w-3" />
+      </Button>
+    </div>
+  </div>
+);
+
+const PaperSizeCard = ({
+  size,
+  label,
+  isSelected,
+  onClick,
+}: {
+  size: (typeof PAPER_SIZES)[number]["value"];
+  label: string;
+  isSelected: boolean;
+  onClick: () => void;
+}) => {
+  const sizeInfo = PAPER_SIZES.find((s) => s.value === size)!;
+  const aspectRatio = sizeInfo.width / sizeInfo.height;
+
+  return (
+    <button
+      onClick={onClick}
+      className={cn(
+        "group relative flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200",
+        isSelected
+          ? "border-primary bg-primary/5 shadow-sm"
+          : "border-transparent bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/20",
+      )}
+    >
+      <div
+        className={cn(
+          "rounded border-2 transition-colors flex items-center justify-center",
+          isSelected
+            ? "border-primary bg-background"
+            : "border-muted-foreground/30 bg-background/50",
+        )}
+        style={{
+          width: 28,
+          height: 28 / aspectRatio,
+        }}
+      >
+        {isSelected && <div className="w-2 h-2 rounded-full bg-primary" />}
+      </div>
+      <span
+        className={cn(
+          "text-xs font-medium transition-colors",
+          isSelected
+            ? "text-primary"
+            : "text-muted-foreground group-hover:text-foreground",
+        )}
+      >
+        {label}
+      </span>
+      <span className="text-[10px] text-muted-foreground">
+        {sizeInfo.width}×{sizeInfo.height}
+      </span>
+    </button>
+  );
+};
+
+const OrientationCard = ({
+  label,
+  isPortrait,
+  isSelected,
+  onClick,
+}: {
+  label: string;
+  isPortrait: boolean;
+  isSelected: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200",
+      isSelected
+        ? "border-primary bg-primary/5"
+        : "border-transparent bg-muted/30 hover:bg-muted/50",
+    )}
+  >
+    <div
+      className={cn(
+        "rounded border-2 transition-colors",
+        isSelected
+          ? "border-primary bg-background"
+          : "border-muted-foreground/30 bg-background/50",
+      )}
+      style={{
+        width: isPortrait ? 20 : 32,
+        height: isPortrait ? 28 : 20,
+      }}
+    />
+    <span
+      className={cn(
+        "text-xs font-medium",
+        isSelected ? "text-primary" : "text-muted-foreground",
+      )}
+    >
+      {label}
+    </span>
+  </button>
+);
+
+const ColumnCard = ({
+  cols,
+  isSelected,
+  onClick,
+}: {
+  cols: 1 | 2 | 3;
+  isSelected: boolean;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200",
+      isSelected
+        ? "border-primary bg-primary/5"
+        : "border-transparent bg-muted/30 hover:bg-muted/50",
+    )}
+  >
+    <div className="flex gap-0.5">
+      {Array.from({ length: cols }).map((_, i) => (
+        <div
+          key={i}
+          className={cn(
+            "rounded-sm border transition-colors",
+            isSelected
+              ? "border-primary bg-primary/20"
+              : "border-muted-foreground/30 bg-muted",
+          )}
+          style={{ width: 28 / cols - 2, height: 32 }}
+        />
+      ))}
+    </div>
+    <span
+      className={cn(
+        "text-xs font-medium",
+        isSelected ? "text-primary" : "text-muted-foreground",
+      )}
+    >
+      {cols} কলাম
+    </span>
+  </button>
+);
+
+const OptionStyleCard = ({
+  isSelected,
+  display,
+  onClick,
+}: {
+  isSelected: boolean;
+  display: React.ReactNode;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "flex-1 flex items-center justify-center p-3 rounded-xl border-2 transition-all duration-200 min-w-[60px]",
+      isSelected
+        ? "border-primary bg-primary/5"
+        : "border-transparent bg-muted/30 hover:bg-muted/50",
+    )}
+  >
+    <span
+      className={cn(
+        "text-sm font-medium",
+        isSelected ? "text-primary" : "text-muted-foreground",
+      )}
+    >
+      {display}
+    </span>
+  </button>
+);
+
+const FontWeightCard = ({
+  isSelected,
+  label,
+  weightClass,
+  onClick,
+}: {
+  isSelected: boolean;
+  label: string;
+  weightClass: string;
+  onClick: () => void;
+}) => (
+  <button
+    onClick={onClick}
+    className={cn(
+      "flex-1 p-2.5 rounded-lg border-2 transition-all duration-200",
+      isSelected
+        ? "border-primary bg-primary/5"
+        : "border-transparent bg-muted/30 hover:bg-muted/50",
+    )}
+  >
+    <span
+      className={cn(
+        "text-xs",
+        weightClass,
+        isSelected ? "text-primary" : "text-muted-foreground",
+      )}
+    >
+      {label}
+    </span>
+  </button>
+);
+
+const ToggleItem = ({
+  label,
+  description,
+  checked,
+  onCheckedChange,
+  icon,
+}: {
+  label: string;
+  description?: string;
+  checked: boolean;
+  onCheckedChange: (v: boolean) => void;
+  icon?: React.ReactNode;
+}) => (
+  <div
+    className={cn(
+      "p-3 rounded-xl border-2 transition-all duration-200",
+      checked
+        ? "border-primary/30 bg-primary/5"
+        : "border-transparent bg-muted/20",
+    )}
+  >
+    <div className="flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2">
+        {icon && (
+          <div
+            className={cn(
+              "p-1.5 rounded-lg",
+              checked
+                ? "bg-primary/10 text-primary"
+                : "bg-muted text-muted-foreground",
+            )}
+          >
+            {icon}
+          </div>
+        )}
+        <div>
+          <Label className="text-sm font-medium cursor-pointer">{label}</Label>
+          {description && (
+            <p className="text-xs text-muted-foreground mt-0.5">
+              {description}
+            </p>
+          )}
+        </div>
+      </div>
+      <Switch checked={checked} onCheckedChange={onCheckedChange} />
+    </div>
+  </div>
+);
+
 export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   settings,
   onSettingsChange,
@@ -100,355 +439,6 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
     const newValue = Math.max(5, Math.min(50, currentValue + delta));
     updateMargin(side, newValue);
   };
-
-  // Visual margin preview component
-  const MarginPreview = () => {
-    const scale = 0.15;
-    const pageW = settings.paperOrientation === "portrait" ? 60 : 80;
-    const pageH = settings.paperOrientation === "portrait" ? 80 : 60;
-
-    return (
-      <div className="flex justify-center py-2">
-        <div
-          className="relative border-2 border-primary/30 bg-background rounded shadow-sm"
-          style={{ width: pageW, height: pageH }}
-        >
-          {/* Content area */}
-          <div
-            className="absolute bg-primary/10 border border-dashed border-primary/40 rounded-sm"
-            style={{
-              top: margins.top * scale,
-              left: margins.left * scale,
-              right: margins.right * scale,
-              bottom: margins.bottom * scale,
-            }}
-          >
-            {/* Content lines */}
-            <div className="p-1 space-y-0.5">
-              <div className="h-0.5 bg-primary/20 rounded w-full" />
-              <div className="h-0.5 bg-primary/20 rounded w-3/4" />
-              <div className="h-0.5 bg-primary/20 rounded w-5/6" />
-            </div>
-          </div>
-          {/* Margin indicators */}
-          <div className="absolute -top-4 left-1/2 -translate-x-1/2 text-[8px] text-muted-foreground">
-            {margins.top}
-          </div>
-          <div className="absolute -bottom-4 left-1/2 -translate-x-1/2 text-[8px] text-muted-foreground">
-            {margins.bottom}
-          </div>
-          <div className="absolute top-1/2 -left-4 -translate-y-1/2 text-[8px] text-muted-foreground">
-            {margins.left}
-          </div>
-          <div className="absolute top-1/2 -right-4 -translate-y-1/2 text-[8px] text-muted-foreground">
-            {margins.right}
-          </div>
-        </div>
-      </div>
-    );
-  };
-
-  // Margin input with +/- buttons
-  const MarginInput = ({
-    label,
-    side,
-    icon,
-  }: {
-    label: string;
-    side: "top" | "bottom" | "left" | "right";
-    icon?: React.ReactNode;
-  }) => (
-    <div className="flex items-center justify-between gap-2 p-2 rounded-lg bg-muted/30 hover:bg-muted/50 transition-colors">
-      <span className="text-xs font-medium text-muted-foreground flex items-center gap-1.5">
-        {icon}
-        {label}
-      </span>
-      <div className="flex items-center gap-1">
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={() => adjustMargin(side, -5)}
-        >
-          <Minus className="h-3 w-3" />
-        </Button>
-        <span className="w-8 text-center text-sm font-medium">
-          {margins[side]}
-        </span>
-        <Button
-          variant="ghost"
-          size="icon"
-          className="h-6 w-6"
-          onClick={() => adjustMargin(side, 5)}
-        >
-          <Plus className="h-3 w-3" />
-        </Button>
-      </div>
-    </div>
-  );
-
-  // Paper size card component
-  const PaperSizeCard = ({
-    size,
-    label,
-    isSelected,
-  }: {
-    size: (typeof PAPER_SIZES)[number]["value"];
-    label: string;
-    isSelected: boolean;
-  }) => {
-    const sizeInfo = PAPER_SIZES.find((s) => s.value === size)!;
-    const aspectRatio = sizeInfo.width / sizeInfo.height;
-
-    return (
-      <button
-        onClick={() => updateSetting("paperSize", size)}
-        className={cn(
-          "group relative flex flex-col items-center gap-1.5 p-3 rounded-xl border-2 transition-all duration-200",
-          isSelected
-            ? "border-primary bg-primary/5 shadow-sm"
-            : "border-transparent bg-muted/30 hover:bg-muted/50 hover:border-muted-foreground/20",
-        )}
-      >
-        <div
-          className={cn(
-            "rounded border-2 transition-colors flex items-center justify-center",
-            isSelected
-              ? "border-primary bg-background"
-              : "border-muted-foreground/30 bg-background/50",
-          )}
-          style={{
-            width: 28,
-            height: 28 / aspectRatio,
-          }}
-        >
-          {isSelected && <div className="w-2 h-2 rounded-full bg-primary" />}
-        </div>
-        <span
-          className={cn(
-            "text-xs font-medium transition-colors",
-            isSelected
-              ? "text-primary"
-              : "text-muted-foreground group-hover:text-foreground",
-          )}
-        >
-          {label}
-        </span>
-        <span className="text-[10px] text-muted-foreground">
-          {sizeInfo.width}×{sizeInfo.height}
-        </span>
-      </button>
-    );
-  };
-
-  // Orientation card
-  const OrientationCard = ({
-    value,
-    label,
-    isPortrait,
-  }: {
-    value: "portrait" | "landscape";
-    label: string;
-    isPortrait: boolean;
-  }) => {
-    const isSelected = settings.paperOrientation === value;
-
-    return (
-      <button
-        onClick={() => updateSetting("paperOrientation", value)}
-        className={cn(
-          "flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200",
-          isSelected
-            ? "border-primary bg-primary/5"
-            : "border-transparent bg-muted/30 hover:bg-muted/50",
-        )}
-      >
-        <div
-          className={cn(
-            "rounded border-2 transition-colors",
-            isSelected
-              ? "border-primary bg-background"
-              : "border-muted-foreground/30 bg-background/50",
-          )}
-          style={{
-            width: isPortrait ? 20 : 32,
-            height: isPortrait ? 28 : 20,
-          }}
-        />
-        <span
-          className={cn(
-            "text-xs font-medium",
-            isSelected ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          {label}
-        </span>
-      </button>
-    );
-  };
-
-  // Column layout card
-  const ColumnCard = ({ cols }: { cols: 1 | 2 | 3 }) => {
-    const isSelected = settings.columns === cols;
-
-    return (
-      <button
-        onClick={() => updateSetting("columns", cols)}
-        className={cn(
-          "flex-1 flex flex-col items-center gap-2 p-3 rounded-xl border-2 transition-all duration-200",
-          isSelected
-            ? "border-primary bg-primary/5"
-            : "border-transparent bg-muted/30 hover:bg-muted/50",
-        )}
-      >
-        <div className="flex gap-0.5">
-          {Array.from({ length: cols }).map((_, i) => (
-            <div
-              key={i}
-              className={cn(
-                "rounded-sm border transition-colors",
-                isSelected
-                  ? "border-primary bg-primary/20"
-                  : "border-muted-foreground/30 bg-muted",
-              )}
-              style={{ width: 28 / cols - 2, height: 32 }}
-            />
-          ))}
-        </div>
-        <span
-          className={cn(
-            "text-xs font-medium",
-            isSelected ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          {cols} কলাম
-        </span>
-      </button>
-    );
-  };
-
-  // Option style card
-  const OptionStyleCard = ({
-    value,
-    display,
-  }: {
-    value: PaperSettings["optionStyle"];
-    display: React.ReactNode;
-  }) => {
-    const isSelected = settings.optionStyle === value;
-
-    return (
-      <button
-        onClick={() => updateSetting("optionStyle", value)}
-        className={cn(
-          "flex-1 flex items-center justify-center p-3 rounded-xl border-2 transition-all duration-200 min-w-[60px]",
-          isSelected
-            ? "border-primary bg-primary/5"
-            : "border-transparent bg-muted/30 hover:bg-muted/50",
-        )}
-      >
-        <span
-          className={cn(
-            "text-sm font-medium",
-            isSelected ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          {display}
-        </span>
-      </button>
-    );
-  };
-
-  // Font weight card
-  const FontWeightCard = ({
-    value,
-    label,
-  }: {
-    value: PaperSettings["fontWeight"];
-    label: string;
-  }) => {
-    const isSelected = settings.fontWeight === value;
-    const weightClass = {
-      normal: "font-normal",
-      medium: "font-medium",
-      semibold: "font-semibold",
-      bold: "font-bold",
-    }[value];
-
-    return (
-      <button
-        onClick={() => updateSetting("fontWeight", value)}
-        className={cn(
-          "flex-1 p-2.5 rounded-lg border-2 transition-all duration-200",
-          isSelected
-            ? "border-primary bg-primary/5"
-            : "border-transparent bg-muted/30 hover:bg-muted/50",
-        )}
-      >
-        <span
-          className={cn(
-            "text-xs",
-            weightClass,
-            isSelected ? "text-primary" : "text-muted-foreground",
-          )}
-        >
-          {label}
-        </span>
-      </button>
-    );
-  };
-
-  // Toggle item component
-  const ToggleItem = ({
-    label,
-    description,
-    checked,
-    onCheckedChange,
-    icon,
-  }: {
-    label: string;
-    description?: string;
-    checked: boolean;
-    onCheckedChange: (v: boolean) => void;
-    icon?: React.ReactNode;
-  }) => (
-    <div
-      className={cn(
-        "p-3 rounded-xl border-2 transition-all duration-200",
-        checked
-          ? "border-primary/30 bg-primary/5"
-          : "border-transparent bg-muted/20",
-      )}
-    >
-      <div className="flex items-center justify-between gap-3">
-        <div className="flex items-center gap-2">
-          {icon && (
-            <div
-              className={cn(
-                "p-1.5 rounded-lg",
-                checked
-                  ? "bg-primary/10 text-primary"
-                  : "bg-muted text-muted-foreground",
-              )}
-            >
-              {icon}
-            </div>
-          )}
-          <div>
-            <Label className="text-sm font-medium cursor-pointer">
-              {label}
-            </Label>
-            {description && (
-              <p className="text-xs text-muted-foreground mt-0.5">
-                {description}
-              </p>
-            )}
-          </div>
-        </div>
-        <Switch checked={checked} onCheckedChange={onCheckedChange} />
-      </div>
-    </div>
-  );
 
   return (
     <div className="w-80 border-l bg-muted/10 flex flex-col h-full overflow-hidden">
@@ -507,6 +497,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                         size={size.value}
                         label={size.label}
                         isSelected={settings.paperSize === size.value}
+                        onClick={() => updateSetting("paperSize", size.value)}
                       />
                     ))}
                   </div>
@@ -519,14 +510,20 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   </Label>
                   <div className="flex gap-2">
                     <OrientationCard
-                      value="portrait"
                       label="পোর্ট্রেট"
                       isPortrait
+                      isSelected={settings.paperOrientation === "portrait"}
+                      onClick={() =>
+                        updateSetting("paperOrientation", "portrait")
+                      }
                     />
                     <OrientationCard
-                      value="landscape"
                       label="ল্যান্ডস্কেপ"
                       isPortrait={false}
+                      isSelected={settings.paperOrientation === "landscape"}
+                      onClick={() =>
+                        updateSetting("paperOrientation", "landscape")
+                      }
                     />
                   </div>
                 </div>
@@ -552,12 +549,31 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                       রিসেট
                     </Button>
                   </div>
-                  <MarginPreview />
+                  <MarginPreview
+                    orientation={settings.paperOrientation}
+                    margins={margins}
+                  />
                   <div className="grid grid-cols-2 gap-2">
-                    <MarginInput label="উপর" side="top" />
-                    <MarginInput label="নীচে" side="bottom" />
-                    <MarginInput label="বাম" side="left" />
-                    <MarginInput label="ডান" side="right" />
+                    <MarginInput
+                      label="উপর"
+                      value={margins.top}
+                      onAdjust={(delta) => adjustMargin("top", delta)}
+                    />
+                    <MarginInput
+                      label="নীচে"
+                      value={margins.bottom}
+                      onAdjust={(delta) => adjustMargin("bottom", delta)}
+                    />
+                    <MarginInput
+                      label="বাম"
+                      value={margins.left}
+                      onAdjust={(delta) => adjustMargin("left", delta)}
+                    />
+                    <MarginInput
+                      label="ডান"
+                      value={margins.right}
+                      onAdjust={(delta) => adjustMargin("right", delta)}
+                    />
                   </div>
                 </div>
 
@@ -567,9 +583,21 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                     কলাম লেআউট
                   </Label>
                   <div className="flex gap-2">
-                    <ColumnCard cols={1} />
-                    <ColumnCard cols={2} />
-                    <ColumnCard cols={3} />
+                    <ColumnCard
+                      cols={1}
+                      isSelected={settings.columns === 1}
+                      onClick={() => updateSetting("columns", 1)}
+                    />
+                    <ColumnCard
+                      cols={2}
+                      isSelected={settings.columns === 2}
+                      onClick={() => updateSetting("columns", 2)}
+                    />
+                    <ColumnCard
+                      cols={3}
+                      isSelected={settings.columns === 3}
+                      onClick={() => updateSetting("columns", 3)}
+                    />
                   </div>
                   <ToggleItem
                     label="কলাম ডিভাইডার"
@@ -629,6 +657,81 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                     />
                   </div>
                 ))}
+              </AccordionContent>
+            </AccordionItem>
+
+            {/* Branding */}
+            <AccordionItem
+              value="branding"
+              className="border rounded-xl bg-background px-3"
+            >
+              <AccordionTrigger className="hover:no-underline py-3">
+                <div className="flex items-center gap-2">
+                  <div className="p-1.5 rounded-lg bg-orange-500/10">
+                    <Stamp className="w-4 h-4 text-orange-500" />
+                  </div>
+                  <span className="font-medium">ব্র্যান্ডিং</span>
+                </div>
+              </AccordionTrigger>
+              <AccordionContent className="space-y-4 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
+                <div className="space-y-3">
+                  <ToggleItem
+                    label="লোগো প্রদর্শন করুন"
+                    checked={settings.showLogo}
+                    onCheckedChange={(v) => updateSetting("showLogo", v)}
+                    icon={<Circle className="w-4 h-4" />}
+                  />
+
+                  {settings.showLogo && (
+                    <div className="space-y-2 px-1">
+                      <Label className="text-xs text-muted-foreground uppercase tracking-wider">
+                        লোগো URL (অপশনাল)
+                      </Label>
+                      <Input
+                        value={settings.logoUrl}
+                        onChange={(e) =>
+                          updateSetting("logoUrl", e.target.value)
+                        }
+                        placeholder="https://..."
+                        className="h-9 rounded-lg"
+                      />
+                    </div>
+                  )}
+                </div>
+
+                <div className="border-t border-dashed my-2" />
+
+                <div className="space-y-3">
+                  <ToggleItem
+                    label="ঠিকানা দেখান"
+                    checked={settings.showAddress}
+                    onCheckedChange={(v) => updateSetting("showAddress", v)}
+                  />
+                  {settings.showAddress && (
+                    <Input
+                      placeholder="প্রতিষ্ঠানের ঠিকানা লিখুন"
+                      value={settings.address}
+                      onChange={(e) => updateSetting("address", e.target.value)}
+                      className="bg-background"
+                    />
+                  )}
+
+                  <ToggleItem
+                    label="জলছাপ দেখান"
+                    checked={settings.showWatermark}
+                    onCheckedChange={(v) => updateSetting("showWatermark", v)}
+                  />
+                  {settings.showWatermark && (
+                    <Input
+                      placeholder="জলছাপ টেক্সট লিখুন"
+                      value={settings.watermark}
+                      onChange={(e) =>
+                        updateSetting("watermark", e.target.value)
+                      }
+                      className="bg-background"
+                    />
+                  )}
+                </div>
               </AccordionContent>
             </AccordionItem>
 
@@ -802,10 +905,30 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                     ফন্ট ওয়েট
                   </Label>
                   <div className="grid grid-cols-4 gap-1.5">
-                    <FontWeightCard value="normal" label="Regular" />
-                    <FontWeightCard value="medium" label="Medium" />
-                    <FontWeightCard value="semibold" label="Semi" />
-                    <FontWeightCard value="bold" label="Bold" />
+                    <FontWeightCard
+                      isSelected={settings.fontWeight === "normal"}
+                      label="Regular"
+                      weightClass="font-normal"
+                      onClick={() => updateSetting("fontWeight", "normal")}
+                    />
+                    <FontWeightCard
+                      isSelected={settings.fontWeight === "medium"}
+                      label="Medium"
+                      weightClass="font-medium"
+                      onClick={() => updateSetting("fontWeight", "medium")}
+                    />
+                    <FontWeightCard
+                      isSelected={settings.fontWeight === "semibold"}
+                      label="Semi"
+                      weightClass="font-semibold"
+                      onClick={() => updateSetting("fontWeight", "semibold")}
+                    />
+                    <FontWeightCard
+                      isSelected={settings.fontWeight === "bold"}
+                      label="Bold"
+                      weightClass="font-bold"
+                      onClick={() => updateSetting("fontWeight", "bold")}
+                    />
                   </div>
                 </div>
 
@@ -815,16 +938,31 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                     অপশন স্টাইল
                   </Label>
                   <div className="grid grid-cols-4 gap-1.5">
-                    <OptionStyleCard value="parentheses" display="(ক)" />
-                    <OptionStyleCard value="dot" display="ক." />
-                    <OptionStyleCard value="bracket" display="ক)" />
                     <OptionStyleCard
-                      value="round"
+                      isSelected={settings.optionStyle === "parentheses"}
+                      display="(ক)"
+                      onClick={() =>
+                        updateSetting("optionStyle", "parentheses")
+                      }
+                    />
+                    <OptionStyleCard
+                      isSelected={settings.optionStyle === "dot"}
+                      display="ক."
+                      onClick={() => updateSetting("optionStyle", "dot")}
+                    />
+                    <OptionStyleCard
+                      isSelected={settings.optionStyle === "bracket"}
+                      display="ক)"
+                      onClick={() => updateSetting("optionStyle", "bracket")}
+                    />
+                    <OptionStyleCard
+                      isSelected={settings.optionStyle === "round"}
                       display={
                         <span className="flex items-center gap-0.5">
-                          <Circle className="w-3 h-3" />ক
+                          <Circle className="w-2.5 h-2.5" />ক
                         </span>
                       }
+                      onClick={() => updateSetting("optionStyle", "round")}
                     />
                   </div>
                 </div>
@@ -870,50 +1008,6 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   checked={settings.enableShuffle}
                   onCheckedChange={(v) => updateSetting("enableShuffle", v)}
                 />
-              </AccordionContent>
-            </AccordionItem>
-
-            {/* Branding */}
-            <AccordionItem
-              value="branding"
-              className="border rounded-xl bg-background px-3"
-            >
-              <AccordionTrigger className="hover:no-underline py-3">
-                <div className="flex items-center gap-2">
-                  <div className="p-1.5 rounded-lg bg-pink-500/10">
-                    <Stamp className="w-4 h-4 text-pink-500" />
-                  </div>
-                  <span className="font-medium">ব্র্যান্ডিং</span>
-                </div>
-              </AccordionTrigger>
-              <AccordionContent className="space-y-3 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
-                <ToggleItem
-                  label="ঠিকানা দেখান"
-                  checked={settings.showAddress}
-                  onCheckedChange={(v) => updateSetting("showAddress", v)}
-                />
-                {settings.showAddress && (
-                  <Input
-                    placeholder="প্রতিষ্ঠানের ঠিকানা লিখুন"
-                    value={settings.address}
-                    onChange={(e) => updateSetting("address", e.target.value)}
-                    className="bg-background"
-                  />
-                )}
-
-                <ToggleItem
-                  label="জলছাপ দেখান"
-                  checked={settings.showWatermark}
-                  onCheckedChange={(v) => updateSetting("showWatermark", v)}
-                />
-                {settings.showWatermark && (
-                  <Input
-                    placeholder="জলছাপ টেক্সট লিখুন"
-                    value={settings.watermark}
-                    onChange={(e) => updateSetting("watermark", e.target.value)}
-                    className="bg-background"
-                  />
-                )}
               </AccordionContent>
             </AccordionItem>
           </Accordion>

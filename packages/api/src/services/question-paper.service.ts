@@ -230,4 +230,19 @@ export class QuestionPaperService {
       handlePrismaError(error);
     }
   }
+  // ───────────────────────────────────────────────────────────── OVERRIDES ─
+  async updateQuestionOverrides(
+    id: string,
+    overrides: Record<string, unknown>,
+  ): Promise<any | undefined> {
+    try {
+      const validatedId = uuidSchema.parse(id);
+      return await (this.masterDb as any).questionPaperQuestion.update({
+        where: { id: validatedId },
+        data: { overrides },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
 }
