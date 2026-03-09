@@ -441,7 +441,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   };
 
   return (
-    <div className="w-80 border-l bg-muted/10 flex flex-col h-full overflow-hidden">
+    <div className="w-full border-l bg-muted/10 flex flex-col h-full overflow-hidden">
       {/* Header with Export Button */}
       <div className="p-4 border-b bg-background space-y-3 shrink-0">
         <div className="flex items-center gap-2">

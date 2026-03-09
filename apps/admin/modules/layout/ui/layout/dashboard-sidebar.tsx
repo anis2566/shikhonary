@@ -99,6 +99,7 @@ const questionBankGroup: NavGroup = {
   items: [
     { title: "MCQs", url: "/mcqs", icon: HelpCircle },
     { title: "CQs", url: "/cqs", icon: FileText },
+    { title: "Question Types", url: "/question-types", icon: Layers },
     { title: "Paper Builder", url: "/question-papers", icon: Sparkles },
   ],
 };

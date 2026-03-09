@@ -13,6 +13,7 @@ export * from "./academic-subtopic";
 // Question Schemas
 export * from "./mcq";
 export * from "./cq";
+export * from "./question-type";
 
 // Paper Builder Schemas
 export * from "./question-paper";

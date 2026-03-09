@@ -601,7 +601,7 @@ export const QuestionPaperBuilderView: React.FC<
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col">
+    <div className="h-screen bg-muted/30 flex flex-col overflow-hidden">
       {/* Header */}
       <div className="sticky top-0 z-20 bg-background/80 backdrop-blur-xl border-b shadow-soft px-4 py-3">
         <div className="flex items-center justify-between gap-4 max-w-[1800px] mx-auto">
@@ -815,7 +815,7 @@ export const QuestionPaperBuilderView: React.FC<
             </Button>
           </div>
 
-          <div className="flex-1 bg-muted/20 overflow-auto pt-12 pb-12 pattern-grid">
+          <div className="flex-1 bg-muted/20 overflow-auto scroll-smooth pt-12 pb-12 pattern-grid">
             {/* Empty State — shown when no questions have been added */}
             {processedQuestions.length === 0 ? (
               <div className="flex items-center justify-center h-full">
@@ -861,7 +861,7 @@ export const QuestionPaperBuilderView: React.FC<
         </div>
 
         {/* Desktop Sidebar — visible only on xl+ */}
-        <div className="w-[380px] hidden xl:flex flex-col bg-background border-l shadow-2xl relative z-10">
+        <div className="w-[380px] hidden xl:flex flex-col bg-background border-l shadow-2xl relative z-10 h-full overflow-hidden">
           {sidebarTab === "settings" ? (
             <SettingsSidebar
               settings={settings}

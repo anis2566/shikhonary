@@ -339,9 +339,9 @@ model AcademicClass {
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 
-    // FIX: explicit join table replaces the old implicit m-n `subjects AcademicSubject[]`
-    classSubjects AcademicClassSubject[]
-    cqs           Cq[]
+    classSubjects  AcademicClassSubject[]
+    cqs            Cq[]
+    questionPapers QuestionPaper[]
 
     @@index([isActive])
     @@index([name])
@@ -360,11 +360,12 @@ model AcademicSubject {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    // FIX: explicit join table replaces the old implicit m-n `classes AcademicClass[]`
-    classSubjects AcademicClassSubject[]
-    chapters      AcademicChapter[]
-    mcqs          Mcq[]
-    cqs           Cq[]
+    classSubjects         AcademicClassSubject[]
+    chapters              AcademicChapter[]
+    mcqs                  Mcq[]
+    cqs                   Cq[]
+    questionPaperSubjects QuestionPaperSubject[]
+    questionTypes         QuestionType[]
 
     @@index([isActive])
     @@map("academic_subject")
@@ -404,9 +405,10 @@ model AcademicChapter {
     //      require explicit cleanup so question data is not orphaned.
     subject AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
 
-    topics AcademicTopic[]
-    mcqs   Mcq[]
-    cqs    Cq[]
+    topics        AcademicTopic[]
+    mcqs          Mcq[]
+    cqs           Cq[]
+    questionTypes QuestionType[]
 
     @@index([isActive])
     @@index([subjectId])
@@ -456,6 +458,22 @@ model AcademicSubTopic {
     @@index([isActive])
     @@index([topicId])
     @@map("academic_subtopic")
+}
+
+model QuestionType {
+    id          String @id @default(uuid())
+    name        String
+    displayName String
+
+    subjectId String
+    subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
+
+    chapterId String?
+    chapter   AcademicChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+
+    isActive  Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 }
 
 model Mcq {
@@ -784,23 +802,36 @@ model AudioCache {
     @@map("audio_cache")
 }
 
-model QuestionPaper {
-    id          String    @id @default(uuid())
-    title       String
-    examName    String?
-    description String?
-    className   String?
-    subjectName String?
-    chapterName String?
-    // Stores the full PaperSettings JSON (layout, typography, header toggles, etc.)
-    settings    Json      @default("{}")
-    status      String    @default("Draft") // Draft | Published
-    isActive    Boolean   @default(true)
-    createdAt   DateTime  @default(now())
-    updatedAt   DateTime  @updatedAt
-    deletedAt   DateTime?
+// ─────────────────────────────────────────────────────────────
+//  QuestionPaper  –  improved data model with mark breakdown
+// ─────────────────────────────────────────────────────────────
 
+model QuestionPaper {
+    id          String  @id @default(uuid())
+    title       String
+    examName    String
+    description String?
+
+    classId       String
+    academicClass AcademicClass @relation(fields: [classId], references: [id], onDelete: Cascade)
+
+    // Full paper-level settings JSON (layout, typography, header toggles, etc.)
+    settings Json    @default("{}")
+    status   String  @default("Draft") // "Draft" | "Published"
+    isActive Boolean @default(true)
+
+    // ── Aggregate totals (denormalised for fast reads) ──────────
+    //    Recomputed whenever subjects / distributions change.
+    total         Float @default(0)
+    timeInMinutes Int   @default(0)
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
+
+    // ── Relations ───────────────────────────────────────────────
     questions QuestionPaperQuestion[]
+    subjects  QuestionPaperSubject[]
 
     @@index([status])
     @@index([isActive])
@@ -808,6 +839,74 @@ model QuestionPaper {
     @@map("question_paper")
 }
 
+// ── One row per (paper × subject) ──────────────────────────────
+model QuestionPaperSubject {
+    id              String @id @default(uuid())
+    questionPaperId String
+    subjectId       String
+
+    // Denormalised subject-level total (sum of all distributions below)
+    subjectTotal Float @default(0)
+
+    questionPaper QuestionPaper   @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
+    subject       AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+
+    // The per-question-type breakdown rows live here
+    distributions QuestionPaperSubjectMarkDistribution[]
+
+    @@unique([questionPaperId, subjectId])
+    @@index([questionPaperId])
+    @@index([subjectId])
+    @@map("question_paper_subject")
+}
+
+// ── One row per question-type within a subject ─────────────────
+//
+//  type examples:
+//    "MCQ"              – multiple-choice
+//    "CQ"               – creative / comprehension question
+//    "Short"            – short-answer
+//    "Practical"        – lab / hands-on
+//    "Viva"             – oral examination
+//    "Essay"            – long-form written
+//    "Fill-in-the-Blank"
+//    "True/False"
+//
+model QuestionPaperSubjectMarkDistribution {
+    id             String               @id @default(uuid())
+    paperSubjectId String
+    paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
+
+    // ── What kind of question? ──────────────────────────────────
+    type String // free-text; validated in the application layer
+
+    // ── Marks ───────────────────────────────────────────────────
+    marksPerQuestion Float @default(0) // marks awarded per single question
+    questionCount    Int   @default(0) // total questions of this type
+
+    // Derived: totalMarks = marksPerQuestion × questionCount
+    // Stored for fast aggregation; kept in sync by the service layer.
+    totalMarks Float @default(0)
+
+    // ── Optional attempt rules ──────────────────────────────────
+    //    e.g. "answer 5 out of 8 questions"
+    questionsToAttempt Int? // null means all must be attempted
+
+    // ── Optional section label ──────────────────────────────────
+    //    Printed on the paper: "Section A", "Part I", etc.
+    sectionLabel String?
+
+    // ── Per-distribution ordering ───────────────────────────────
+    orderIndex Int @default(0)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([paperSubjectId])
+    @@map("question_paper_subject_mark_distribution")
+}
+
+// ── Junction: which MCQs belong to a paper, in what order ──────
 model QuestionPaperQuestion {
     id              String        @id @default(uuid())
     questionPaperId String
@@ -815,12 +914,11 @@ model QuestionPaperQuestion {
     mcqId           String
     mcq             Mcq           @relation(fields: [mcqId], references: [id], onDelete: Cascade)
 
-    // Position of the question within the paper (0-based)
-    orderIndex Int      @default(0)
-    // Optional per-question style overrides stored as JSON
-    overrides  Json     @default("{}")
-    createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+    orderIndex Int  @default(0)
+    overrides  Json @default("{}") // per-question style / mark overrides
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
 
     @@unique([questionPaperId, mcqId])
     @@index([questionPaperId])

@@ -20,8 +20,20 @@ export type QuestionPaperModel = runtime.Types.Result.DefaultSelection<Prisma.$Q
 
 export type AggregateQuestionPaper = {
   _count: QuestionPaperCountAggregateOutputType | null
+  _avg: QuestionPaperAvgAggregateOutputType | null
+  _sum: QuestionPaperSumAggregateOutputType | null
   _min: QuestionPaperMinAggregateOutputType | null
   _max: QuestionPaperMaxAggregateOutputType | null
+}
+
+export type QuestionPaperAvgAggregateOutputType = {
+  total: number | null
+  timeInMinutes: number | null
+}
+
+export type QuestionPaperSumAggregateOutputType = {
+  total: number | null
+  timeInMinutes: number | null
 }
 
 export type QuestionPaperMinAggregateOutputType = {
@@ -29,11 +41,11 @@ export type QuestionPaperMinAggregateOutputType = {
   title: string | null
   examName: string | null
   description: string | null
-  className: string | null
-  subjectName: string | null
-  chapterName: string | null
+  classId: string | null
   status: string | null
   isActive: boolean | null
+  total: number | null
+  timeInMinutes: number | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -44,11 +56,11 @@ export type QuestionPaperMaxAggregateOutputType = {
   title: string | null
   examName: string | null
   description: string | null
-  className: string | null
-  subjectName: string | null
-  chapterName: string | null
+  classId: string | null
   status: string | null
   isActive: boolean | null
+  total: number | null
+  timeInMinutes: number | null
   createdAt: Date | null
   updatedAt: Date | null
   deletedAt: Date | null
@@ -59,12 +71,12 @@ export type QuestionPaperCountAggregateOutputType = {
   title: number
   examName: number
   description: number
-  className: number
-  subjectName: number
-  chapterName: number
+  classId: number
   settings: number
   status: number
   isActive: number
+  total: number
+  timeInMinutes: number
   createdAt: number
   updatedAt: number
   deletedAt: number
@@ -72,16 +84,26 @@ export type QuestionPaperCountAggregateOutputType = {
 }
 
 
+export type QuestionPaperAvgAggregateInputType = {
+  total?: true
+  timeInMinutes?: true
+}
+
+export type QuestionPaperSumAggregateInputType = {
+  total?: true
+  timeInMinutes?: true
+}
+
 export type QuestionPaperMinAggregateInputType = {
   id?: true
   title?: true
   examName?: true
   description?: true
-  className?: true
-  subjectName?: true
-  chapterName?: true
+  classId?: true
   status?: true
   isActive?: true
+  total?: true
+  timeInMinutes?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -92,11 +114,11 @@ export type QuestionPaperMaxAggregateInputType = {
   title?: true
   examName?: true
   description?: true
-  className?: true
-  subjectName?: true
-  chapterName?: true
+  classId?: true
   status?: true
   isActive?: true
+  total?: true
+  timeInMinutes?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -107,12 +129,12 @@ export type QuestionPaperCountAggregateInputType = {
   title?: true
   examName?: true
   description?: true
-  className?: true
-  subjectName?: true
-  chapterName?: true
+  classId?: true
   settings?: true
   status?: true
   isActive?: true
+  total?: true
+  timeInMinutes?: true
   createdAt?: true
   updatedAt?: true
   deletedAt?: true
@@ -157,6 +179,18 @@ export type QuestionPaperAggregateArgs<ExtArgs extends runtime.Types.Extensions.
   /**
    * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
    * 
+   * Select which fields to average
+  **/
+  _avg?: QuestionPaperAvgAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
+   * Select which fields to sum
+  **/
+  _sum?: QuestionPaperSumAggregateInputType
+  /**
+   * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+   * 
    * Select which fields to find the minimum value
   **/
   _min?: QuestionPaperMinAggregateInputType
@@ -187,6 +221,8 @@ export type QuestionPaperGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   _count?: QuestionPaperCountAggregateInputType | true
+  _avg?: QuestionPaperAvgAggregateInputType
+  _sum?: QuestionPaperSumAggregateInputType
   _min?: QuestionPaperMinAggregateInputType
   _max?: QuestionPaperMaxAggregateInputType
 }
@@ -194,18 +230,20 @@ export type QuestionPaperGroupByArgs<ExtArgs extends runtime.Types.Extensions.In
 export type QuestionPaperGroupByOutputType = {
   id: string
   title: string
-  examName: string | null
+  examName: string
   description: string | null
-  className: string | null
-  subjectName: string | null
-  chapterName: string | null
+  classId: string
   settings: runtime.JsonValue
   status: string
   isActive: boolean
+  total: number
+  timeInMinutes: number
   createdAt: Date
   updatedAt: Date
   deletedAt: Date | null
   _count: QuestionPaperCountAggregateOutputType | null
+  _avg: QuestionPaperAvgAggregateOutputType | null
+  _sum: QuestionPaperSumAggregateOutputType | null
   _min: QuestionPaperMinAggregateOutputType | null
   _max: QuestionPaperMaxAggregateOutputType | null
 }
@@ -231,35 +269,39 @@ export type QuestionPaperWhereInput = {
   NOT?: Prisma.QuestionPaperWhereInput | Prisma.QuestionPaperWhereInput[]
   id?: Prisma.StringFilter<"QuestionPaper"> | string
   title?: Prisma.StringFilter<"QuestionPaper"> | string
-  examName?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
+  examName?: Prisma.StringFilter<"QuestionPaper"> | string
   description?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
-  className?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
-  subjectName?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
-  chapterName?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
+  classId?: Prisma.StringFilter<"QuestionPaper"> | string
   settings?: Prisma.JsonFilter<"QuestionPaper">
   status?: Prisma.StringFilter<"QuestionPaper"> | string
   isActive?: Prisma.BoolFilter<"QuestionPaper"> | boolean
+  total?: Prisma.FloatFilter<"QuestionPaper"> | number
+  timeInMinutes?: Prisma.IntFilter<"QuestionPaper"> | number
   createdAt?: Prisma.DateTimeFilter<"QuestionPaper"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"QuestionPaper"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"QuestionPaper"> | Date | string | null
+  academicClass?: Prisma.XOR<Prisma.AcademicClassScalarRelationFilter, Prisma.AcademicClassWhereInput>
   questions?: Prisma.QuestionPaperQuestionListRelationFilter
+  subjects?: Prisma.QuestionPaperSubjectListRelationFilter
 }
 
 export type QuestionPaperOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  examName?: Prisma.SortOrderInput | Prisma.SortOrder
+  examName?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
-  className?: Prisma.SortOrderInput | Prisma.SortOrder
-  subjectName?: Prisma.SortOrderInput | Prisma.SortOrder
-  chapterName?: Prisma.SortOrderInput | Prisma.SortOrder
+  classId?: Prisma.SortOrder
   settings?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  total?: Prisma.SortOrder
+  timeInMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
+  academicClass?: Prisma.AcademicClassOrderByWithRelationInput
   questions?: Prisma.QuestionPaperQuestionOrderByRelationAggregateInput
+  subjects?: Prisma.QuestionPaperSubjectOrderByRelationAggregateInput
 }
 
 export type QuestionPaperWhereUniqueInput = Prisma.AtLeast<{
@@ -268,37 +310,41 @@ export type QuestionPaperWhereUniqueInput = Prisma.AtLeast<{
   OR?: Prisma.QuestionPaperWhereInput[]
   NOT?: Prisma.QuestionPaperWhereInput | Prisma.QuestionPaperWhereInput[]
   title?: Prisma.StringFilter<"QuestionPaper"> | string
-  examName?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
+  examName?: Prisma.StringFilter<"QuestionPaper"> | string
   description?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
-  className?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
-  subjectName?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
-  chapterName?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
+  classId?: Prisma.StringFilter<"QuestionPaper"> | string
   settings?: Prisma.JsonFilter<"QuestionPaper">
   status?: Prisma.StringFilter<"QuestionPaper"> | string
   isActive?: Prisma.BoolFilter<"QuestionPaper"> | boolean
+  total?: Prisma.FloatFilter<"QuestionPaper"> | number
+  timeInMinutes?: Prisma.IntFilter<"QuestionPaper"> | number
   createdAt?: Prisma.DateTimeFilter<"QuestionPaper"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"QuestionPaper"> | Date | string
   deletedAt?: Prisma.DateTimeNullableFilter<"QuestionPaper"> | Date | string | null
+  academicClass?: Prisma.XOR<Prisma.AcademicClassScalarRelationFilter, Prisma.AcademicClassWhereInput>
   questions?: Prisma.QuestionPaperQuestionListRelationFilter
+  subjects?: Prisma.QuestionPaperSubjectListRelationFilter
 }, "id">
 
 export type QuestionPaperOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   title?: Prisma.SortOrder
-  examName?: Prisma.SortOrderInput | Prisma.SortOrder
+  examName?: Prisma.SortOrder
   description?: Prisma.SortOrderInput | Prisma.SortOrder
-  className?: Prisma.SortOrderInput | Prisma.SortOrder
-  subjectName?: Prisma.SortOrderInput | Prisma.SortOrder
-  chapterName?: Prisma.SortOrderInput | Prisma.SortOrder
+  classId?: Prisma.SortOrder
   settings?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  total?: Prisma.SortOrder
+  timeInMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   _count?: Prisma.QuestionPaperCountOrderByAggregateInput
+  _avg?: Prisma.QuestionPaperAvgOrderByAggregateInput
   _max?: Prisma.QuestionPaperMaxOrderByAggregateInput
   _min?: Prisma.QuestionPaperMinOrderByAggregateInput
+  _sum?: Prisma.QuestionPaperSumOrderByAggregateInput
 }
 
 export type QuestionPaperScalarWhereWithAggregatesInput = {
@@ -307,14 +353,14 @@ export type QuestionPaperScalarWhereWithAggregatesInput = {
   NOT?: Prisma.QuestionPaperScalarWhereWithAggregatesInput | Prisma.QuestionPaperScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"QuestionPaper"> | string
   title?: Prisma.StringWithAggregatesFilter<"QuestionPaper"> | string
-  examName?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaper"> | string | null
+  examName?: Prisma.StringWithAggregatesFilter<"QuestionPaper"> | string
   description?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaper"> | string | null
-  className?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaper"> | string | null
-  subjectName?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaper"> | string | null
-  chapterName?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaper"> | string | null
+  classId?: Prisma.StringWithAggregatesFilter<"QuestionPaper"> | string
   settings?: Prisma.JsonWithAggregatesFilter<"QuestionPaper">
   status?: Prisma.StringWithAggregatesFilter<"QuestionPaper"> | string
   isActive?: Prisma.BoolWithAggregatesFilter<"QuestionPaper"> | boolean
+  total?: Prisma.FloatWithAggregatesFilter<"QuestionPaper"> | number
+  timeInMinutes?: Prisma.IntWithAggregatesFilter<"QuestionPaper"> | number
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"QuestionPaper"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"QuestionPaper"> | Date | string
   deletedAt?: Prisma.DateTimeNullableWithAggregatesFilter<"QuestionPaper"> | Date | string | null
@@ -323,82 +369,86 @@ export type QuestionPaperScalarWhereWithAggregatesInput = {
 export type QuestionPaperCreateInput = {
   id?: string
   title: string
-  examName?: string | null
+  examName: string
   description?: string | null
-  className?: string | null
-  subjectName?: string | null
-  chapterName?: string | null
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   isActive?: boolean
+  total?: number
+  timeInMinutes?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  academicClass: Prisma.AcademicClassCreateNestedOneWithoutQuestionPapersInput
   questions?: Prisma.QuestionPaperQuestionCreateNestedManyWithoutQuestionPaperInput
+  subjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutQuestionPaperInput
 }
 
 export type QuestionPaperUncheckedCreateInput = {
   id?: string
   title: string
-  examName?: string | null
+  examName: string
   description?: string | null
-  className?: string | null
-  subjectName?: string | null
-  chapterName?: string | null
+  classId: string
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   isActive?: boolean
+  total?: number
+  timeInMinutes?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
   questions?: Prisma.QuestionPaperQuestionUncheckedCreateNestedManyWithoutQuestionPaperInput
+  subjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutQuestionPaperInput
 }
 
 export type QuestionPaperUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  examName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subjectName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  academicClass?: Prisma.AcademicClassUpdateOneRequiredWithoutQuestionPapersNestedInput
   questions?: Prisma.QuestionPaperQuestionUpdateManyWithoutQuestionPaperNestedInput
+  subjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutQuestionPaperNestedInput
 }
 
 export type QuestionPaperUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  examName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subjectName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classId?: Prisma.StringFieldUpdateOperationsInput | string
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   questions?: Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionPaperNestedInput
+  subjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutQuestionPaperNestedInput
 }
 
 export type QuestionPaperCreateManyInput = {
   id?: string
   title: string
-  examName?: string | null
+  examName: string
   description?: string | null
-  className?: string | null
-  subjectName?: string | null
-  chapterName?: string | null
+  classId: string
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   isActive?: boolean
+  total?: number
+  timeInMinutes?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
@@ -407,14 +457,13 @@ export type QuestionPaperCreateManyInput = {
 export type QuestionPaperUpdateManyMutationInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  examName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subjectName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -423,17 +472,27 @@ export type QuestionPaperUpdateManyMutationInput = {
 export type QuestionPaperUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  examName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subjectName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classId?: Prisma.StringFieldUpdateOperationsInput | string
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
+export type QuestionPaperListRelationFilter = {
+  every?: Prisma.QuestionPaperWhereInput
+  some?: Prisma.QuestionPaperWhereInput
+  none?: Prisma.QuestionPaperWhereInput
+}
+
+export type QuestionPaperOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type QuestionPaperCountOrderByAggregateInput = {
@@ -441,15 +500,20 @@ export type QuestionPaperCountOrderByAggregateInput = {
   title?: Prisma.SortOrder
   examName?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  className?: Prisma.SortOrder
-  subjectName?: Prisma.SortOrder
-  chapterName?: Prisma.SortOrder
+  classId?: Prisma.SortOrder
   settings?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  total?: Prisma.SortOrder
+  timeInMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
+}
+
+export type QuestionPaperAvgOrderByAggregateInput = {
+  total?: Prisma.SortOrder
+  timeInMinutes?: Prisma.SortOrder
 }
 
 export type QuestionPaperMaxOrderByAggregateInput = {
@@ -457,11 +521,11 @@ export type QuestionPaperMaxOrderByAggregateInput = {
   title?: Prisma.SortOrder
   examName?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  className?: Prisma.SortOrder
-  subjectName?: Prisma.SortOrder
-  chapterName?: Prisma.SortOrder
+  classId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  total?: Prisma.SortOrder
+  timeInMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
@@ -472,19 +536,80 @@ export type QuestionPaperMinOrderByAggregateInput = {
   title?: Prisma.SortOrder
   examName?: Prisma.SortOrder
   description?: Prisma.SortOrder
-  className?: Prisma.SortOrder
-  subjectName?: Prisma.SortOrder
-  chapterName?: Prisma.SortOrder
+  classId?: Prisma.SortOrder
   status?: Prisma.SortOrder
   isActive?: Prisma.SortOrder
+  total?: Prisma.SortOrder
+  timeInMinutes?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   deletedAt?: Prisma.SortOrder
 }
 
+export type QuestionPaperSumOrderByAggregateInput = {
+  total?: Prisma.SortOrder
+  timeInMinutes?: Prisma.SortOrder
+}
+
 export type QuestionPaperScalarRelationFilter = {
   is?: Prisma.QuestionPaperWhereInput
   isNot?: Prisma.QuestionPaperWhereInput
+}
+
+export type QuestionPaperCreateNestedManyWithoutAcademicClassInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperCreateWithoutAcademicClassInput, Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput> | Prisma.QuestionPaperCreateWithoutAcademicClassInput[] | Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput[]
+  connectOrCreate?: Prisma.QuestionPaperCreateOrConnectWithoutAcademicClassInput | Prisma.QuestionPaperCreateOrConnectWithoutAcademicClassInput[]
+  createMany?: Prisma.QuestionPaperCreateManyAcademicClassInputEnvelope
+  connect?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+}
+
+export type QuestionPaperUncheckedCreateNestedManyWithoutAcademicClassInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperCreateWithoutAcademicClassInput, Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput> | Prisma.QuestionPaperCreateWithoutAcademicClassInput[] | Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput[]
+  connectOrCreate?: Prisma.QuestionPaperCreateOrConnectWithoutAcademicClassInput | Prisma.QuestionPaperCreateOrConnectWithoutAcademicClassInput[]
+  createMany?: Prisma.QuestionPaperCreateManyAcademicClassInputEnvelope
+  connect?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+}
+
+export type QuestionPaperUpdateManyWithoutAcademicClassNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperCreateWithoutAcademicClassInput, Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput> | Prisma.QuestionPaperCreateWithoutAcademicClassInput[] | Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput[]
+  connectOrCreate?: Prisma.QuestionPaperCreateOrConnectWithoutAcademicClassInput | Prisma.QuestionPaperCreateOrConnectWithoutAcademicClassInput[]
+  upsert?: Prisma.QuestionPaperUpsertWithWhereUniqueWithoutAcademicClassInput | Prisma.QuestionPaperUpsertWithWhereUniqueWithoutAcademicClassInput[]
+  createMany?: Prisma.QuestionPaperCreateManyAcademicClassInputEnvelope
+  set?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+  disconnect?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+  delete?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+  connect?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+  update?: Prisma.QuestionPaperUpdateWithWhereUniqueWithoutAcademicClassInput | Prisma.QuestionPaperUpdateWithWhereUniqueWithoutAcademicClassInput[]
+  updateMany?: Prisma.QuestionPaperUpdateManyWithWhereWithoutAcademicClassInput | Prisma.QuestionPaperUpdateManyWithWhereWithoutAcademicClassInput[]
+  deleteMany?: Prisma.QuestionPaperScalarWhereInput | Prisma.QuestionPaperScalarWhereInput[]
+}
+
+export type QuestionPaperUncheckedUpdateManyWithoutAcademicClassNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperCreateWithoutAcademicClassInput, Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput> | Prisma.QuestionPaperCreateWithoutAcademicClassInput[] | Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput[]
+  connectOrCreate?: Prisma.QuestionPaperCreateOrConnectWithoutAcademicClassInput | Prisma.QuestionPaperCreateOrConnectWithoutAcademicClassInput[]
+  upsert?: Prisma.QuestionPaperUpsertWithWhereUniqueWithoutAcademicClassInput | Prisma.QuestionPaperUpsertWithWhereUniqueWithoutAcademicClassInput[]
+  createMany?: Prisma.QuestionPaperCreateManyAcademicClassInputEnvelope
+  set?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+  disconnect?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+  delete?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+  connect?: Prisma.QuestionPaperWhereUniqueInput | Prisma.QuestionPaperWhereUniqueInput[]
+  update?: Prisma.QuestionPaperUpdateWithWhereUniqueWithoutAcademicClassInput | Prisma.QuestionPaperUpdateWithWhereUniqueWithoutAcademicClassInput[]
+  updateMany?: Prisma.QuestionPaperUpdateManyWithWhereWithoutAcademicClassInput | Prisma.QuestionPaperUpdateManyWithWhereWithoutAcademicClassInput[]
+  deleteMany?: Prisma.QuestionPaperScalarWhereInput | Prisma.QuestionPaperScalarWhereInput[]
+}
+
+export type QuestionPaperCreateNestedOneWithoutSubjectsInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperCreateWithoutSubjectsInput, Prisma.QuestionPaperUncheckedCreateWithoutSubjectsInput>
+  connectOrCreate?: Prisma.QuestionPaperCreateOrConnectWithoutSubjectsInput
+  connect?: Prisma.QuestionPaperWhereUniqueInput
+}
+
+export type QuestionPaperUpdateOneRequiredWithoutSubjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperCreateWithoutSubjectsInput, Prisma.QuestionPaperUncheckedCreateWithoutSubjectsInput>
+  connectOrCreate?: Prisma.QuestionPaperCreateOrConnectWithoutSubjectsInput
+  upsert?: Prisma.QuestionPaperUpsertWithoutSubjectsInput
+  connect?: Prisma.QuestionPaperWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionPaperUpdateToOneWithWhereWithoutSubjectsInput, Prisma.QuestionPaperUpdateWithoutSubjectsInput>, Prisma.QuestionPaperUncheckedUpdateWithoutSubjectsInput>
 }
 
 export type QuestionPaperCreateNestedOneWithoutQuestionsInput = {
@@ -501,36 +626,201 @@ export type QuestionPaperUpdateOneRequiredWithoutQuestionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionPaperUpdateToOneWithWhereWithoutQuestionsInput, Prisma.QuestionPaperUpdateWithoutQuestionsInput>, Prisma.QuestionPaperUncheckedUpdateWithoutQuestionsInput>
 }
 
-export type QuestionPaperCreateWithoutQuestionsInput = {
+export type QuestionPaperCreateWithoutAcademicClassInput = {
   id?: string
   title: string
-  examName?: string | null
+  examName: string
   description?: string | null
-  className?: string | null
-  subjectName?: string | null
-  chapterName?: string | null
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   isActive?: boolean
+  total?: number
+  timeInMinutes?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  questions?: Prisma.QuestionPaperQuestionCreateNestedManyWithoutQuestionPaperInput
+  subjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutQuestionPaperInput
+}
+
+export type QuestionPaperUncheckedCreateWithoutAcademicClassInput = {
+  id?: string
+  title: string
+  examName: string
+  description?: string | null
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: string
+  isActive?: boolean
+  total?: number
+  timeInMinutes?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  questions?: Prisma.QuestionPaperQuestionUncheckedCreateNestedManyWithoutQuestionPaperInput
+  subjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutQuestionPaperInput
+}
+
+export type QuestionPaperCreateOrConnectWithoutAcademicClassInput = {
+  where: Prisma.QuestionPaperWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuestionPaperCreateWithoutAcademicClassInput, Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput>
+}
+
+export type QuestionPaperCreateManyAcademicClassInputEnvelope = {
+  data: Prisma.QuestionPaperCreateManyAcademicClassInput | Prisma.QuestionPaperCreateManyAcademicClassInput[]
+  skipDuplicates?: boolean
+}
+
+export type QuestionPaperUpsertWithWhereUniqueWithoutAcademicClassInput = {
+  where: Prisma.QuestionPaperWhereUniqueInput
+  update: Prisma.XOR<Prisma.QuestionPaperUpdateWithoutAcademicClassInput, Prisma.QuestionPaperUncheckedUpdateWithoutAcademicClassInput>
+  create: Prisma.XOR<Prisma.QuestionPaperCreateWithoutAcademicClassInput, Prisma.QuestionPaperUncheckedCreateWithoutAcademicClassInput>
+}
+
+export type QuestionPaperUpdateWithWhereUniqueWithoutAcademicClassInput = {
+  where: Prisma.QuestionPaperWhereUniqueInput
+  data: Prisma.XOR<Prisma.QuestionPaperUpdateWithoutAcademicClassInput, Prisma.QuestionPaperUncheckedUpdateWithoutAcademicClassInput>
+}
+
+export type QuestionPaperUpdateManyWithWhereWithoutAcademicClassInput = {
+  where: Prisma.QuestionPaperScalarWhereInput
+  data: Prisma.XOR<Prisma.QuestionPaperUpdateManyMutationInput, Prisma.QuestionPaperUncheckedUpdateManyWithoutAcademicClassInput>
+}
+
+export type QuestionPaperScalarWhereInput = {
+  AND?: Prisma.QuestionPaperScalarWhereInput | Prisma.QuestionPaperScalarWhereInput[]
+  OR?: Prisma.QuestionPaperScalarWhereInput[]
+  NOT?: Prisma.QuestionPaperScalarWhereInput | Prisma.QuestionPaperScalarWhereInput[]
+  id?: Prisma.StringFilter<"QuestionPaper"> | string
+  title?: Prisma.StringFilter<"QuestionPaper"> | string
+  examName?: Prisma.StringFilter<"QuestionPaper"> | string
+  description?: Prisma.StringNullableFilter<"QuestionPaper"> | string | null
+  classId?: Prisma.StringFilter<"QuestionPaper"> | string
+  settings?: Prisma.JsonFilter<"QuestionPaper">
+  status?: Prisma.StringFilter<"QuestionPaper"> | string
+  isActive?: Prisma.BoolFilter<"QuestionPaper"> | boolean
+  total?: Prisma.FloatFilter<"QuestionPaper"> | number
+  timeInMinutes?: Prisma.IntFilter<"QuestionPaper"> | number
+  createdAt?: Prisma.DateTimeFilter<"QuestionPaper"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"QuestionPaper"> | Date | string
+  deletedAt?: Prisma.DateTimeNullableFilter<"QuestionPaper"> | Date | string | null
+}
+
+export type QuestionPaperCreateWithoutSubjectsInput = {
+  id?: string
+  title: string
+  examName: string
+  description?: string | null
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: string
+  isActive?: boolean
+  total?: number
+  timeInMinutes?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  academicClass: Prisma.AcademicClassCreateNestedOneWithoutQuestionPapersInput
+  questions?: Prisma.QuestionPaperQuestionCreateNestedManyWithoutQuestionPaperInput
+}
+
+export type QuestionPaperUncheckedCreateWithoutSubjectsInput = {
+  id?: string
+  title: string
+  examName: string
+  description?: string | null
+  classId: string
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: string
+  isActive?: boolean
+  total?: number
+  timeInMinutes?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  questions?: Prisma.QuestionPaperQuestionUncheckedCreateNestedManyWithoutQuestionPaperInput
+}
+
+export type QuestionPaperCreateOrConnectWithoutSubjectsInput = {
+  where: Prisma.QuestionPaperWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuestionPaperCreateWithoutSubjectsInput, Prisma.QuestionPaperUncheckedCreateWithoutSubjectsInput>
+}
+
+export type QuestionPaperUpsertWithoutSubjectsInput = {
+  update: Prisma.XOR<Prisma.QuestionPaperUpdateWithoutSubjectsInput, Prisma.QuestionPaperUncheckedUpdateWithoutSubjectsInput>
+  create: Prisma.XOR<Prisma.QuestionPaperCreateWithoutSubjectsInput, Prisma.QuestionPaperUncheckedCreateWithoutSubjectsInput>
+  where?: Prisma.QuestionPaperWhereInput
+}
+
+export type QuestionPaperUpdateToOneWithWhereWithoutSubjectsInput = {
+  where?: Prisma.QuestionPaperWhereInput
+  data: Prisma.XOR<Prisma.QuestionPaperUpdateWithoutSubjectsInput, Prisma.QuestionPaperUncheckedUpdateWithoutSubjectsInput>
+}
+
+export type QuestionPaperUpdateWithoutSubjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  academicClass?: Prisma.AcademicClassUpdateOneRequiredWithoutQuestionPapersNestedInput
+  questions?: Prisma.QuestionPaperQuestionUpdateManyWithoutQuestionPaperNestedInput
+}
+
+export type QuestionPaperUncheckedUpdateWithoutSubjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classId?: Prisma.StringFieldUpdateOperationsInput | string
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  questions?: Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionPaperNestedInput
+}
+
+export type QuestionPaperCreateWithoutQuestionsInput = {
+  id?: string
+  title: string
+  examName: string
+  description?: string | null
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: string
+  isActive?: boolean
+  total?: number
+  timeInMinutes?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+  academicClass: Prisma.AcademicClassCreateNestedOneWithoutQuestionPapersInput
+  subjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutQuestionPaperInput
 }
 
 export type QuestionPaperUncheckedCreateWithoutQuestionsInput = {
   id?: string
   title: string
-  examName?: string | null
+  examName: string
   description?: string | null
-  className?: string | null
-  subjectName?: string | null
-  chapterName?: string | null
+  classId: string
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: string
   isActive?: boolean
+  total?: number
+  timeInMinutes?: number
   createdAt?: Date | string
   updatedAt?: Date | string
   deletedAt?: Date | string | null
+  subjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutQuestionPaperInput
 }
 
 export type QuestionPaperCreateOrConnectWithoutQuestionsInput = {
@@ -552,30 +842,96 @@ export type QuestionPaperUpdateToOneWithWhereWithoutQuestionsInput = {
 export type QuestionPaperUpdateWithoutQuestionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  examName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subjectName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  academicClass?: Prisma.AcademicClassUpdateOneRequiredWithoutQuestionPapersNestedInput
+  subjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutQuestionPaperNestedInput
 }
 
 export type QuestionPaperUncheckedUpdateWithoutQuestionsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   title?: Prisma.StringFieldUpdateOperationsInput | string
-  examName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
   description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  className?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  subjectName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
-  chapterName?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  classId?: Prisma.StringFieldUpdateOperationsInput | string
   settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   status?: Prisma.StringFieldUpdateOperationsInput | string
   isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  subjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutQuestionPaperNestedInput
+}
+
+export type QuestionPaperCreateManyAcademicClassInput = {
+  id?: string
+  title: string
+  examName: string
+  description?: string | null
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: string
+  isActive?: boolean
+  total?: number
+  timeInMinutes?: number
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  deletedAt?: Date | string | null
+}
+
+export type QuestionPaperUpdateWithoutAcademicClassInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  questions?: Prisma.QuestionPaperQuestionUpdateManyWithoutQuestionPaperNestedInput
+  subjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutQuestionPaperNestedInput
+}
+
+export type QuestionPaperUncheckedUpdateWithoutAcademicClassInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  questions?: Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionPaperNestedInput
+  subjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutQuestionPaperNestedInput
+}
+
+export type QuestionPaperUncheckedUpdateManyWithoutAcademicClassInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  examName?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  settings?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  status?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  total?: Prisma.FloatFieldUpdateOperationsInput | number
+  timeInMinutes?: Prisma.IntFieldUpdateOperationsInput | number
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   deletedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -588,10 +944,12 @@ export type QuestionPaperUncheckedUpdateWithoutQuestionsInput = {
 
 export type QuestionPaperCountOutputType = {
   questions: number
+  subjects: number
 }
 
 export type QuestionPaperCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   questions?: boolean | QuestionPaperCountOutputTypeCountQuestionsArgs
+  subjects?: boolean | QuestionPaperCountOutputTypeCountSubjectsArgs
 }
 
 /**
@@ -611,22 +969,31 @@ export type QuestionPaperCountOutputTypeCountQuestionsArgs<ExtArgs extends runti
   where?: Prisma.QuestionPaperQuestionWhereInput
 }
 
+/**
+ * QuestionPaperCountOutputType without action
+ */
+export type QuestionPaperCountOutputTypeCountSubjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.QuestionPaperSubjectWhereInput
+}
+
 
 export type QuestionPaperSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
   title?: boolean
   examName?: boolean
   description?: boolean
-  className?: boolean
-  subjectName?: boolean
-  chapterName?: boolean
+  classId?: boolean
   settings?: boolean
   status?: boolean
   isActive?: boolean
+  total?: boolean
+  timeInMinutes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  academicClass?: boolean | Prisma.AcademicClassDefaultArgs<ExtArgs>
   questions?: boolean | Prisma.QuestionPaper$questionsArgs<ExtArgs>
+  subjects?: boolean | Prisma.QuestionPaper$subjectsArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionPaperCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["questionPaper"]>
 
@@ -635,15 +1002,16 @@ export type QuestionPaperSelectCreateManyAndReturn<ExtArgs extends runtime.Types
   title?: boolean
   examName?: boolean
   description?: boolean
-  className?: boolean
-  subjectName?: boolean
-  chapterName?: boolean
+  classId?: boolean
   settings?: boolean
   status?: boolean
   isActive?: boolean
+  total?: boolean
+  timeInMinutes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  academicClass?: boolean | Prisma.AcademicClassDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["questionPaper"]>
 
 export type QuestionPaperSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -651,15 +1019,16 @@ export type QuestionPaperSelectUpdateManyAndReturn<ExtArgs extends runtime.Types
   title?: boolean
   examName?: boolean
   description?: boolean
-  className?: boolean
-  subjectName?: boolean
-  chapterName?: boolean
+  classId?: boolean
   settings?: boolean
   status?: boolean
   isActive?: boolean
+  total?: boolean
+  timeInMinutes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
+  academicClass?: boolean | Prisma.AcademicClassDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["questionPaper"]>
 
 export type QuestionPaperSelectScalar = {
@@ -667,41 +1036,49 @@ export type QuestionPaperSelectScalar = {
   title?: boolean
   examName?: boolean
   description?: boolean
-  className?: boolean
-  subjectName?: boolean
-  chapterName?: boolean
+  classId?: boolean
   settings?: boolean
   status?: boolean
   isActive?: boolean
+  total?: boolean
+  timeInMinutes?: boolean
   createdAt?: boolean
   updatedAt?: boolean
   deletedAt?: boolean
 }
 
-export type QuestionPaperOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "examName" | "description" | "className" | "subjectName" | "chapterName" | "settings" | "status" | "isActive" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["questionPaper"]>
+export type QuestionPaperOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "examName" | "description" | "classId" | "settings" | "status" | "isActive" | "total" | "timeInMinutes" | "createdAt" | "updatedAt" | "deletedAt", ExtArgs["result"]["questionPaper"]>
 export type QuestionPaperInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  academicClass?: boolean | Prisma.AcademicClassDefaultArgs<ExtArgs>
   questions?: boolean | Prisma.QuestionPaper$questionsArgs<ExtArgs>
+  subjects?: boolean | Prisma.QuestionPaper$subjectsArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionPaperCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type QuestionPaperIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type QuestionPaperIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type QuestionPaperIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  academicClass?: boolean | Prisma.AcademicClassDefaultArgs<ExtArgs>
+}
+export type QuestionPaperIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  academicClass?: boolean | Prisma.AcademicClassDefaultArgs<ExtArgs>
+}
 
 export type $QuestionPaperPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "QuestionPaper"
   objects: {
+    academicClass: Prisma.$AcademicClassPayload<ExtArgs>
     questions: Prisma.$QuestionPaperQuestionPayload<ExtArgs>[]
+    subjects: Prisma.$QuestionPaperSubjectPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     title: string
-    examName: string | null
+    examName: string
     description: string | null
-    className: string | null
-    subjectName: string | null
-    chapterName: string | null
+    classId: string
     settings: runtime.JsonValue
     status: string
     isActive: boolean
+    total: number
+    timeInMinutes: number
     createdAt: Date
     updatedAt: Date
     deletedAt: Date | null
@@ -1099,7 +1476,9 @@ readonly fields: QuestionPaperFieldRefs;
  */
 export interface Prisma__QuestionPaperClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  academicClass<T extends Prisma.AcademicClassDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicClassDefaultArgs<ExtArgs>>): Prisma.Prisma__AcademicClassClient<runtime.Types.Result.GetResult<Prisma.$AcademicClassPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
   questions<T extends Prisma.QuestionPaper$questionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionPaper$questionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionPaperQuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  subjects<T extends Prisma.QuestionPaper$subjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionPaper$subjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionPaperSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1133,12 +1512,12 @@ export interface QuestionPaperFieldRefs {
   readonly title: Prisma.FieldRef<"QuestionPaper", 'String'>
   readonly examName: Prisma.FieldRef<"QuestionPaper", 'String'>
   readonly description: Prisma.FieldRef<"QuestionPaper", 'String'>
-  readonly className: Prisma.FieldRef<"QuestionPaper", 'String'>
-  readonly subjectName: Prisma.FieldRef<"QuestionPaper", 'String'>
-  readonly chapterName: Prisma.FieldRef<"QuestionPaper", 'String'>
+  readonly classId: Prisma.FieldRef<"QuestionPaper", 'String'>
   readonly settings: Prisma.FieldRef<"QuestionPaper", 'Json'>
   readonly status: Prisma.FieldRef<"QuestionPaper", 'String'>
   readonly isActive: Prisma.FieldRef<"QuestionPaper", 'Boolean'>
+  readonly total: Prisma.FieldRef<"QuestionPaper", 'Float'>
+  readonly timeInMinutes: Prisma.FieldRef<"QuestionPaper", 'Int'>
   readonly createdAt: Prisma.FieldRef<"QuestionPaper", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"QuestionPaper", 'DateTime'>
   readonly deletedAt: Prisma.FieldRef<"QuestionPaper", 'DateTime'>
@@ -1391,6 +1770,10 @@ export type QuestionPaperCreateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    */
   data: Prisma.QuestionPaperCreateManyInput | Prisma.QuestionPaperCreateManyInput[]
   skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuestionPaperIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1461,6 +1844,10 @@ export type QuestionPaperUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.E
    * Limit how many QuestionPapers to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuestionPaperIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1551,6 +1938,30 @@ export type QuestionPaper$questionsArgs<ExtArgs extends runtime.Types.Extensions
   take?: number
   skip?: number
   distinct?: Prisma.QuestionPaperQuestionScalarFieldEnum | Prisma.QuestionPaperQuestionScalarFieldEnum[]
+}
+
+/**
+ * QuestionPaper.subjects
+ */
+export type QuestionPaper$subjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the QuestionPaperSubject
+   */
+  select?: Prisma.QuestionPaperSubjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the QuestionPaperSubject
+   */
+  omit?: Prisma.QuestionPaperSubjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuestionPaperSubjectInclude<ExtArgs> | null
+  where?: Prisma.QuestionPaperSubjectWhereInput
+  orderBy?: Prisma.QuestionPaperSubjectOrderByWithRelationInput | Prisma.QuestionPaperSubjectOrderByWithRelationInput[]
+  cursor?: Prisma.QuestionPaperSubjectWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.QuestionPaperSubjectScalarFieldEnum | Prisma.QuestionPaperSubjectScalarFieldEnum[]
 }
 
 /**

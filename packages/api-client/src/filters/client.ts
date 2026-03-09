@@ -13,6 +13,7 @@ import {
   tenantFilterSchema,
   subscriptionPlanFilterSchema,
   subscriptionFilterSchema,
+  questionTypeFilterSchema,
 } from "./schema";
 
 export const useAcademicClassFilters = () =>
@@ -33,3 +34,5 @@ export const useSubscriptionPlanFilters = () =>
   useQueryStates(subscriptionPlanFilterSchema);
 export const useSubscriptionFilters = () =>
   useQueryStates(subscriptionFilterSchema);
+export const useQuestionTypeFilters = () =>
+  useQueryStates(questionTypeFilterSchema);

@@ -23,6 +23,7 @@ export * from "./services/academic-topic.service";
 export * from "./services/academic-subtopic.service";
 export * from "./services/mcq.service";
 export * from "./services/question-paper.service";
+export * from "./services/question-type.service";
 
 export * from "./services/student.service";
 export * from "./services/batch.service";

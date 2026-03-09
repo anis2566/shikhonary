@@ -12,8 +12,42 @@ import {
   updateQuestionPaperSchema,
 } from "@workspace/schema";
 
+// ─── Inline schemas for new distribution shape ────────────────────────────────
+// Defined here rather than in @workspace/schema so the router owns the wire
+// contract; the service uses its own DistributionInput interface internally.
+
+const distributionItemSchema = z.object({
+  type: z.string().min(1),
+  marksPerQuestion: z.number().min(0),
+  questionCount: z.number().int().min(0),
+  questionsToAttempt: z.number().int().min(0).nullable().optional(),
+  sectionLabel: z.string().nullable().optional(),
+  orderIndex: z.number().int().min(0).optional(),
+});
+
+const subjectBreakdownSchema = z.object({
+  subjectId: z.string().uuid(),
+  distributions: z.array(distributionItemSchema),
+});
+
+// Extends the core paper schema to also accept the optional breakdown payload
+// that `CreatePaperForm` attaches. The service pulls this out before running
+// `questionPaperFormSchema.parse()` on the rest.
+const createQuestionPaperInputSchema = questionPaperFormSchema.extend({
+  subjectBreakdowns: z.array(subjectBreakdownSchema).optional(),
+});
+
+const updateMarkDistributionSchema = z.object({
+  paperSubjectId: z.string().uuid(),
+  // paperId is required so the hook can do targeted cache invalidation
+  paperId: z.string().uuid(),
+  items: z.array(distributionItemSchema),
+});
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export const questionPaperRouter = createTRPCRouter({
-  // ─── Queries ────────────────────────────────────────────────────────────
+  // ─── Queries ──────────────────────────────────────────────────────────────
 
   list: adminProcedure
     .input(
@@ -28,17 +62,29 @@ export const questionPaperRouter = createTRPCRouter({
     }),
 
   getById: adminProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string().uuid() }))
     .query(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
       const data = await service.getByIdWithMcqs(input.id);
       return { success: true, data };
     }),
 
-  // ─── Mutations ──────────────────────────────────────────────────────────
+  /**
+   * Returns all subject mark distributions for a paper, ordered by
+   * subject then orderIndex. Used by the builder's mark-breakdown panel.
+   */
+  getMarkDistributions: adminProcedure
+    .input(z.object({ id: z.string().uuid() }))
+    .query(async ({ ctx, input }) => {
+      const service = new QuestionPaperService(ctx.db);
+      const data = await service.getMarkDistributions(input.id);
+      return { success: true, data };
+    }),
+
+  // ─── Mutations ────────────────────────────────────────────────────────────
 
   create: baseMutationProcedure
-    .input(questionPaperFormSchema)
+    .input(createQuestionPaperInputSchema)
     .mutation(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
       const data = await service.create(input);
@@ -50,7 +96,7 @@ export const questionPaperRouter = createTRPCRouter({
     }),
 
   update: baseMutationProcedure
-    .input(z.object({ id: z.string(), data: updateQuestionPaperSchema }))
+    .input(z.object({ id: z.string().uuid(), data: updateQuestionPaperSchema }))
     .mutation(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
       const data = await service.update(input.id, input.data);
@@ -62,7 +108,7 @@ export const questionPaperRouter = createTRPCRouter({
     }),
 
   delete: baseMutationProcedure
-    .input(z.object({ id: z.string() }))
+    .input(z.object({ id: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
       const data = await service.delete(input.id);
@@ -76,7 +122,7 @@ export const questionPaperRouter = createTRPCRouter({
   updateSettings: baseMutationProcedure
     .input(
       z.object({
-        questionPaperId: z.string(),
+        questionPaperId: z.string().uuid(),
         settings: z.record(z.any()),
       }),
     )
@@ -93,13 +139,13 @@ export const questionPaperRouter = createTRPCRouter({
       };
     }),
 
-  // ─── MCQ Assignment ──────────────────────────────────────────────────────
+  // ─── MCQ Assignment ───────────────────────────────────────────────────────
 
   assignMcq: baseMutationProcedure
     .input(
       z.object({
-        questionPaperId: z.string(),
-        mcqId: z.string(),
+        questionPaperId: z.string().uuid(),
+        mcqId: z.string().uuid(),
         orderIndex: z.number().int().min(0).optional(),
       }),
     )
@@ -114,7 +160,7 @@ export const questionPaperRouter = createTRPCRouter({
     }),
 
   removeMcq: baseMutationProcedure
-    .input(z.object({ questionPaperQuestionId: z.string() }))
+    .input(z.object({ questionPaperQuestionId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
       const data = await service.removeMcq(input.questionPaperQuestionId);
@@ -128,9 +174,12 @@ export const questionPaperRouter = createTRPCRouter({
   reorderQuestions: baseMutationProcedure
     .input(
       z.object({
-        questionPaperId: z.string(),
+        questionPaperId: z.string().uuid(),
         items: z.array(
-          z.object({ id: z.string(), orderIndex: z.number().int() }),
+          z.object({
+            id: z.string().uuid(),
+            orderIndex: z.number().int().min(0),
+          }),
         ),
       }),
     )
@@ -146,7 +195,7 @@ export const questionPaperRouter = createTRPCRouter({
   updateQuestionOverrides: baseMutationProcedure
     .input(
       z.object({
-        id: z.string(),
+        id: z.string().uuid(),
         overrides: z.record(z.any()),
       }),
     )
@@ -160,6 +209,25 @@ export const questionPaperRouter = createTRPCRouter({
         success: true,
         message: "Question style updated",
         data,
+      };
+    }),
+
+  /**
+   * Replaces all distribution rows for a (paper × subject) record.
+   * `paperId` is passed through so the hook can do targeted invalidation
+   * of both `getById` and `getMarkDistributions` without busting every
+   * cached paper in the query client.
+   */
+  updateMarkDistribution: baseMutationProcedure
+    .input(updateMarkDistributionSchema)
+    .mutation(async ({ ctx, input }) => {
+      const service = new QuestionPaperService(ctx.db);
+      // paperId is only used for cache invalidation in the hook; the service
+      // needs only paperSubjectId + items.
+      await service.updateMarkDistribution(input.paperSubjectId, input.items);
+      return {
+        success: true,
+        message: "Mark distribution updated",
       };
     }),
 });

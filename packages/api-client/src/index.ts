@@ -16,6 +16,7 @@ export * from "./hooks/use-subscription-plan";
 export * from "./hooks/use-subscription";
 export * from "./hooks/use-book";
 export * from "./hooks/use-question-paper";
+export * from "./hooks/use-question-type";
 
 // Filters
 export * from "./filters/client";

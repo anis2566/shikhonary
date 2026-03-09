@@ -134,6 +134,18 @@ export const mcqFilterSchema = {
 };
 
 /**
+ * Question Type Filters
+ */
+export const questionTypeFilterSchema = {
+  ...baseFilterSchema,
+  subjectId: parseAsString.withOptions({ clearOnDefault: true }),
+  chapterId: parseAsString.withOptions({ clearOnDefault: true }),
+  isActive: parseAsStringEnum(ACTIVE_STATUS).withOptions({
+    clearOnDefault: true,
+  }),
+};
+
+/**
  * Student Filters
  */
 export const studentFilterSchema = {

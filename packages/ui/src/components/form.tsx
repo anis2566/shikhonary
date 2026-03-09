@@ -8,6 +8,7 @@ import {
   FormProvider,
   useFormContext,
   useFormState,
+  useWatch,
   type ControllerProps,
   type FieldPath,
   type FieldValues,
@@ -169,4 +170,5 @@ export {
   FormDescription,
   FormMessage,
   FormField,
+  useWatch,
 };

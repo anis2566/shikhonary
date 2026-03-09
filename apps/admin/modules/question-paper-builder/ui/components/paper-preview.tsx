@@ -209,6 +209,10 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
   // Track how many questions go on page 1 so the rest-container only renders remaining
   const [firstPageEnd, setFirstPageEnd] = useState(questions.length);
 
+  const isLandscape = settings.paperOrientation === "landscape";
+  const isMultiColumn = settings.columns > 1;
+  const shouldRestrictHeaderWidth = isLandscape && isMultiColumn;
+
   // DnD sensors
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -311,8 +315,9 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
     const headerMarginBuffer = 8;
     const generalSafetyBuffer = 12; // 12px ≈ 3mm buffer to be safe against overflow
 
-    const headerHeightPx =
-      (measureHeaderRef.current?.offsetHeight ?? 180) + headerMarginBuffer;
+    const headerHeightPx = shouldRestrictHeaderWidth
+      ? 0
+      : (measureHeaderRef.current?.offsetHeight ?? 180) + headerMarginBuffer;
     const firstPageQuestionsHeight = Math.max(
       80,
       pageHeightPx -
@@ -405,6 +410,7 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
     settings.showExamName,
     computePageIndicesFromColumnOverflow,
     getPaperDimensions,
+    shouldRestrictHeaderWidth,
   ]);
 
   // Calculate auto-scale to fit paper in container
@@ -671,7 +677,7 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
   );
 
   const renderHeader = () => (
-    <div className="relative mb-2">
+    <div className="relative mb-2" style={{ breakInside: "avoid" }}>
       {/* Top Section: Logo, Institution Info, and Set Code */}
       <div className="flex flex-col items-center justify-center relative mb-1">
         {/* Logo - Positioned left if enabled */}
@@ -912,7 +918,10 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
   );
 
   // Render questions for a page
-  const renderQuestions = (pageQuestions: PaperQuestion[]) => (
+  const renderQuestions = (
+    pageQuestions: PaperQuestion[],
+    pageIndex: number,
+  ) => (
     <div
       className="pagination-column-container"
       style={{
@@ -935,6 +944,7 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
             : "none",
       }}
     >
+      {pageIndex === 0 && shouldRestrictHeaderWidth && renderHeader()}
       {pageQuestions.map((q) => {
         // Look up the latest question data from props to ensure real-time styling updates
         // even if the pagination state (pages) is still catching up.
@@ -963,7 +973,10 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
   );
 
   return (
-    <div ref={containerRef} className="w-full h-full min-h-0 overflow-auto p-6">
+    <div
+      ref={containerRef}
+      className="w-full h-full min-h-0 overflow-auto scroll-smooth p-6"
+    >
       {/* Floating Toolbar */}
       <FloatingToolbar
         ref={toolbarRef}
@@ -1002,7 +1015,9 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
             padding: `${settings.margins.top}mm ${settings.margins.right}mm ${settings.margins.bottom}mm ${settings.margins.left}mm`,
           }}
         >
-          <div ref={measureHeaderRef}>{renderHeader()}</div>
+          {!shouldRestrictHeaderWidth && (
+            <div ref={measureHeaderRef}>{renderHeader()}</div>
+          )}
           <div
             ref={measureFirstQuestionsRef}
             style={{
@@ -1013,6 +1028,7 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
               overflow: "visible",
             }}
           >
+            {shouldRestrictHeaderWidth && renderHeader()}
             {questions.map((question, idx) => (
               <div
                 key={question.id}
@@ -1109,11 +1125,13 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
                     {toBengaliDigits(pages.length)}
                   </div>
 
-                  {/* Header only on first page */}
-                  {pageIndex === 0 && renderHeader()}
+                  {/* Header only on first page - only if not restricted to first column */}
+                  {pageIndex === 0 &&
+                    !shouldRestrictHeaderWidth &&
+                    renderHeader()}
 
                   {/* Questions */}
-                  {renderQuestions(pageQuestions)}
+                  {renderQuestions(pageQuestions, pageIndex)}
 
                   {/* Watermark */}
                   {settings.showWatermark && settings.watermark && (

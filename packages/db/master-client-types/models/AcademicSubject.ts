@@ -252,6 +252,8 @@ export type AcademicSubjectWhereInput = {
   chapters?: Prisma.AcademicChapterListRelationFilter
   mcqs?: Prisma.McqListRelationFilter
   cqs?: Prisma.CqListRelationFilter
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectListRelationFilter
+  questionTypes?: Prisma.QuestionTypeListRelationFilter
 }
 
 export type AcademicSubjectOrderByWithRelationInput = {
@@ -268,6 +270,8 @@ export type AcademicSubjectOrderByWithRelationInput = {
   chapters?: Prisma.AcademicChapterOrderByRelationAggregateInput
   mcqs?: Prisma.McqOrderByRelationAggregateInput
   cqs?: Prisma.CqOrderByRelationAggregateInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectOrderByRelationAggregateInput
+  questionTypes?: Prisma.QuestionTypeOrderByRelationAggregateInput
 }
 
 export type AcademicSubjectWhereUniqueInput = Prisma.AtLeast<{
@@ -287,6 +291,8 @@ export type AcademicSubjectWhereUniqueInput = Prisma.AtLeast<{
   chapters?: Prisma.AcademicChapterListRelationFilter
   mcqs?: Prisma.McqListRelationFilter
   cqs?: Prisma.CqListRelationFilter
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectListRelationFilter
+  questionTypes?: Prisma.QuestionTypeListRelationFilter
 }, "id">
 
 export type AcademicSubjectOrderByWithAggregationInput = {
@@ -335,6 +341,8 @@ export type AcademicSubjectCreateInput = {
   chapters?: Prisma.AcademicChapterCreateNestedManyWithoutSubjectInput
   mcqs?: Prisma.McqCreateNestedManyWithoutSubjectInput
   cqs?: Prisma.CqCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectUncheckedCreateInput = {
@@ -351,6 +359,8 @@ export type AcademicSubjectUncheckedCreateInput = {
   chapters?: Prisma.AcademicChapterUncheckedCreateNestedManyWithoutSubjectInput
   mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutSubjectInput
   cqs?: Prisma.CqUncheckedCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectUpdateInput = {
@@ -367,6 +377,8 @@ export type AcademicSubjectUpdateInput = {
   chapters?: Prisma.AcademicChapterUpdateManyWithoutSubjectNestedInput
   mcqs?: Prisma.McqUpdateManyWithoutSubjectNestedInput
   cqs?: Prisma.CqUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectUncheckedUpdateInput = {
@@ -383,6 +395,8 @@ export type AcademicSubjectUncheckedUpdateInput = {
   chapters?: Prisma.AcademicChapterUncheckedUpdateManyWithoutSubjectNestedInput
   mcqs?: Prisma.McqUncheckedUpdateManyWithoutSubjectNestedInput
   cqs?: Prisma.CqUncheckedUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectCreateManyInput = {
@@ -498,6 +512,20 @@ export type AcademicSubjectUpdateOneRequiredWithoutChaptersNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AcademicSubjectUpdateToOneWithWhereWithoutChaptersInput, Prisma.AcademicSubjectUpdateWithoutChaptersInput>, Prisma.AcademicSubjectUncheckedUpdateWithoutChaptersInput>
 }
 
+export type AcademicSubjectCreateNestedOneWithoutQuestionTypesInput = {
+  create?: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutQuestionTypesInput, Prisma.AcademicSubjectUncheckedCreateWithoutQuestionTypesInput>
+  connectOrCreate?: Prisma.AcademicSubjectCreateOrConnectWithoutQuestionTypesInput
+  connect?: Prisma.AcademicSubjectWhereUniqueInput
+}
+
+export type AcademicSubjectUpdateOneRequiredWithoutQuestionTypesNestedInput = {
+  create?: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutQuestionTypesInput, Prisma.AcademicSubjectUncheckedCreateWithoutQuestionTypesInput>
+  connectOrCreate?: Prisma.AcademicSubjectCreateOrConnectWithoutQuestionTypesInput
+  upsert?: Prisma.AcademicSubjectUpsertWithoutQuestionTypesInput
+  connect?: Prisma.AcademicSubjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AcademicSubjectUpdateToOneWithWhereWithoutQuestionTypesInput, Prisma.AcademicSubjectUpdateWithoutQuestionTypesInput>, Prisma.AcademicSubjectUncheckedUpdateWithoutQuestionTypesInput>
+}
+
 export type AcademicSubjectCreateNestedOneWithoutMcqsInput = {
   create?: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutMcqsInput, Prisma.AcademicSubjectUncheckedCreateWithoutMcqsInput>
   connectOrCreate?: Prisma.AcademicSubjectCreateOrConnectWithoutMcqsInput
@@ -526,6 +554,20 @@ export type AcademicSubjectUpdateOneRequiredWithoutCqsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.AcademicSubjectUpdateToOneWithWhereWithoutCqsInput, Prisma.AcademicSubjectUpdateWithoutCqsInput>, Prisma.AcademicSubjectUncheckedUpdateWithoutCqsInput>
 }
 
+export type AcademicSubjectCreateNestedOneWithoutQuestionPaperSubjectsInput = {
+  create?: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutQuestionPaperSubjectsInput, Prisma.AcademicSubjectUncheckedCreateWithoutQuestionPaperSubjectsInput>
+  connectOrCreate?: Prisma.AcademicSubjectCreateOrConnectWithoutQuestionPaperSubjectsInput
+  connect?: Prisma.AcademicSubjectWhereUniqueInput
+}
+
+export type AcademicSubjectUpdateOneRequiredWithoutQuestionPaperSubjectsNestedInput = {
+  create?: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutQuestionPaperSubjectsInput, Prisma.AcademicSubjectUncheckedCreateWithoutQuestionPaperSubjectsInput>
+  connectOrCreate?: Prisma.AcademicSubjectCreateOrConnectWithoutQuestionPaperSubjectsInput
+  upsert?: Prisma.AcademicSubjectUpsertWithoutQuestionPaperSubjectsInput
+  connect?: Prisma.AcademicSubjectWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AcademicSubjectUpdateToOneWithWhereWithoutQuestionPaperSubjectsInput, Prisma.AcademicSubjectUpdateWithoutQuestionPaperSubjectsInput>, Prisma.AcademicSubjectUncheckedUpdateWithoutQuestionPaperSubjectsInput>
+}
+
 export type AcademicSubjectCreateWithoutClassSubjectsInput = {
   id?: string
   name: string
@@ -539,6 +581,8 @@ export type AcademicSubjectCreateWithoutClassSubjectsInput = {
   chapters?: Prisma.AcademicChapterCreateNestedManyWithoutSubjectInput
   mcqs?: Prisma.McqCreateNestedManyWithoutSubjectInput
   cqs?: Prisma.CqCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectUncheckedCreateWithoutClassSubjectsInput = {
@@ -554,6 +598,8 @@ export type AcademicSubjectUncheckedCreateWithoutClassSubjectsInput = {
   chapters?: Prisma.AcademicChapterUncheckedCreateNestedManyWithoutSubjectInput
   mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutSubjectInput
   cqs?: Prisma.CqUncheckedCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectCreateOrConnectWithoutClassSubjectsInput = {
@@ -585,6 +631,8 @@ export type AcademicSubjectUpdateWithoutClassSubjectsInput = {
   chapters?: Prisma.AcademicChapterUpdateManyWithoutSubjectNestedInput
   mcqs?: Prisma.McqUpdateManyWithoutSubjectNestedInput
   cqs?: Prisma.CqUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectUncheckedUpdateWithoutClassSubjectsInput = {
@@ -600,6 +648,8 @@ export type AcademicSubjectUncheckedUpdateWithoutClassSubjectsInput = {
   chapters?: Prisma.AcademicChapterUncheckedUpdateManyWithoutSubjectNestedInput
   mcqs?: Prisma.McqUncheckedUpdateManyWithoutSubjectNestedInput
   cqs?: Prisma.CqUncheckedUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectCreateWithoutChaptersInput = {
@@ -615,6 +665,8 @@ export type AcademicSubjectCreateWithoutChaptersInput = {
   classSubjects?: Prisma.AcademicClassSubjectCreateNestedManyWithoutAcademicSubjectInput
   mcqs?: Prisma.McqCreateNestedManyWithoutSubjectInput
   cqs?: Prisma.CqCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectUncheckedCreateWithoutChaptersInput = {
@@ -630,6 +682,8 @@ export type AcademicSubjectUncheckedCreateWithoutChaptersInput = {
   classSubjects?: Prisma.AcademicClassSubjectUncheckedCreateNestedManyWithoutAcademicSubjectInput
   mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutSubjectInput
   cqs?: Prisma.CqUncheckedCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectCreateOrConnectWithoutChaptersInput = {
@@ -661,6 +715,8 @@ export type AcademicSubjectUpdateWithoutChaptersInput = {
   classSubjects?: Prisma.AcademicClassSubjectUpdateManyWithoutAcademicSubjectNestedInput
   mcqs?: Prisma.McqUpdateManyWithoutSubjectNestedInput
   cqs?: Prisma.CqUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectUncheckedUpdateWithoutChaptersInput = {
@@ -676,6 +732,92 @@ export type AcademicSubjectUncheckedUpdateWithoutChaptersInput = {
   classSubjects?: Prisma.AcademicClassSubjectUncheckedUpdateManyWithoutAcademicSubjectNestedInput
   mcqs?: Prisma.McqUncheckedUpdateManyWithoutSubjectNestedInput
   cqs?: Prisma.CqUncheckedUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUncheckedUpdateManyWithoutSubjectNestedInput
+}
+
+export type AcademicSubjectCreateWithoutQuestionTypesInput = {
+  id?: string
+  name: string
+  displayName: string
+  code?: string | null
+  group?: string | null
+  position?: number
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classSubjects?: Prisma.AcademicClassSubjectCreateNestedManyWithoutAcademicSubjectInput
+  chapters?: Prisma.AcademicChapterCreateNestedManyWithoutSubjectInput
+  mcqs?: Prisma.McqCreateNestedManyWithoutSubjectInput
+  cqs?: Prisma.CqCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutSubjectInput
+}
+
+export type AcademicSubjectUncheckedCreateWithoutQuestionTypesInput = {
+  id?: string
+  name: string
+  displayName: string
+  code?: string | null
+  group?: string | null
+  position?: number
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classSubjects?: Prisma.AcademicClassSubjectUncheckedCreateNestedManyWithoutAcademicSubjectInput
+  chapters?: Prisma.AcademicChapterUncheckedCreateNestedManyWithoutSubjectInput
+  mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutSubjectInput
+  cqs?: Prisma.CqUncheckedCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutSubjectInput
+}
+
+export type AcademicSubjectCreateOrConnectWithoutQuestionTypesInput = {
+  where: Prisma.AcademicSubjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutQuestionTypesInput, Prisma.AcademicSubjectUncheckedCreateWithoutQuestionTypesInput>
+}
+
+export type AcademicSubjectUpsertWithoutQuestionTypesInput = {
+  update: Prisma.XOR<Prisma.AcademicSubjectUpdateWithoutQuestionTypesInput, Prisma.AcademicSubjectUncheckedUpdateWithoutQuestionTypesInput>
+  create: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutQuestionTypesInput, Prisma.AcademicSubjectUncheckedCreateWithoutQuestionTypesInput>
+  where?: Prisma.AcademicSubjectWhereInput
+}
+
+export type AcademicSubjectUpdateToOneWithWhereWithoutQuestionTypesInput = {
+  where?: Prisma.AcademicSubjectWhereInput
+  data: Prisma.XOR<Prisma.AcademicSubjectUpdateWithoutQuestionTypesInput, Prisma.AcademicSubjectUncheckedUpdateWithoutQuestionTypesInput>
+}
+
+export type AcademicSubjectUpdateWithoutQuestionTypesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  group?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classSubjects?: Prisma.AcademicClassSubjectUpdateManyWithoutAcademicSubjectNestedInput
+  chapters?: Prisma.AcademicChapterUpdateManyWithoutSubjectNestedInput
+  mcqs?: Prisma.McqUpdateManyWithoutSubjectNestedInput
+  cqs?: Prisma.CqUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutSubjectNestedInput
+}
+
+export type AcademicSubjectUncheckedUpdateWithoutQuestionTypesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  group?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classSubjects?: Prisma.AcademicClassSubjectUncheckedUpdateManyWithoutAcademicSubjectNestedInput
+  chapters?: Prisma.AcademicChapterUncheckedUpdateManyWithoutSubjectNestedInput
+  mcqs?: Prisma.McqUncheckedUpdateManyWithoutSubjectNestedInput
+  cqs?: Prisma.CqUncheckedUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectCreateWithoutMcqsInput = {
@@ -691,6 +833,8 @@ export type AcademicSubjectCreateWithoutMcqsInput = {
   classSubjects?: Prisma.AcademicClassSubjectCreateNestedManyWithoutAcademicSubjectInput
   chapters?: Prisma.AcademicChapterCreateNestedManyWithoutSubjectInput
   cqs?: Prisma.CqCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectUncheckedCreateWithoutMcqsInput = {
@@ -706,6 +850,8 @@ export type AcademicSubjectUncheckedCreateWithoutMcqsInput = {
   classSubjects?: Prisma.AcademicClassSubjectUncheckedCreateNestedManyWithoutAcademicSubjectInput
   chapters?: Prisma.AcademicChapterUncheckedCreateNestedManyWithoutSubjectInput
   cqs?: Prisma.CqUncheckedCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectCreateOrConnectWithoutMcqsInput = {
@@ -737,6 +883,8 @@ export type AcademicSubjectUpdateWithoutMcqsInput = {
   classSubjects?: Prisma.AcademicClassSubjectUpdateManyWithoutAcademicSubjectNestedInput
   chapters?: Prisma.AcademicChapterUpdateManyWithoutSubjectNestedInput
   cqs?: Prisma.CqUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectUncheckedUpdateWithoutMcqsInput = {
@@ -752,6 +900,8 @@ export type AcademicSubjectUncheckedUpdateWithoutMcqsInput = {
   classSubjects?: Prisma.AcademicClassSubjectUncheckedUpdateManyWithoutAcademicSubjectNestedInput
   chapters?: Prisma.AcademicChapterUncheckedUpdateManyWithoutSubjectNestedInput
   cqs?: Prisma.CqUncheckedUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectCreateWithoutCqsInput = {
@@ -767,6 +917,8 @@ export type AcademicSubjectCreateWithoutCqsInput = {
   classSubjects?: Prisma.AcademicClassSubjectCreateNestedManyWithoutAcademicSubjectInput
   chapters?: Prisma.AcademicChapterCreateNestedManyWithoutSubjectInput
   mcqs?: Prisma.McqCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectUncheckedCreateWithoutCqsInput = {
@@ -782,6 +934,8 @@ export type AcademicSubjectUncheckedCreateWithoutCqsInput = {
   classSubjects?: Prisma.AcademicClassSubjectUncheckedCreateNestedManyWithoutAcademicSubjectInput
   chapters?: Prisma.AcademicChapterUncheckedCreateNestedManyWithoutSubjectInput
   mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutSubjectInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeUncheckedCreateNestedManyWithoutSubjectInput
 }
 
 export type AcademicSubjectCreateOrConnectWithoutCqsInput = {
@@ -813,6 +967,8 @@ export type AcademicSubjectUpdateWithoutCqsInput = {
   classSubjects?: Prisma.AcademicClassSubjectUpdateManyWithoutAcademicSubjectNestedInput
   chapters?: Prisma.AcademicChapterUpdateManyWithoutSubjectNestedInput
   mcqs?: Prisma.McqUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUpdateManyWithoutSubjectNestedInput
 }
 
 export type AcademicSubjectUncheckedUpdateWithoutCqsInput = {
@@ -828,6 +984,92 @@ export type AcademicSubjectUncheckedUpdateWithoutCqsInput = {
   classSubjects?: Prisma.AcademicClassSubjectUncheckedUpdateManyWithoutAcademicSubjectNestedInput
   chapters?: Prisma.AcademicChapterUncheckedUpdateManyWithoutSubjectNestedInput
   mcqs?: Prisma.McqUncheckedUpdateManyWithoutSubjectNestedInput
+  questionPaperSubjects?: Prisma.QuestionPaperSubjectUncheckedUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUncheckedUpdateManyWithoutSubjectNestedInput
+}
+
+export type AcademicSubjectCreateWithoutQuestionPaperSubjectsInput = {
+  id?: string
+  name: string
+  displayName: string
+  code?: string | null
+  group?: string | null
+  position?: number
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classSubjects?: Prisma.AcademicClassSubjectCreateNestedManyWithoutAcademicSubjectInput
+  chapters?: Prisma.AcademicChapterCreateNestedManyWithoutSubjectInput
+  mcqs?: Prisma.McqCreateNestedManyWithoutSubjectInput
+  cqs?: Prisma.CqCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeCreateNestedManyWithoutSubjectInput
+}
+
+export type AcademicSubjectUncheckedCreateWithoutQuestionPaperSubjectsInput = {
+  id?: string
+  name: string
+  displayName: string
+  code?: string | null
+  group?: string | null
+  position?: number
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  classSubjects?: Prisma.AcademicClassSubjectUncheckedCreateNestedManyWithoutAcademicSubjectInput
+  chapters?: Prisma.AcademicChapterUncheckedCreateNestedManyWithoutSubjectInput
+  mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutSubjectInput
+  cqs?: Prisma.CqUncheckedCreateNestedManyWithoutSubjectInput
+  questionTypes?: Prisma.QuestionTypeUncheckedCreateNestedManyWithoutSubjectInput
+}
+
+export type AcademicSubjectCreateOrConnectWithoutQuestionPaperSubjectsInput = {
+  where: Prisma.AcademicSubjectWhereUniqueInput
+  create: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutQuestionPaperSubjectsInput, Prisma.AcademicSubjectUncheckedCreateWithoutQuestionPaperSubjectsInput>
+}
+
+export type AcademicSubjectUpsertWithoutQuestionPaperSubjectsInput = {
+  update: Prisma.XOR<Prisma.AcademicSubjectUpdateWithoutQuestionPaperSubjectsInput, Prisma.AcademicSubjectUncheckedUpdateWithoutQuestionPaperSubjectsInput>
+  create: Prisma.XOR<Prisma.AcademicSubjectCreateWithoutQuestionPaperSubjectsInput, Prisma.AcademicSubjectUncheckedCreateWithoutQuestionPaperSubjectsInput>
+  where?: Prisma.AcademicSubjectWhereInput
+}
+
+export type AcademicSubjectUpdateToOneWithWhereWithoutQuestionPaperSubjectsInput = {
+  where?: Prisma.AcademicSubjectWhereInput
+  data: Prisma.XOR<Prisma.AcademicSubjectUpdateWithoutQuestionPaperSubjectsInput, Prisma.AcademicSubjectUncheckedUpdateWithoutQuestionPaperSubjectsInput>
+}
+
+export type AcademicSubjectUpdateWithoutQuestionPaperSubjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  group?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classSubjects?: Prisma.AcademicClassSubjectUpdateManyWithoutAcademicSubjectNestedInput
+  chapters?: Prisma.AcademicChapterUpdateManyWithoutSubjectNestedInput
+  mcqs?: Prisma.McqUpdateManyWithoutSubjectNestedInput
+  cqs?: Prisma.CqUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUpdateManyWithoutSubjectNestedInput
+}
+
+export type AcademicSubjectUncheckedUpdateWithoutQuestionPaperSubjectsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  code?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  group?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  position?: Prisma.IntFieldUpdateOperationsInput | number
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  classSubjects?: Prisma.AcademicClassSubjectUncheckedUpdateManyWithoutAcademicSubjectNestedInput
+  chapters?: Prisma.AcademicChapterUncheckedUpdateManyWithoutSubjectNestedInput
+  mcqs?: Prisma.McqUncheckedUpdateManyWithoutSubjectNestedInput
+  cqs?: Prisma.CqUncheckedUpdateManyWithoutSubjectNestedInput
+  questionTypes?: Prisma.QuestionTypeUncheckedUpdateManyWithoutSubjectNestedInput
 }
 
 
@@ -840,6 +1082,8 @@ export type AcademicSubjectCountOutputType = {
   chapters: number
   mcqs: number
   cqs: number
+  questionPaperSubjects: number
+  questionTypes: number
 }
 
 export type AcademicSubjectCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -847,6 +1091,8 @@ export type AcademicSubjectCountOutputTypeSelect<ExtArgs extends runtime.Types.E
   chapters?: boolean | AcademicSubjectCountOutputTypeCountChaptersArgs
   mcqs?: boolean | AcademicSubjectCountOutputTypeCountMcqsArgs
   cqs?: boolean | AcademicSubjectCountOutputTypeCountCqsArgs
+  questionPaperSubjects?: boolean | AcademicSubjectCountOutputTypeCountQuestionPaperSubjectsArgs
+  questionTypes?: boolean | AcademicSubjectCountOutputTypeCountQuestionTypesArgs
 }
 
 /**
@@ -887,6 +1133,20 @@ export type AcademicSubjectCountOutputTypeCountCqsArgs<ExtArgs extends runtime.T
   where?: Prisma.CqWhereInput
 }
 
+/**
+ * AcademicSubjectCountOutputType without action
+ */
+export type AcademicSubjectCountOutputTypeCountQuestionPaperSubjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.QuestionPaperSubjectWhereInput
+}
+
+/**
+ * AcademicSubjectCountOutputType without action
+ */
+export type AcademicSubjectCountOutputTypeCountQuestionTypesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.QuestionTypeWhereInput
+}
+
 
 export type AcademicSubjectSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -902,6 +1162,8 @@ export type AcademicSubjectSelect<ExtArgs extends runtime.Types.Extensions.Inter
   chapters?: boolean | Prisma.AcademicSubject$chaptersArgs<ExtArgs>
   mcqs?: boolean | Prisma.AcademicSubject$mcqsArgs<ExtArgs>
   cqs?: boolean | Prisma.AcademicSubject$cqsArgs<ExtArgs>
+  questionPaperSubjects?: boolean | Prisma.AcademicSubject$questionPaperSubjectsArgs<ExtArgs>
+  questionTypes?: boolean | Prisma.AcademicSubject$questionTypesArgs<ExtArgs>
   _count?: boolean | Prisma.AcademicSubjectCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["academicSubject"]>
 
@@ -947,6 +1209,8 @@ export type AcademicSubjectInclude<ExtArgs extends runtime.Types.Extensions.Inte
   chapters?: boolean | Prisma.AcademicSubject$chaptersArgs<ExtArgs>
   mcqs?: boolean | Prisma.AcademicSubject$mcqsArgs<ExtArgs>
   cqs?: boolean | Prisma.AcademicSubject$cqsArgs<ExtArgs>
+  questionPaperSubjects?: boolean | Prisma.AcademicSubject$questionPaperSubjectsArgs<ExtArgs>
+  questionTypes?: boolean | Prisma.AcademicSubject$questionTypesArgs<ExtArgs>
   _count?: boolean | Prisma.AcademicSubjectCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type AcademicSubjectIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -959,6 +1223,8 @@ export type $AcademicSubjectPayload<ExtArgs extends runtime.Types.Extensions.Int
     chapters: Prisma.$AcademicChapterPayload<ExtArgs>[]
     mcqs: Prisma.$McqPayload<ExtArgs>[]
     cqs: Prisma.$CqPayload<ExtArgs>[]
+    questionPaperSubjects: Prisma.$QuestionPaperSubjectPayload<ExtArgs>[]
+    questionTypes: Prisma.$QuestionTypePayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1368,6 +1634,8 @@ export interface Prisma__AcademicSubjectClient<T, Null = never, ExtArgs extends 
   chapters<T extends Prisma.AcademicSubject$chaptersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicSubject$chaptersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AcademicChapterPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mcqs<T extends Prisma.AcademicSubject$mcqsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicSubject$mcqsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$McqPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cqs<T extends Prisma.AcademicSubject$cqsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicSubject$cqsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CqPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  questionPaperSubjects<T extends Prisma.AcademicSubject$questionPaperSubjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicSubject$questionPaperSubjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionPaperSubjectPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  questionTypes<T extends Prisma.AcademicSubject$questionTypesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AcademicSubject$questionTypesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1887,6 +2155,54 @@ export type AcademicSubject$cqsArgs<ExtArgs extends runtime.Types.Extensions.Int
   take?: number
   skip?: number
   distinct?: Prisma.CqScalarFieldEnum | Prisma.CqScalarFieldEnum[]
+}
+
+/**
+ * AcademicSubject.questionPaperSubjects
+ */
+export type AcademicSubject$questionPaperSubjectsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the QuestionPaperSubject
+   */
+  select?: Prisma.QuestionPaperSubjectSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the QuestionPaperSubject
+   */
+  omit?: Prisma.QuestionPaperSubjectOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuestionPaperSubjectInclude<ExtArgs> | null
+  where?: Prisma.QuestionPaperSubjectWhereInput
+  orderBy?: Prisma.QuestionPaperSubjectOrderByWithRelationInput | Prisma.QuestionPaperSubjectOrderByWithRelationInput[]
+  cursor?: Prisma.QuestionPaperSubjectWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.QuestionPaperSubjectScalarFieldEnum | Prisma.QuestionPaperSubjectScalarFieldEnum[]
+}
+
+/**
+ * AcademicSubject.questionTypes
+ */
+export type AcademicSubject$questionTypesArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the QuestionType
+   */
+  select?: Prisma.QuestionTypeSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the QuestionType
+   */
+  omit?: Prisma.QuestionTypeOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.QuestionTypeInclude<ExtArgs> | null
+  where?: Prisma.QuestionTypeWhereInput
+  orderBy?: Prisma.QuestionTypeOrderByWithRelationInput | Prisma.QuestionTypeOrderByWithRelationInput[]
+  cursor?: Prisma.QuestionTypeWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.QuestionTypeScalarFieldEnum | Prisma.QuestionTypeScalarFieldEnum[]
 }
 
 /**

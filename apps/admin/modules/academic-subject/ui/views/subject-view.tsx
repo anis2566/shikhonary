@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Activity, BarChart3, FileText } from "lucide-react";
+import { Activity, BarChart3, FileText, Layers } from "lucide-react";
 
 import { Badge } from "@workspace/ui/components/badge";
 import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
@@ -11,6 +11,7 @@ import { useAcademicSubjectById } from "@workspace/api-client";
 import { Overview } from "../components/overview-tab";
 import { ChaptersTab } from "../components/chapters";
 import { StatisticsTab } from "../components/statistics-tab";
+import { QuestionTypesTab } from "../components/question-types-tab";
 
 interface SubjectViewProps {
   subjectId: string;
@@ -58,6 +59,10 @@ export function SubjectView({ subjectId }: SubjectViewProps) {
             <BarChart3 className="h-4 w-4" />
             <span className="hidden sm:inline">Statistics</span>
           </TabsTrigger>
+          <TabsTrigger value="question-types" className="gap-2">
+            <Layers className="h-4 w-4" />
+            <span className="hidden sm:inline">Question Types</span>
+          </TabsTrigger>
         </TabsList>
         <Overview
           subjectId={subjectId}
@@ -66,6 +71,7 @@ export function SubjectView({ subjectId }: SubjectViewProps) {
         />
         <ChaptersTab chapters={subject.chapters || []} subjectId={subjectId} />
         <StatisticsTab subjectId={subjectId} />
+        <QuestionTypesTab subjectId={subjectId} />
       </Tabs>
     </div>
   );

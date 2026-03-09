@@ -103,6 +103,11 @@ export type AcademicTopic = Prisma.AcademicTopicModel
  */
 export type AcademicSubTopic = Prisma.AcademicSubTopicModel
 /**
+ * Model QuestionType
+ * 
+ */
+export type QuestionType = Prisma.QuestionTypeModel
+/**
  * Model Mcq
  * 
  */
@@ -166,6 +171,16 @@ export type AudioCache = Prisma.AudioCacheModel
  * 
  */
 export type QuestionPaper = Prisma.QuestionPaperModel
+/**
+ * Model QuestionPaperSubject
+ * 
+ */
+export type QuestionPaperSubject = Prisma.QuestionPaperSubjectModel
+/**
+ * Model QuestionPaperSubjectMarkDistribution
+ * 
+ */
+export type QuestionPaperSubjectMarkDistribution = Prisma.QuestionPaperSubjectMarkDistributionModel
 /**
  * Model QuestionPaperQuestion
  * 

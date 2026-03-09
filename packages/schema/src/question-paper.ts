@@ -9,11 +9,14 @@ import { uuidSchema } from "./shared/fields";
 
 export const questionPaperFormSchema = z.object({
   title: z.string().min(1, "Title is required"),
-  examName: z.string().optional().or(z.literal("")),
-  description: z.string().optional().or(z.literal("")),
-  className: z.string().optional().or(z.literal("")),
-  subjectName: z.string().optional().or(z.literal("")),
-  chapterName: z.string().optional().or(z.literal("")),
+  examName: z.string().min(1, "Exam name is required"),
+  description: z.string().optional(),
+  classId: z.string().uuid("Invalid Class ID"),
+  subjectIds: z
+    .array(z.string().uuid())
+    .min(1, "At least one subject is required"),
+  total: z.number().min(0),
+  timeInMinutes: z.number().min(0),
   status: z.enum(["Draft", "Published"]),
 });
 
@@ -23,9 +26,10 @@ export const defaultQuestionPaperValues: QuestionPaperFormValues = {
   title: "",
   examName: "",
   description: "",
-  className: "",
-  subjectName: "",
-  chapterName: "",
+  classId: "",
+  subjectIds: [],
+  total: 0,
+  timeInMinutes: 0,
   status: "Draft",
 };
 
@@ -65,6 +69,17 @@ export const reorderQuestionsSchema = z.object({
     z.object({
       id: uuidSchema,
       orderIndex: z.number().int().min(0),
+    }),
+  ),
+});
+
+export const updateMarkDistributionSchema = z.object({
+  paperSubjectId: uuidSchema,
+  items: z.array(
+    z.object({
+      type: z.string().min(1),
+      marks: z.number().min(0),
+      questionCount: z.number().int().min(0).optional(),
     }),
   ),
 });

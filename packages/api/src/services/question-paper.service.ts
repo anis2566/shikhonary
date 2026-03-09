@@ -17,6 +17,24 @@ import {
   type PaginatedResponse,
 } from "../shared/pagination";
 
+// ─── Internal input types ─────────────────────────────────────────────────────
+
+interface DistributionInput {
+  type: string;
+  marksPerQuestion: number;
+  questionCount: number;
+  questionsToAttempt?: number | null;
+  sectionLabel?: string | null;
+  orderIndex?: number;
+}
+
+interface SubjectBreakdownInput {
+  subjectId: string;
+  distributions: DistributionInput[];
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
 export class QuestionPaperService {
   constructor(private masterDb: PrismaClient) {}
 
@@ -35,7 +53,6 @@ export class QuestionPaperService {
     try {
       const where = buildWhere(input, ["title", "examName", "description"]);
       if (input.status) where.status = input.status;
-      // Always exclude soft-deleted papers
       where.isActive = true;
       where.deletedAt = null;
 
@@ -53,6 +70,12 @@ export class QuestionPaperService {
           ...pagination,
           include: {
             _count: { select: { questions: true } },
+            academicClass: { select: { name: true, displayName: true } },
+            subjects: {
+              include: {
+                subject: { select: { name: true, displayName: true } },
+              },
+            },
           },
         }),
         (this.masterDb as any).questionPaper.count({ where }),
@@ -72,6 +95,14 @@ export class QuestionPaperService {
       return await (this.masterDb as any).questionPaper.findUnique({
         where: { id: validatedId },
         include: {
+          subjects: {
+            include: {
+              subject: true,
+              distributions: {
+                orderBy: { orderIndex: "asc" as const },
+              },
+            },
+          },
           questions: {
             orderBy: { orderIndex: "asc" as const },
           },
@@ -88,10 +119,17 @@ export class QuestionPaperService {
   async getByIdWithMcqs(id: string): Promise<any | null | undefined> {
     try {
       const validatedId = uuidSchema.parse(id);
-
       return await (this.masterDb as any).questionPaper.findUnique({
         where: { id: validatedId },
         include: {
+          subjects: {
+            include: {
+              subject: true,
+              distributions: {
+                orderBy: { orderIndex: "asc" as const },
+              },
+            },
+          },
           questions: {
             orderBy: { orderIndex: "asc" as const },
             include: {
@@ -112,10 +150,83 @@ export class QuestionPaperService {
 
   // ──────────────────────────────────────────────────────────────── CREATE ──
 
+  /**
+   * Creates a question paper together with its subject rows and, optionally,
+   * the full mark-distribution breakdown for each subject.
+   *
+   * The `subjectBreakdowns` field is not part of the Zod schema (it lives in
+   * the form payload but not in the DB schema directly), so we extract it
+   * before passing the rest to `questionPaperFormSchema`.
+   */
   async create(input: unknown): Promise<any | undefined> {
     try {
-      const data = questionPaperFormSchema.parse(input);
-      return await (this.masterDb as any).questionPaper.create({ data });
+      // Pull out breakdowns before schema validation so Zod doesn't reject the
+      // extra key, then validate the core paper fields.
+      const { subjectBreakdowns, ...rawPaperData } = input as {
+        subjectBreakdowns?: SubjectBreakdownInput[];
+        [key: string]: unknown;
+      };
+
+      const { subjectIds, ...paperData } =
+        questionPaperFormSchema.parse(rawPaperData);
+
+      // Build the subject-level total for each subject, derived from its
+      // distribution rows (marksPerQuestion × questionsToAttempt ?? questionCount).
+      const subjectCreateData = subjectIds.map((sid) => {
+        const breakdown = subjectBreakdowns?.find((b) => b.subjectId === sid);
+        const distributions = breakdown?.distributions ?? [];
+
+        const subjectTotal = distributions.reduce((sum, d) => {
+          const effective =
+            d.questionsToAttempt !== null && d.questionsToAttempt !== undefined
+              ? d.questionsToAttempt
+              : d.questionCount;
+          return sum + d.marksPerQuestion * effective;
+        }, 0);
+
+        return {
+          subjectId: sid,
+          subjectTotal,
+          distributions: {
+            create: distributions.map((d, idx) => ({
+              type: d.type,
+              marksPerQuestion: d.marksPerQuestion,
+              questionCount: d.questionCount,
+              totalMarks:
+                d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount),
+              questionsToAttempt: d.questionsToAttempt ?? null,
+              sectionLabel: d.sectionLabel ?? null,
+              orderIndex: d.orderIndex ?? idx,
+            })),
+          },
+        };
+      });
+
+      // Derive the paper-level grand total from all subjects
+      const grandTotal = subjectCreateData.reduce(
+        (s, sub) => s + sub.subjectTotal,
+        0,
+      );
+
+      return await (this.masterDb as any).questionPaper.create({
+        data: {
+          ...paperData,
+          // Override total with the computed value when distributions are
+          // provided; fall back to whatever the user typed in the form field.
+          total: grandTotal > 0 ? grandTotal : (paperData.total ?? 0),
+          subjects: {
+            create: subjectCreateData,
+          },
+        },
+        include: {
+          subjects: {
+            include: {
+              subject: { select: { name: true, displayName: true } },
+              distributions: true,
+            },
+          },
+        },
+      });
     } catch (error) {
       handlePrismaError(error);
     }
@@ -123,13 +234,32 @@ export class QuestionPaperService {
 
   // ──────────────────────────────────────────────────────────────── UPDATE ──
 
+  /**
+   * Updates paper metadata and optionally replaces the subject list.
+   * Does NOT touch mark distributions — use `updateMarkDistribution` for that.
+   */
   async update(id: string, input: unknown): Promise<any | undefined> {
     try {
       const validatedId = uuidSchema.parse(id);
-      const data = updateQuestionPaperSchema.parse(input);
+      const { subjectIds, ...paperData } =
+        updateQuestionPaperSchema.parse(input);
+
       return await (this.masterDb as any).questionPaper.update({
         where: { id: validatedId },
-        data,
+        data: {
+          ...paperData,
+          ...(subjectIds && {
+            subjects: {
+              // Wipe and re-create subject rows; distributions are preserved
+              // only if the subjectId is still in the new list via cascade.
+              deleteMany: {},
+              create: (subjectIds as string[]).map((sid) => ({
+                subjectId: sid,
+                subjectTotal: 0,
+              })),
+            },
+          }),
+        },
       });
     } catch (error) {
       handlePrismaError(error);
@@ -158,7 +288,6 @@ export class QuestionPaperService {
   async delete(id: string): Promise<any | undefined> {
     try {
       const validatedId = uuidSchema.parse(id);
-      // Soft-delete
       return await (this.masterDb as any).questionPaper.update({
         where: { id: validatedId },
         data: { deletedAt: new Date(), isActive: false },
@@ -175,7 +304,6 @@ export class QuestionPaperService {
       const { questionPaperId, mcqId, orderIndex } =
         assignMcqSchema.parse(input);
 
-      // If no orderIndex provided, auto-assign to end
       let resolvedIndex = orderIndex;
       if (resolvedIndex === undefined || resolvedIndex === null) {
         const count = await (this.masterDb as any).questionPaperQuestion.count({
@@ -230,7 +358,9 @@ export class QuestionPaperService {
       handlePrismaError(error);
     }
   }
+
   // ───────────────────────────────────────────────────────────── OVERRIDES ─
+
   async updateQuestionOverrides(
     id: string,
     overrides: Record<string, unknown>,
@@ -240,6 +370,111 @@ export class QuestionPaperService {
       return await (this.masterDb as any).questionPaperQuestion.update({
         where: { id: validatedId },
         data: { overrides },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  // ────────────────────────────────────────────────── MARK DISTRIBUTION ──
+
+  /**
+   * Fully replaces the mark-distribution rows for a single (paper × subject)
+   * record, then re-derives and persists the subject-level total and the
+   * paper-level grand total.
+   *
+   * All writes are wrapped in a single transaction so the DB is never left in
+   * a partially-updated state.
+   */
+  async updateMarkDistribution(
+    paperSubjectId: string,
+    items: DistributionInput[],
+  ): Promise<void> {
+    try {
+      const validatedId = uuidSchema.parse(paperSubjectId);
+
+      // Compute the new subject-level total from the incoming rows
+      const newSubjectTotal = items.reduce((sum, d) => {
+        const effective =
+          d.questionsToAttempt !== null && d.questionsToAttempt !== undefined
+            ? d.questionsToAttempt
+            : d.questionCount;
+        return sum + d.marksPerQuestion * effective;
+      }, 0);
+
+      await (this.masterDb as any).$transaction(async (tx: any) => {
+        // 1. Wipe existing distribution rows for this subject
+        await tx.questionPaperSubjectMarkDistribution.deleteMany({
+          where: { paperSubjectId: validatedId },
+        });
+
+        // 2. Re-create with the new rows
+        await tx.questionPaperSubjectMarkDistribution.createMany({
+          data: items.map((d, idx) => ({
+            paperSubjectId: validatedId,
+            type: d.type,
+            marksPerQuestion: d.marksPerQuestion,
+            questionCount: d.questionCount,
+            totalMarks:
+              d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount),
+            questionsToAttempt: d.questionsToAttempt ?? null,
+            sectionLabel: d.sectionLabel ?? null,
+            orderIndex: d.orderIndex ?? idx,
+          })),
+        });
+
+        // 3. Update the denormalised subject-level total
+        await tx.questionPaperSubject.update({
+          where: { id: validatedId },
+          data: { subjectTotal: newSubjectTotal },
+        });
+
+        // 4. Re-aggregate and update the paper-level grand total
+        const paperSubject = await tx.questionPaperSubject.findUnique({
+          where: { id: validatedId },
+          select: { questionPaperId: true },
+        });
+
+        if (paperSubject) {
+          const allSubjects = await tx.questionPaperSubject.findMany({
+            where: { questionPaperId: paperSubject.questionPaperId },
+            select: { subjectTotal: true },
+          });
+
+          const grandTotal = allSubjects.reduce(
+            (s: number, sub: { subjectTotal: number }) => s + sub.subjectTotal,
+            0,
+          );
+
+          await tx.questionPaper.update({
+            where: { id: paperSubject.questionPaperId },
+            data: { total: grandTotal },
+          });
+        }
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  // ─────────────────────────────────────── GET MARK DISTRIBUTION (by paper) ─
+
+  /**
+   * Convenience method: returns all subject distributions for a paper,
+   * grouped by subject, in the order defined by `orderIndex`.
+   */
+  async getMarkDistributions(paperId: string): Promise<any[] | undefined> {
+    try {
+      const validatedId = uuidSchema.parse(paperId);
+      return await (this.masterDb as any).questionPaperSubject.findMany({
+        where: { questionPaperId: validatedId },
+        include: {
+          subject: { select: { name: true, displayName: true } },
+          distributions: {
+            orderBy: { orderIndex: "asc" as const },
+          },
+        },
+        orderBy: { id: "asc" as const },
       });
     } catch (error) {
       handlePrismaError(error);

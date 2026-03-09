@@ -41,12 +41,27 @@ export function useQuestionPaperById(id: string) {
   });
 }
 
+/**
+ * Hook for fetching all subject mark distributions for a paper.
+ * Returns subjects with their ordered distribution rows — used in the
+ * customize / builder page to render the mark breakdown panel.
+ */
+export function useQuestionPaperMarkDistributions(paperId: string) {
+  const trpc = useTRPC();
+  return useQuery({
+    ...trpc.questionPaper.getMarkDistributions.queryOptions({ id: paperId }),
+    select: (data: any) => data.data,
+    enabled: !!paperId,
+  });
+}
+
 // ============================================================================
 // MUTATION HOOKS
 // ============================================================================
 
 /**
- * Create a new question paper (metadata only — no questions yet)
+ * Create a new question paper together with its subject rows and optional
+ * mark-distribution breakdown for each subject.
  */
 export function useCreateQuestionPaper() {
   const trpc = useTRPC();
@@ -101,7 +116,8 @@ export function useUpdateQuestionPaper() {
 }
 
 /**
- * Persist the builder's PaperSettings JSON to the database (debounce in the calling component)
+ * Persist the builder's PaperSettings JSON to the database
+ * (debounce in the calling component)
  */
 export function useUpdateQuestionPaperSettings() {
   const trpc = useTRPC();
@@ -163,7 +179,6 @@ export function useAssignMcqToQuestionPaper() {
     },
     onSuccess: async (data: any) => {
       if (data.success) {
-        // Invalidate the specific paper so the builder refreshes
         const paperId = data.data?.questionPaperId;
         if (paperId) {
           await queryClient.invalidateQueries({
@@ -192,19 +207,18 @@ export function useRemoveMcqFromQuestionPaper() {
     onSuccess: async (data: any) => {
       if (data.success) {
         toast.success(data.message);
-        // Targeted invalidation using the paperId from the deleted record
         const paperId = data.data?.questionPaperId;
         if (paperId) {
           await queryClient.invalidateQueries({
             queryKey: trpc.questionPaper.getById.queryKey({ id: paperId }),
           });
         } else {
-          // Fallback: invalidate all getById queries
+          // Fallback: bust all cached paper detail queries
           await queryClient.invalidateQueries({
             queryKey: trpc.questionPaper.getById.queryKey(),
           });
         }
-        // Also refresh the list to update question counts
+        // Also refresh the list to keep question counts in sync
         await queryClient.invalidateQueries({
           queryKey: trpc.questionPaper.list.queryKey(),
         });
@@ -258,6 +272,65 @@ export function useUpdateQuestionOverrides() {
             id: data.data.questionPaperId,
           }),
         });
+      }
+    },
+  });
+}
+
+/**
+ * Replace the mark-distribution rows for a single (paper × subject) record.
+ *
+ * The service atomically:
+ *   1. Wipes & re-creates the distribution rows
+ *   2. Updates the subject-level `subjectTotal`
+ *   3. Re-aggregates and updates the paper-level `total`
+ *
+ * So on success we invalidate both the paper detail cache (which carries the
+ * updated `total`) and the dedicated distributions cache.
+ *
+ * The caller must pass `paperId` alongside `paperSubjectId` so we can do a
+ * targeted invalidation instead of busting every cached paper.
+ */
+export function useUpdateMarkDistribution() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.questionPaper.updateMarkDistribution.mutationOptions(),
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to update mark distribution");
+    },
+    onSuccess: async (data: any, variables: any) => {
+      if (data.success) {
+        toast.success(data.message ?? "Mark distribution updated");
+
+        // `variables.paperId` must be passed by the caller — see JSDoc above.
+        const paperId: string | undefined = variables?.paperId;
+
+        if (paperId) {
+          await Promise.all([
+            // Bust the full paper detail (carries updated `total`)
+            queryClient.invalidateQueries({
+              queryKey: trpc.questionPaper.getById.queryKey({ id: paperId }),
+            }),
+            // Bust the dedicated distributions query
+            queryClient.invalidateQueries({
+              queryKey: trpc.questionPaper.getMarkDistributions.queryKey({
+                id: paperId,
+              }),
+            }),
+          ]);
+        } else {
+          // Fallback if caller forgot to pass paperId — bust everything
+          await queryClient.invalidateQueries({
+            queryKey: trpc.questionPaper.getById.queryKey(),
+          });
+          await queryClient.invalidateQueries({
+            queryKey: trpc.questionPaper.getMarkDistributions.queryKey(),
+          });
+        }
+      } else {
+        toast.error(data.message);
       }
     },
   });

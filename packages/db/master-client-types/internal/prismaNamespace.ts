@@ -401,6 +401,7 @@ export const ModelName = {
   AcademicChapter: 'AcademicChapter',
   AcademicTopic: 'AcademicTopic',
   AcademicSubTopic: 'AcademicSubTopic',
+  QuestionType: 'QuestionType',
   Mcq: 'Mcq',
   Cq: 'Cq',
   AuditLog: 'AuditLog',
@@ -413,6 +414,8 @@ export const ModelName = {
   ContentBlockMedia: 'ContentBlockMedia',
   AudioCache: 'AudioCache',
   QuestionPaper: 'QuestionPaper',
+  QuestionPaperSubject: 'QuestionPaperSubject',
+  QuestionPaperSubjectMarkDistribution: 'QuestionPaperSubjectMarkDistribution',
   QuestionPaperQuestion: 'QuestionPaperQuestion'
 } as const
 
@@ -429,7 +432,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "tenant" | "tenantMember" | "tenantInvitation" | "subscriptionPlan" | "subscription" | "subscriptionHistory" | "invoice" | "academicClass" | "academicSubject" | "academicClassSubject" | "academicChapter" | "academicTopic" | "academicSubTopic" | "mcq" | "cq" | "auditLog" | "systemSetting" | "notification" | "pdfIngestionJob" | "book" | "chapter" | "contentBlock" | "contentBlockMedia" | "audioCache" | "questionPaper" | "questionPaperQuestion"
+    modelProps: "user" | "session" | "account" | "verification" | "tenant" | "tenantMember" | "tenantInvitation" | "subscriptionPlan" | "subscription" | "subscriptionHistory" | "invoice" | "academicClass" | "academicSubject" | "academicClassSubject" | "academicChapter" | "academicTopic" | "academicSubTopic" | "questionType" | "mcq" | "cq" | "auditLog" | "systemSetting" | "notification" | "pdfIngestionJob" | "book" | "chapter" | "contentBlock" | "contentBlockMedia" | "audioCache" | "questionPaper" | "questionPaperSubject" | "questionPaperSubjectMarkDistribution" | "questionPaperQuestion"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1691,6 +1694,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    QuestionType: {
+      payload: Prisma.$QuestionTypePayload<ExtArgs>
+      fields: Prisma.QuestionTypeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuestionTypeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuestionTypeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>
+        }
+        findFirst: {
+          args: Prisma.QuestionTypeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuestionTypeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>
+        }
+        findMany: {
+          args: Prisma.QuestionTypeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>[]
+        }
+        create: {
+          args: Prisma.QuestionTypeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>
+        }
+        createMany: {
+          args: Prisma.QuestionTypeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuestionTypeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>[]
+        }
+        delete: {
+          args: Prisma.QuestionTypeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>
+        }
+        update: {
+          args: Prisma.QuestionTypeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>
+        }
+        deleteMany: {
+          args: Prisma.QuestionTypeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuestionTypeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuestionTypeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>[]
+        }
+        upsert: {
+          args: Prisma.QuestionTypeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionTypePayload>
+        }
+        aggregate: {
+          args: Prisma.QuestionTypeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuestionType>
+        }
+        groupBy: {
+          args: Prisma.QuestionTypeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuestionTypeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuestionTypeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuestionTypeCountAggregateOutputType> | number
+        }
+      }
+    }
     Mcq: {
       payload: Prisma.$McqPayload<ExtArgs>
       fields: Prisma.McqFieldRefs
@@ -2579,6 +2656,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    QuestionPaperSubject: {
+      payload: Prisma.$QuestionPaperSubjectPayload<ExtArgs>
+      fields: Prisma.QuestionPaperSubjectFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuestionPaperSubjectFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuestionPaperSubjectFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>
+        }
+        findFirst: {
+          args: Prisma.QuestionPaperSubjectFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuestionPaperSubjectFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>
+        }
+        findMany: {
+          args: Prisma.QuestionPaperSubjectFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>[]
+        }
+        create: {
+          args: Prisma.QuestionPaperSubjectCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>
+        }
+        createMany: {
+          args: Prisma.QuestionPaperSubjectCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuestionPaperSubjectCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>[]
+        }
+        delete: {
+          args: Prisma.QuestionPaperSubjectDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>
+        }
+        update: {
+          args: Prisma.QuestionPaperSubjectUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>
+        }
+        deleteMany: {
+          args: Prisma.QuestionPaperSubjectDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuestionPaperSubjectUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuestionPaperSubjectUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>[]
+        }
+        upsert: {
+          args: Prisma.QuestionPaperSubjectUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectPayload>
+        }
+        aggregate: {
+          args: Prisma.QuestionPaperSubjectAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuestionPaperSubject>
+        }
+        groupBy: {
+          args: Prisma.QuestionPaperSubjectGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuestionPaperSubjectGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuestionPaperSubjectCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuestionPaperSubjectCountAggregateOutputType> | number
+        }
+      }
+    }
+    QuestionPaperSubjectMarkDistribution: {
+      payload: Prisma.$QuestionPaperSubjectMarkDistributionPayload<ExtArgs>
+      fields: Prisma.QuestionPaperSubjectMarkDistributionFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>
+        }
+        findFirst: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>
+        }
+        findMany: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>[]
+        }
+        create: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>
+        }
+        createMany: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>[]
+        }
+        delete: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>
+        }
+        update: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>
+        }
+        deleteMany: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>[]
+        }
+        upsert: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload>
+        }
+        aggregate: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateQuestionPaperSubjectMarkDistribution>
+        }
+        groupBy: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuestionPaperSubjectMarkDistributionGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.QuestionPaperSubjectMarkDistributionCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.QuestionPaperSubjectMarkDistributionCountAggregateOutputType> | number
+        }
+      }
+    }
     QuestionPaperQuestion: {
       payload: Prisma.$QuestionPaperQuestionPayload<ExtArgs>
       fields: Prisma.QuestionPaperQuestionFieldRefs
@@ -3002,6 +3227,20 @@ export const AcademicSubTopicScalarFieldEnum = {
 export type AcademicSubTopicScalarFieldEnum = (typeof AcademicSubTopicScalarFieldEnum)[keyof typeof AcademicSubTopicScalarFieldEnum]
 
 
+export const QuestionTypeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  displayName: 'displayName',
+  subjectId: 'subjectId',
+  chapterId: 'chapterId',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuestionTypeScalarFieldEnum = (typeof QuestionTypeScalarFieldEnum)[keyof typeof QuestionTypeScalarFieldEnum]
+
+
 export const McqScalarFieldEnum = {
   id: 'id',
   question: 'question',
@@ -3207,18 +3446,45 @@ export const QuestionPaperScalarFieldEnum = {
   title: 'title',
   examName: 'examName',
   description: 'description',
-  className: 'className',
-  subjectName: 'subjectName',
-  chapterName: 'chapterName',
+  classId: 'classId',
   settings: 'settings',
   status: 'status',
   isActive: 'isActive',
+  total: 'total',
+  timeInMinutes: 'timeInMinutes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
 export type QuestionPaperScalarFieldEnum = (typeof QuestionPaperScalarFieldEnum)[keyof typeof QuestionPaperScalarFieldEnum]
+
+
+export const QuestionPaperSubjectScalarFieldEnum = {
+  id: 'id',
+  questionPaperId: 'questionPaperId',
+  subjectId: 'subjectId',
+  subjectTotal: 'subjectTotal'
+} as const
+
+export type QuestionPaperSubjectScalarFieldEnum = (typeof QuestionPaperSubjectScalarFieldEnum)[keyof typeof QuestionPaperSubjectScalarFieldEnum]
+
+
+export const QuestionPaperSubjectMarkDistributionScalarFieldEnum = {
+  id: 'id',
+  paperSubjectId: 'paperSubjectId',
+  type: 'type',
+  marksPerQuestion: 'marksPerQuestion',
+  questionCount: 'questionCount',
+  totalMarks: 'totalMarks',
+  questionsToAttempt: 'questionsToAttempt',
+  sectionLabel: 'sectionLabel',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuestionPaperSubjectMarkDistributionScalarFieldEnum = (typeof QuestionPaperSubjectMarkDistributionScalarFieldEnum)[keyof typeof QuestionPaperSubjectMarkDistributionScalarFieldEnum]
 
 
 export const QuestionPaperQuestionScalarFieldEnum = {
@@ -3476,6 +3742,7 @@ export type GlobalOmitConfig = {
   academicChapter?: Prisma.AcademicChapterOmit
   academicTopic?: Prisma.AcademicTopicOmit
   academicSubTopic?: Prisma.AcademicSubTopicOmit
+  questionType?: Prisma.QuestionTypeOmit
   mcq?: Prisma.McqOmit
   cq?: Prisma.CqOmit
   auditLog?: Prisma.AuditLogOmit
@@ -3488,6 +3755,8 @@ export type GlobalOmitConfig = {
   contentBlockMedia?: Prisma.ContentBlockMediaOmit
   audioCache?: Prisma.AudioCacheOmit
   questionPaper?: Prisma.QuestionPaperOmit
+  questionPaperSubject?: Prisma.QuestionPaperSubjectOmit
+  questionPaperSubjectMarkDistribution?: Prisma.QuestionPaperSubjectMarkDistributionOmit
   questionPaperQuestion?: Prisma.QuestionPaperQuestionOmit
 }
 

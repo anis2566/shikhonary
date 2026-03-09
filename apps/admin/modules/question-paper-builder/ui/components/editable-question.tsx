@@ -241,7 +241,7 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
               }
               onBlur={onBlur}
               className={cn(
-                "w-full bg-transparent border-0 resize-none",
+                "w-full bg-transparent border-0 resize-none font-bold",
                 editableBaseClass,
                 editableHoverClass,
                 editableFocusClass,
@@ -370,7 +370,7 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
                 <div
                   key={idx}
                   className={cn(
-                    "flex items-center gap-2 mb-1",
+                    "flex items-center gap-2",
                     settings.optionStyle === "round" && "gap-2",
                   )}
                   style={{

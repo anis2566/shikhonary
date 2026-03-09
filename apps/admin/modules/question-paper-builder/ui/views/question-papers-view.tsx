@@ -54,9 +54,14 @@ interface QuestionPaperListItem {
   title: string;
   status: string;
   createdAt: string;
-  subjectName?: string;
-  className?: string;
-  examName?: string;
+  examName: string;
+  total: number;
+  timeInMinutes: number;
+  academicClass?: { name: string; displayName: string };
+  academicChapter?: { name: string; displayName: string };
+  questionPaperSubjects?: {
+    subject: { name: string; displayName: string };
+  }[];
   _count?: { questions: number };
 }
 
@@ -236,7 +241,12 @@ export const QuestionPapersView = () => {
                         </span>
                       </div>
                       <span className="text-sm font-bold truncate">
-                        {paper.subjectName || "Uncategorized"}
+                        {paper.questionPaperSubjects &&
+                        paper.questionPaperSubjects.length > 0
+                          ? paper.questionPaperSubjects
+                              .map((s) => s.subject.displayName)
+                              .join(", ")
+                          : "Uncategorized"}
                       </span>
                     </div>
                     <div className="p-3 bg-background/50 rounded-2xl border border-border/50 flex flex-col justify-center gap-1">
@@ -251,10 +261,10 @@ export const QuestionPapersView = () => {
                       </span>
                     </div>
                   </div>
-                  {paper.className && (
+                  {paper.academicClass && (
                     <div className="flex items-center gap-2 text-sm font-medium text-muted-foreground">
                       <Badge variant="outline" className="rounded-md font-bold">
-                        {paper.className}
+                        {paper.academicClass.displayName}
                       </Badge>
                       <span className="truncate">{paper.examName}</span>
                     </div>

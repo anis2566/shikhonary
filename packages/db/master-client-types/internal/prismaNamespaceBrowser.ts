@@ -68,6 +68,7 @@ export const ModelName = {
   AcademicChapter: 'AcademicChapter',
   AcademicTopic: 'AcademicTopic',
   AcademicSubTopic: 'AcademicSubTopic',
+  QuestionType: 'QuestionType',
   Mcq: 'Mcq',
   Cq: 'Cq',
   AuditLog: 'AuditLog',
@@ -80,6 +81,8 @@ export const ModelName = {
   ContentBlockMedia: 'ContentBlockMedia',
   AudioCache: 'AudioCache',
   QuestionPaper: 'QuestionPaper',
+  QuestionPaperSubject: 'QuestionPaperSubject',
+  QuestionPaperSubjectMarkDistribution: 'QuestionPaperSubjectMarkDistribution',
   QuestionPaperQuestion: 'QuestionPaperQuestion'
 } as const
 
@@ -409,6 +412,20 @@ export const AcademicSubTopicScalarFieldEnum = {
 export type AcademicSubTopicScalarFieldEnum = (typeof AcademicSubTopicScalarFieldEnum)[keyof typeof AcademicSubTopicScalarFieldEnum]
 
 
+export const QuestionTypeScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  displayName: 'displayName',
+  subjectId: 'subjectId',
+  chapterId: 'chapterId',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuestionTypeScalarFieldEnum = (typeof QuestionTypeScalarFieldEnum)[keyof typeof QuestionTypeScalarFieldEnum]
+
+
 export const McqScalarFieldEnum = {
   id: 'id',
   question: 'question',
@@ -614,18 +631,45 @@ export const QuestionPaperScalarFieldEnum = {
   title: 'title',
   examName: 'examName',
   description: 'description',
-  className: 'className',
-  subjectName: 'subjectName',
-  chapterName: 'chapterName',
+  classId: 'classId',
   settings: 'settings',
   status: 'status',
   isActive: 'isActive',
+  total: 'total',
+  timeInMinutes: 'timeInMinutes',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt'
 } as const
 
 export type QuestionPaperScalarFieldEnum = (typeof QuestionPaperScalarFieldEnum)[keyof typeof QuestionPaperScalarFieldEnum]
+
+
+export const QuestionPaperSubjectScalarFieldEnum = {
+  id: 'id',
+  questionPaperId: 'questionPaperId',
+  subjectId: 'subjectId',
+  subjectTotal: 'subjectTotal'
+} as const
+
+export type QuestionPaperSubjectScalarFieldEnum = (typeof QuestionPaperSubjectScalarFieldEnum)[keyof typeof QuestionPaperSubjectScalarFieldEnum]
+
+
+export const QuestionPaperSubjectMarkDistributionScalarFieldEnum = {
+  id: 'id',
+  paperSubjectId: 'paperSubjectId',
+  type: 'type',
+  marksPerQuestion: 'marksPerQuestion',
+  questionCount: 'questionCount',
+  totalMarks: 'totalMarks',
+  questionsToAttempt: 'questionsToAttempt',
+  sectionLabel: 'sectionLabel',
+  orderIndex: 'orderIndex',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type QuestionPaperSubjectMarkDistributionScalarFieldEnum = (typeof QuestionPaperSubjectMarkDistributionScalarFieldEnum)[keyof typeof QuestionPaperSubjectMarkDistributionScalarFieldEnum]
 
 
 export const QuestionPaperQuestionScalarFieldEnum = {
