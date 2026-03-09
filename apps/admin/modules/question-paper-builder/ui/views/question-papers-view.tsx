@@ -196,7 +196,9 @@ export const QuestionPapersView = () => {
                       <DropdownMenuContent align="end" className="rounded-xl">
                         <DropdownMenuItem
                           onClick={() =>
-                            router.push(`/question-papers/${paper.id}/build`)
+                            router.push(
+                              `/question-papers/${paper.id}/customize`,
+                            )
                           }
                           className="rounded-lg font-medium"
                         >
@@ -261,7 +263,7 @@ export const QuestionPapersView = () => {
                 <CardFooter className="pt-0 pb-6 px-6">
                   <Button
                     onClick={() =>
-                      router.push(`/question-papers/${paper.id}/build`)
+                      router.push(`/question-papers/${paper.id}/customize`)
                     }
                     className="w-full bg-primary/10 hover:bg-primary text-primary hover:text-primary-foreground font-bold rounded-xl transition-all h-10 border-none"
                   >
