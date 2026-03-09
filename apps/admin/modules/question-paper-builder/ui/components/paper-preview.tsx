@@ -719,8 +719,7 @@ export const PaperPreview: React.FC<PaperPreviewProps> = ({
                   fontFamily: getHeaderStyle("setCode").fontFamily,
                 }}
               >
-                {/* {settings.setCode || "ক"} */}
-                {"ক"}
+                {settings.setCode || "ক"}
               </span>
             </div>
           </div>

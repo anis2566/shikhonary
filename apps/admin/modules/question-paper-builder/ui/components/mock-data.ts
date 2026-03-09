@@ -38,25 +38,25 @@ const defaultMargins: MarginSettings = {
 };
 
 export const defaultPaperSettings: PaperSettings = {
-  institutionName: "Basic Education Care",
+  institutionName: "",
   showClassName: true,
   showSubjectName: true,
   showChapterName: true,
   showSetCode: true,
   setCode: "ক",
   showExamName: true,
-  examName: "Model Test",
+  examName: "",
   showInstructions: true,
   instructions:
     "[প্রতিটি প্রশ্নের সঠিক উত্তর শুধু একটি। উত্তরপত্রে প্রশ্নের ক্রমিক নম্বরের বিপরীতে প্রদত্ত বর্ণসমূহলিত বৃত্ত সমূহ হতে সঠিক উত্তরের বৃত্তটি বল পয়েন্ট কলম দ্বারা সম্পূর্ণ ভরাট করো। প্রতিটি প্রশ্নের মান ১।]",
   showNoMarkingNote: true,
   showTime: true,
-  time: "৩০ মিনিট",
+  time: "",
   showTotalMarks: true,
-  totalMarks: 20,
-  className: "নবম/দশম",
-  subjectName: "বাংলা ১ম পত্র",
-  chapterName: "গদ্য ১ - সুভা",
+  totalMarks: 0,
+  className: "",
+  subjectName: "",
+  chapterName: "",
 
   headerStyles: defaultHeaderStyles,
 

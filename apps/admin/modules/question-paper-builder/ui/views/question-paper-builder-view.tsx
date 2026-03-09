@@ -196,8 +196,10 @@ export const QuestionPaperBuilderView: React.FC<
         subjectName: paper.subjectName || dbSettings.subjectName || "",
         chapterName: paper.chapterName || dbSettings.chapterName || "",
         examName: paper.examName || dbSettings.examName || "",
-        institutionName: dbSettings.institutionName || "My Institution",
+        institutionName: dbSettings.institutionName || "",
         setCode: dbSettings.setCode || "ক",
+        // If totalMarks is still 0/default, sync it with question count later or keep it as is
+        totalMarks: dbSettings.totalMarks || paper.questions?.length || 0,
       });
       isInitialSyncRef.current = false;
     }
