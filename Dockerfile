@@ -71,12 +71,17 @@ ENV HOSTNAME="0.0.0.0"
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy standalone output
+# Copy essential files from builder stage
+# Standard Next.js Standalone mode output includes all required node_modules and the monorepo structure
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/standalone ./
 
-# ✅ Fixed: static and public must be at root level, not inside monorepo subpath
+# Static files and public assets are not bundled in standalone mode
+# We copy them to both the monorepo root and the specific app folder to ensure compatibility
+# with all Next.js route resolution patterns in production.
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./.next/static
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/.next/static ./apps/admin/.next/static
 COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./public
+COPY --from=builder --chown=nextjs:nodejs /app/apps/admin/public ./apps/admin/public
 
 EXPOSE 3000
 
