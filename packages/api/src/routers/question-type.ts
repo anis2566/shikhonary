@@ -16,7 +16,6 @@ export const questionTypeRouter = createTRPCRouter({
     .input(
       baseListInputSchema.extend({
         subjectId: zNullishString,
-        chapterId: zNullishString,
       }),
     )
     .query(async ({ ctx, input }) => {
@@ -107,6 +106,15 @@ export const questionTypeRouter = createTRPCRouter({
         message: "Question types deleted successfully",
       };
     }),
+
+  getStats: adminProcedure.query(async ({ ctx }) => {
+    const service = new QuestionTypeService(ctx.db);
+    const data = await service.getStats();
+    return {
+      success: true,
+      data,
+    };
+  }),
 
   forSelection: adminProcedure
     .input(z.object({ subjectId: z.string().optional() }).optional())

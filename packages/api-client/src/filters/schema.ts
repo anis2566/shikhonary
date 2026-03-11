@@ -139,7 +139,6 @@ export const mcqFilterSchema = {
 export const questionTypeFilterSchema = {
   ...baseFilterSchema,
   subjectId: parseAsString.withOptions({ clearOnDefault: true }),
-  chapterId: parseAsString.withOptions({ clearOnDefault: true }),
   isActive: parseAsStringEnum(ACTIVE_STATUS).withOptions({
     clearOnDefault: true,
   }),

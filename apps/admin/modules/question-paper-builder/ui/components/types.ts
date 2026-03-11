@@ -18,6 +18,9 @@ export interface PaperQuestion {
   statementStyles?: ElementStyle[];
   type: "single" | "multiple" | "assertion" | "statement" | "contextual";
   optionsColumns?: 1 | 2;
+  subjectId?: string;
+  questionTypeId?: string;
+  reference?: string[];
 }
 
 export interface HeaderStyles {
@@ -91,6 +94,7 @@ export interface PaperSettings {
   address: string;
   showWatermark: boolean;
   watermark: string;
+  showReference: boolean;
 }
 
 export interface PaperMetadata {
@@ -108,4 +112,39 @@ export interface ActiveElementContext {
   statementIndex?: number;
   currentStyle: ElementStyle;
   optionsColumns?: 1 | 2;
+}
+
+export interface PaperSubjectAction {
+  id: string;
+  questionTypeId: string;
+  questionType: {
+    name: string;
+    label: string;
+  };
+  marksPerQuestion: number;
+  questionCount: number;
+  totalMarks: number;
+  questionsToAttempt: number | null;
+}
+
+export interface PaperSubjectBreakdown {
+  id: string;
+  subjectId: string;
+  subject: {
+    displayName: string;
+  };
+  distributions: PaperSubjectAction[];
+}
+
+export interface PaperPreviewProps {
+  questions: PaperQuestion[];
+  subjects?: PaperSubjectBreakdown[];
+  settings: PaperSettings;
+  onUpdateQuestion: (question: PaperQuestion) => void;
+  onDeleteQuestion: (id: string) => void;
+  onDuplicateQuestion: (question: PaperQuestion) => void;
+  onReorderQuestions?: (questions: PaperQuestion[]) => void;
+  onSettingsChange: (settings: PaperSettings) => void;
+  isEditing: boolean;
+  zoom?: number | "auto";
 }

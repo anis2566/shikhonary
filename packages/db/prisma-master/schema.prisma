@@ -365,7 +365,7 @@ model AcademicSubject {
     mcqs                  Mcq[]
     cqs                   Cq[]
     questionPaperSubjects QuestionPaperSubject[]
-    questionTypes         QuestionType[]
+    questionTypes         SubjectQuestionType[]
 
     @@index([isActive])
     @@map("academic_subject")
@@ -405,10 +405,9 @@ model AcademicChapter {
     //      require explicit cleanup so question data is not orphaned.
     subject AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
 
-    topics        AcademicTopic[]
-    mcqs          Mcq[]
-    cqs           Cq[]
-    questionTypes QuestionType[]
+    topics AcademicTopic[]
+    mcqs   Mcq[]
+    cqs    Cq[]
 
     @@index([isActive])
     @@index([subjectId])
@@ -464,16 +463,35 @@ model QuestionType {
     id          String @id @default(uuid())
     name        String
     displayName String
+    label       String
 
-    subjectId String
-    subject   AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Restrict)
-
-    chapterId String?
-    chapter   AcademicChapter? @relation(fields: [chapterId], references: [id], onDelete: SetNull)
+    subjects      SubjectQuestionType[]
+    mcqs          Mcq[]
+    distributions QuestionPaperSubjectMarkDistribution[]
+    questions     QuestionPaperQuestion[]
 
     isActive  Boolean  @default(true)
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
+
+    @@map("question_type")
+}
+
+model SubjectQuestionType {
+    id             String @id @default(uuid())
+    subjectId      String
+    questionTypeId String
+    label          String
+
+    subject      AcademicSubject @relation(fields: [subjectId], references: [id], onDelete: Cascade)
+    questionType QuestionType    @relation(fields: [questionTypeId], references: [id], onDelete: Cascade)
+
+    createdAt DateTime @default(now())
+
+    @@unique([subjectId, questionTypeId])
+    @@index([subjectId])
+    @@index([questionTypeId])
+    @@map("subject_question_type")
 }
 
 model Mcq {
@@ -504,6 +522,9 @@ model Mcq {
     // FIX: SetNull on optional FKs — topic/subtopic can be removed without losing the question
     topic    AcademicTopic?    @relation(fields: [topicId], references: [id], onDelete: SetNull)
     subtopic AcademicSubTopic? @relation(fields: [subTopicId], references: [id], onDelete: SetNull)
+
+    questionTypeId String?
+    questionType   QuestionType? @relation(fields: [questionTypeId], references: [id], onDelete: SetNull)
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -853,6 +874,7 @@ model QuestionPaperSubject {
 
     // The per-question-type breakdown rows live here
     distributions QuestionPaperSubjectMarkDistribution[]
+    questions     QuestionPaperQuestion[]
 
     @@unique([questionPaperId, subjectId])
     @@index([questionPaperId])
@@ -873,12 +895,13 @@ model QuestionPaperSubject {
 //    "True/False"
 //
 model QuestionPaperSubjectMarkDistribution {
-    id             String               @id @default(uuid())
+    id String @id @default(uuid())
+
+    questionTypeId String
+    questionType   QuestionType @relation(fields: [questionTypeId], references: [id], onDelete: Cascade)
+
     paperSubjectId String
     paperSubject   QuestionPaperSubject @relation(fields: [paperSubjectId], references: [id], onDelete: Cascade)
-
-    // ── What kind of question? ──────────────────────────────────
-    type String // free-text; validated in the application layer
 
     // ── Marks ───────────────────────────────────────────────────
     marksPerQuestion Float @default(0) // marks awarded per single question
@@ -892,12 +915,9 @@ model QuestionPaperSubjectMarkDistribution {
     //    e.g. "answer 5 out of 8 questions"
     questionsToAttempt Int? // null means all must be attempted
 
-    // ── Optional section label ──────────────────────────────────
-    //    Printed on the paper: "Section A", "Part I", etc.
-    sectionLabel String?
-
     // ── Per-distribution ordering ───────────────────────────────
-    orderIndex Int @default(0)
+    orderIndex Int                     @default(0)
+    questions  QuestionPaperQuestion[]
 
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
@@ -913,6 +933,17 @@ model QuestionPaperQuestion {
     questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
     mcqId           String
     mcq             Mcq           @relation(fields: [mcqId], references: [id], onDelete: Cascade)
+
+    // TRACKING: Associate with subject and distribution breakdown
+    paperSubjectId String?
+    paperSubject   QuestionPaperSubject? @relation(fields: [paperSubjectId], references: [id], onDelete: SetNull)
+
+    distributionId String?
+    distribution   QuestionPaperSubjectMarkDistribution? @relation(fields: [distributionId], references: [id], onDelete: SetNull)
+
+    // Optional: track question type explicitly for easier filtering
+    questionTypeId String?
+    questionType   QuestionType? @relation(fields: [questionTypeId], references: [id], onDelete: SetNull)
 
     orderIndex Int  @default(0)
     overrides  Json @default("{}") // per-question style / mark overrides

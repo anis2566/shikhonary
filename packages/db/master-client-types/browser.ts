@@ -108,6 +108,11 @@ export type AcademicSubTopic = Prisma.AcademicSubTopicModel
  */
 export type QuestionType = Prisma.QuestionTypeModel
 /**
+ * Model SubjectQuestionType
+ * 
+ */
+export type SubjectQuestionType = Prisma.SubjectQuestionTypeModel
+/**
  * Model Mcq
  * 
  */

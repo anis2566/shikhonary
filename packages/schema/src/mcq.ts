@@ -28,6 +28,9 @@ export const mcqFormSchema = z.object({
     .min(1900, "Invalid session")
     .max(2100, "Invalid session"),
   source: z.string().optional().or(z.literal("")),
+  questionUrl: z.string().url().optional().or(z.literal("")),
+  contextUrl: z.string().url().optional().or(z.literal("")),
+  questionTypeId: uuidSchema.optional().or(z.literal("")),
 });
 
 export type MCQFormValues = z.infer<typeof mcqFormSchema>;
@@ -48,6 +51,9 @@ export const defaultMCQValues: MCQFormValues = {
   statements: [],
   session: new Date().getFullYear(),
   source: "",
+  questionUrl: "",
+  contextUrl: "",
+  questionTypeId: "",
 };
 
 export const updateMCQSchema = mcqFormSchema.partial();

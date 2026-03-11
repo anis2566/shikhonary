@@ -36,7 +36,7 @@ import {
 
 import { cn } from "@workspace/ui/lib/utils";
 
-import { PaperSettings } from "./types";
+import { PaperSettings, PaperSubjectBreakdown } from "./types";
 
 const FONT_FAMILIES = [
   { value: "SolaimanLipi", label: "সোলাইমানলিপি" },
@@ -56,6 +56,7 @@ const PAPER_SIZES = [
 
 interface SettingsSidebarProps {
   settings: PaperSettings;
+  subjects?: PaperSubjectBreakdown[];
   onSettingsChange: (settings: PaperSettings) => void;
   onExportPdf: () => void;
   isExporting: boolean;
@@ -402,6 +403,7 @@ const ToggleItem = ({
 
 export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
   settings,
+  subjects = [],
   onSettingsChange,
   onExportPdf,
   isExporting,
@@ -460,7 +462,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
           size="lg"
         >
           <Download className="w-4 h-4" />
-          {isExporting ? "Exporting..." : "PDF ডাউনলোড করুন"}
+          {isExporting ? "এক্সপোর্ট হচ্ছে..." : "PDF ডাউনলোড করুন"}
         </Button>
       </div>
 
@@ -626,7 +628,12 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
               <AccordionContent className="space-y-2 pb-4 animate-in fade-in slide-in-from-top-2 duration-300">
                 {[
                   { key: "showClassName", label: "শ্রেণির নাম" },
-                  { key: "showSubjectName", label: "বিষয়ের নাম" },
+                  { 
+                    key: "showSubjectName", 
+                    label: "বিষয়ের নাম", 
+                    disabled: subjects.length > 1,
+                    description: subjects.length > 1 ? "একাধিক বিষয় থাকায় হেডার থেকে নাম সরানো হয়েছে" : undefined
+                  },
                   { key: "showChapterName", label: "অধ্যায়ের নাম" },
                   { key: "showSetCode", label: "সেট কোড" },
                   { key: "showExamName", label: "পরীক্ষার নাম" },
@@ -634,6 +641,7 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   { key: "showTotalMarks", label: "পূর্ণমান" },
                   { key: "showInstructions", label: "নির্দেশনা" },
                   { key: "showNoMarkingNote", label: "দাগ/চিহ্ন নোট" },
+                  { key: "showReference", label: "প্রশ্নের রেফারেন্স" },
                 ].map((item) => (
                   <div
                     key={item.key}
@@ -642,15 +650,22 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                       settings[item.key as keyof PaperSettings]
                         ? "bg-green-500/5"
                         : "bg-muted/30",
+                      (item as any).disabled && "opacity-50 cursor-not-allowed"
                     )}
                   >
-                    <Label className="text-sm cursor-pointer">
-                      {item.label}
-                    </Label>
+                    <div className="flex flex-col">
+                      <Label className={cn("text-sm cursor-pointer", (item as any).disabled && "cursor-not-allowed")}>
+                        {item.label}
+                      </Label>
+                      {(item as any).description && (
+                        <span className="text-[10px] text-muted-foreground">{(item as any).description}</span>
+                      )}
+                    </div>
                     <Switch
                       checked={
                         settings[item.key as keyof PaperSettings] as boolean
                       }
+                      disabled={(item as any).disabled}
                       onCheckedChange={(v) =>
                         updateSetting(item.key as keyof PaperSettings, v)
                       }
@@ -874,10 +889,10 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   {/* Quick presets */}
                   <div className="flex gap-1">
                     {[
-                      { value: 1.0, label: "Tight" },
-                      { value: 1.2, label: "Normal" },
-                      { value: 1.5, label: "Relaxed" },
-                      { value: 1.8, label: "Loose" },
+                      { value: 1.0, label: "ঘন" },
+                      { value: 1.2, label: "স্বাভাবিক" },
+                      { value: 1.5, label: "শিথিল" },
+                      { value: 1.8, label: "ফাঁকা" },
                     ].map((preset) => (
                       <button
                         key={preset.value}
@@ -907,25 +922,25 @@ export const SettingsSidebar: React.FC<SettingsSidebarProps> = ({
                   <div className="grid grid-cols-4 gap-1.5">
                     <FontWeightCard
                       isSelected={settings.fontWeight === "normal"}
-                      label="Regular"
+                      label="সাধারণ"
                       weightClass="font-normal"
                       onClick={() => updateSetting("fontWeight", "normal")}
                     />
                     <FontWeightCard
                       isSelected={settings.fontWeight === "medium"}
-                      label="Medium"
+                      label="মাঝারি"
                       weightClass="font-medium"
                       onClick={() => updateSetting("fontWeight", "medium")}
                     />
                     <FontWeightCard
                       isSelected={settings.fontWeight === "semibold"}
-                      label="Semi"
+                      label="সেমি বোল্ড"
                       weightClass="font-semibold"
                       onClick={() => updateSetting("fontWeight", "semibold")}
                     />
                     <FontWeightCard
                       isSelected={settings.fontWeight === "bold"}
-                      label="Bold"
+                      label="বোল্ড"
                       weightClass="font-bold"
                       onClick={() => updateSetting("fontWeight", "bold")}
                     />

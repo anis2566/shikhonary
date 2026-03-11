@@ -17,14 +17,13 @@ import {
 } from "../shared/pagination";
 
 export interface QuestionTypeWithRelations extends QuestionType {
-  subject: {
-    id: string;
-    displayName: string;
-  };
-  chapter?: {
-    id: string;
-    displayName: string;
-  } | null;
+  subjects: {
+    label: string;
+    subject: {
+      id: string;
+      displayName: string;
+    };
+  }[];
 }
 
 /**
@@ -53,19 +52,40 @@ export class QuestionTypeService {
 
       const [items, total] = await Promise.all([
         this.db.questionType.findMany({
-          where,
+          where: {
+            ...where,
+            ...(input.subjectId
+              ? {
+                  subjects: {
+                    some: { subjectId: input.subjectId },
+                  },
+                }
+              : {}),
+          },
           orderBy: input.sortBy ? orderBy : { createdAt: "desc" },
           ...pagination,
           include: {
-            subject: {
-              select: { id: true, displayName: true },
-            },
-            chapter: {
-              select: { id: true, displayName: true },
+            subjects: {
+              include: {
+                subject: {
+                  select: { id: true, displayName: true },
+                },
+              },
             },
           },
         }),
-        this.db.questionType.count({ where }),
+        this.db.questionType.count({
+          where: {
+            ...where,
+            ...(input.subjectId
+              ? {
+                  subjects: {
+                    some: { subjectId: input.subjectId },
+                  },
+                }
+              : {}),
+          },
+        }),
       ]);
 
       return createPaginatedResponse(
@@ -87,11 +107,12 @@ export class QuestionTypeService {
       const item = await this.db.questionType.findUnique({
         where: { id: validatedId },
         include: {
-          subject: {
-            select: { id: true, displayName: true },
-          },
-          chapter: {
-            select: { id: true, displayName: true },
+          subjects: {
+            include: {
+              subject: {
+                select: { id: true, displayName: true },
+              },
+            },
           },
         },
       });
@@ -106,9 +127,17 @@ export class QuestionTypeService {
     input: z.infer<typeof questionTypeFormSchema>,
   ): Promise<QuestionType | undefined> {
     try {
-      const data = questionTypeFormSchema.parse(input);
+      const { subjectIds, ...data } = questionTypeFormSchema.parse(input);
       const item = await this.db.questionType.create({
-        data,
+        data: {
+          ...data,
+          subjects: {
+            create: subjectIds.map((id) => ({
+              subjectId: id,
+              label: data.label,
+            })),
+          },
+        },
       });
       return item;
     } catch (error) {
@@ -122,11 +151,24 @@ export class QuestionTypeService {
   ): Promise<QuestionType | undefined> {
     try {
       const validatedId = uuidSchema.parse(id);
-      const data = updateQuestionTypeSchema.parse(input);
+      const { subjectIds, ...data } = updateQuestionTypeSchema.parse(input);
 
       const item = await this.db.questionType.update({
         where: { id: validatedId },
-        data,
+        data: {
+          ...data,
+          ...(subjectIds
+            ? {
+                subjects: {
+                  deleteMany: {},
+                  create: subjectIds.map((id) => ({
+                    subjectId: id,
+                    label: data.label ?? "",
+                  })),
+                },
+              }
+            : {}),
+        },
       });
       return item;
     } catch (error) {
@@ -181,6 +223,29 @@ export class QuestionTypeService {
     }
   }
 
+  async getStats(): Promise<
+    | {
+        totalQuestionType: number;
+        activeQuestionType: number;
+        inactiveQuestionType: number;
+      }
+    | undefined
+  > {
+    try {
+      const [total, active] = await Promise.all([
+        this.db.questionType.count(),
+        this.db.questionType.count({ where: { isActive: true } }),
+      ]);
+      return {
+        totalQuestionType: total,
+        activeQuestionType: active,
+        inactiveQuestionType: total - active,
+      };
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
   async forSelection(
     subjectId?: string,
   ): Promise<{ id: string; displayName: string }[] | undefined> {
@@ -188,7 +253,13 @@ export class QuestionTypeService {
       return await this.db.questionType.findMany({
         where: {
           isActive: true,
-          ...(subjectId ? { subjectId } : {}),
+          ...(subjectId
+            ? {
+                subjects: {
+                  some: { subjectId },
+                },
+              }
+            : {}),
         },
         select: {
           id: true,

@@ -402,6 +402,7 @@ export const ModelName = {
   AcademicTopic: 'AcademicTopic',
   AcademicSubTopic: 'AcademicSubTopic',
   QuestionType: 'QuestionType',
+  SubjectQuestionType: 'SubjectQuestionType',
   Mcq: 'Mcq',
   Cq: 'Cq',
   AuditLog: 'AuditLog',
@@ -432,7 +433,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "tenant" | "tenantMember" | "tenantInvitation" | "subscriptionPlan" | "subscription" | "subscriptionHistory" | "invoice" | "academicClass" | "academicSubject" | "academicClassSubject" | "academicChapter" | "academicTopic" | "academicSubTopic" | "questionType" | "mcq" | "cq" | "auditLog" | "systemSetting" | "notification" | "pdfIngestionJob" | "book" | "chapter" | "contentBlock" | "contentBlockMedia" | "audioCache" | "questionPaper" | "questionPaperSubject" | "questionPaperSubjectMarkDistribution" | "questionPaperQuestion"
+    modelProps: "user" | "session" | "account" | "verification" | "tenant" | "tenantMember" | "tenantInvitation" | "subscriptionPlan" | "subscription" | "subscriptionHistory" | "invoice" | "academicClass" | "academicSubject" | "academicClassSubject" | "academicChapter" | "academicTopic" | "academicSubTopic" | "questionType" | "subjectQuestionType" | "mcq" | "cq" | "auditLog" | "systemSetting" | "notification" | "pdfIngestionJob" | "book" | "chapter" | "contentBlock" | "contentBlockMedia" | "audioCache" | "questionPaper" | "questionPaperSubject" | "questionPaperSubjectMarkDistribution" | "questionPaperQuestion"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1765,6 +1766,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         count: {
           args: Prisma.QuestionTypeCountArgs<ExtArgs>
           result: runtime.Types.Utils.Optional<Prisma.QuestionTypeCountAggregateOutputType> | number
+        }
+      }
+    }
+    SubjectQuestionType: {
+      payload: Prisma.$SubjectQuestionTypePayload<ExtArgs>
+      fields: Prisma.SubjectQuestionTypeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.SubjectQuestionTypeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.SubjectQuestionTypeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>
+        }
+        findFirst: {
+          args: Prisma.SubjectQuestionTypeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.SubjectQuestionTypeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>
+        }
+        findMany: {
+          args: Prisma.SubjectQuestionTypeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>[]
+        }
+        create: {
+          args: Prisma.SubjectQuestionTypeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>
+        }
+        createMany: {
+          args: Prisma.SubjectQuestionTypeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.SubjectQuestionTypeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>[]
+        }
+        delete: {
+          args: Prisma.SubjectQuestionTypeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>
+        }
+        update: {
+          args: Prisma.SubjectQuestionTypeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>
+        }
+        deleteMany: {
+          args: Prisma.SubjectQuestionTypeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.SubjectQuestionTypeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.SubjectQuestionTypeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>[]
+        }
+        upsert: {
+          args: Prisma.SubjectQuestionTypeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$SubjectQuestionTypePayload>
+        }
+        aggregate: {
+          args: Prisma.SubjectQuestionTypeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateSubjectQuestionType>
+        }
+        groupBy: {
+          args: Prisma.SubjectQuestionTypeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubjectQuestionTypeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.SubjectQuestionTypeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.SubjectQuestionTypeCountAggregateOutputType> | number
         }
       }
     }
@@ -3231,14 +3306,24 @@ export const QuestionTypeScalarFieldEnum = {
   id: 'id',
   name: 'name',
   displayName: 'displayName',
-  subjectId: 'subjectId',
-  chapterId: 'chapterId',
+  label: 'label',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type QuestionTypeScalarFieldEnum = (typeof QuestionTypeScalarFieldEnum)[keyof typeof QuestionTypeScalarFieldEnum]
+
+
+export const SubjectQuestionTypeScalarFieldEnum = {
+  id: 'id',
+  subjectId: 'subjectId',
+  questionTypeId: 'questionTypeId',
+  label: 'label',
+  createdAt: 'createdAt'
+} as const
+
+export type SubjectQuestionTypeScalarFieldEnum = (typeof SubjectQuestionTypeScalarFieldEnum)[keyof typeof SubjectQuestionTypeScalarFieldEnum]
 
 
 export const McqScalarFieldEnum = {
@@ -3260,6 +3345,7 @@ export const McqScalarFieldEnum = {
   chapterId: 'chapterId',
   topicId: 'topicId',
   subTopicId: 'subTopicId',
+  questionTypeId: 'questionTypeId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -3472,13 +3558,12 @@ export type QuestionPaperSubjectScalarFieldEnum = (typeof QuestionPaperSubjectSc
 
 export const QuestionPaperSubjectMarkDistributionScalarFieldEnum = {
   id: 'id',
+  questionTypeId: 'questionTypeId',
   paperSubjectId: 'paperSubjectId',
-  type: 'type',
   marksPerQuestion: 'marksPerQuestion',
   questionCount: 'questionCount',
   totalMarks: 'totalMarks',
   questionsToAttempt: 'questionsToAttempt',
-  sectionLabel: 'sectionLabel',
   orderIndex: 'orderIndex',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -3491,6 +3576,9 @@ export const QuestionPaperQuestionScalarFieldEnum = {
   id: 'id',
   questionPaperId: 'questionPaperId',
   mcqId: 'mcqId',
+  paperSubjectId: 'paperSubjectId',
+  distributionId: 'distributionId',
+  questionTypeId: 'questionTypeId',
   orderIndex: 'orderIndex',
   overrides: 'overrides',
   createdAt: 'createdAt',
@@ -3743,6 +3831,7 @@ export type GlobalOmitConfig = {
   academicTopic?: Prisma.AcademicTopicOmit
   academicSubTopic?: Prisma.AcademicSubTopicOmit
   questionType?: Prisma.QuestionTypeOmit
+  subjectQuestionType?: Prisma.SubjectQuestionTypeOmit
   mcq?: Prisma.McqOmit
   cq?: Prisma.CqOmit
   auditLog?: Prisma.AuditLogOmit

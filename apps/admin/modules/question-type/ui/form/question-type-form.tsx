@@ -2,7 +2,15 @@
 
 import { ChevronLeft, HelpCircle, Loader2, Plus, Sparkles } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect } from "react";
+import { useState } from "react";
+
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
 
 import { Form, useForm, zodResolver } from "@workspace/ui/components/form";
 import {
@@ -20,13 +28,6 @@ import {
   FormMessage,
 } from "@workspace/ui/components/form";
 import { Input } from "@workspace/ui/components/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@workspace/ui/components/select";
 import { Switch } from "@workspace/ui/components/switch";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
@@ -35,38 +36,40 @@ import {
   QuestionTypeFormValues,
   defaultQuestionTypeValues,
 } from "@workspace/schema";
+import { MultiSelect } from "@workspace/ui/components/multi-select";
 
 import {
   useCreateQuestionType,
   useAcademicSubjectsForSelection,
-  useAcademicChaptersForSelection,
+  useAcademicClassesForSelection,
 } from "@workspace/api-client";
 
 export function QuestionTypeForm() {
+  const [classId, setClassId] = useState<string>("");
+
   const router = useRouter();
   const searchParams = useSearchParams();
   const urlSubjectId = searchParams.get("subjectId");
   const { mutateAsync: createType, isPending } = useCreateQuestionType();
 
+  const { data: classes } =
+    useAcademicClassesForSelection();
+
   const form = useForm<QuestionTypeFormValues>({
     resolver: zodResolver(questionTypeFormSchema),
     defaultValues: {
       ...defaultQuestionTypeValues,
-      subjectId: urlSubjectId || "",
+      subjectIds: urlSubjectId ? [urlSubjectId] : [],
     },
   });
 
-  const subjectId = form.watch("subjectId");
+  const { data: subjects } = useAcademicSubjectsForSelection(classId);
 
-  const { data: subjects } = useAcademicSubjectsForSelection();
-  const { data: chapters } = useAcademicChaptersForSelection(subjectId);
-
-  useEffect(() => {
-    // Reset chapter if subject changes
-    if (subjectId) {
-      form.setValue("chapterId", null);
-    }
-  }, [subjectId, form]);
+  // Clear subject selection when class changes to avoid orphaned subjects
+  const handleClassChange = (newClassId: string) => {
+    setClassId(newClassId);
+    form.setValue("subjectIds", []);
+  };
 
   const onSubmit = async (data: QuestionTypeFormValues) => {
     try {
@@ -78,7 +81,7 @@ export function QuestionTypeForm() {
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 lg:p-6 space-y-8 animate-in fade-in duration-500 text-foreground">
+    <div className="w-full max-w-4xl mx-auto p-4 lg:p-6 space-y-8 animate-in fade-in duration-500 text-foreground">
       {/* Header */}
       <div className="flex flex-col gap-4">
         <Button
@@ -121,86 +124,56 @@ export function QuestionTypeForm() {
         <CardContent className="pt-6">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                {/* Subject Selection */}
-                <FormField
-                  control={form.control}
-                  name="subjectId"
-                  render={({ field }) => (
-                    <FormItem className="space-y-2">
-                      <FormLabel className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                        Subject
-                      </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value || ""}
-                        disabled={isPending}
+              {/* Class Filter (Optional but recommended) */}
+              <div className="space-y-2">
+                <FormLabel className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                  Filter by Class
+                </FormLabel>
+                <Select onValueChange={handleClassChange} value={classId}>
+                  <SelectTrigger className="h-12 bg-background/50 border-border/50 rounded-xl px-4 focus:ring-primary/20 transition-all shadow-soft font-semibold w-full text-foreground">
+                    <SelectValue placeholder="All Classes" />
+                  </SelectTrigger>
+                  <SelectContent className="rounded-xl border-border/50 shadow-medium backdrop-blur-xl bg-background/95 max-h-[300px]">
+                    <SelectItem value="all" className="rounded-lg font-medium">
+                      All Classes
+                    </SelectItem>
+                    {classes?.map((cls) => (
+                      <SelectItem
+                        key={cls.id}
+                        value={cls.id}
+                        className="rounded-lg font-medium"
                       >
-                        <FormControl>
-                          <SelectTrigger className="h-12 bg-background/50 border-border/50 rounded-xl px-4 focus:ring-primary/20 transition-all shadow-soft font-semibold w-full text-foreground">
-                            <SelectValue placeholder="Select subject" />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="rounded-xl border-border/50 shadow-medium backdrop-blur-xl bg-background/95 max-h-[300px]">
-                          {subjects?.map((subject) => (
-                            <SelectItem
-                              key={subject.id}
-                              value={subject.id}
-                              className="rounded-lg font-medium"
-                            >
-                              {subject.displayName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                      <FormMessage className="font-bold text-xs" />
-                    </FormItem>
-                  )}
-                />
+                        {cls.displayName}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
 
-                {/* Chapter Selection (Optional) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 col-span-2">
+                {/* Associated Subjects - Multi Select */}
                 <FormField
                   control={form.control}
-                  name="chapterId"
+                  name="subjectIds"
                   render={({ field }) => (
-                    <FormItem className="space-y-2">
+                    <FormItem className="space-y-2 col-span-2">
                       <FormLabel className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
-                        Chapter (Optional)
+                        Associated Subjects
                       </FormLabel>
-                      <Select
-                        onValueChange={field.onChange}
-                        value={field.value || "none"}
-                        disabled={isPending || !subjectId}
-                      >
-                        <FormControl>
-                          <SelectTrigger className="h-12 bg-background/50 border-border/50 rounded-xl px-4 focus:ring-primary/20 transition-all shadow-soft font-semibold w-full text-foreground">
-                            <SelectValue
-                              placeholder={
-                                subjectId
-                                  ? "Select chapter"
-                                  : "Select subject first"
-                              }
-                            />
-                          </SelectTrigger>
-                        </FormControl>
-                        <SelectContent className="rounded-xl border-border/50 shadow-medium backdrop-blur-xl bg-background/95 max-h-[300px]">
-                          <SelectItem
-                            value="none"
-                            className="rounded-lg font-medium text-muted-foreground"
-                          >
-                            Generic (No Chapter)
-                          </SelectItem>
-                          {chapters?.map((chapter) => (
-                            <SelectItem
-                              key={chapter.id}
-                              value={chapter.id}
-                              className="rounded-lg font-medium"
-                            >
-                              {chapter.displayName}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
+                      <FormControl>
+                        <MultiSelect
+                          options={
+                            subjects?.map((s) => ({
+                              label: s.displayName,
+                              value: s.id,
+                            })) || []
+                          }
+                          selected={field.value}
+                          onChange={field.onChange}
+                          placeholder="Select subjects"
+                          className="h-12 bg-background/50 border-border/50 rounded-xl px-4 focus:ring-primary/20 transition-all shadow-soft font-semibold w-full text-foreground"
+                        />
+                      </FormControl>
                       <FormMessage className="font-bold text-xs" />
                     </FormItem>
                   )}
@@ -240,6 +213,28 @@ export function QuestionTypeForm() {
                       <FormControl>
                         <Input
                           placeholder="e.g., Knowledge Based (ক)"
+                          {...field}
+                          disabled={isPending}
+                          className="h-12 bg-background/50 border-border/50 rounded-xl px-4 focus:ring-primary/20 transition-all shadow-soft font-semibold"
+                        />
+                      </FormControl>
+                      <FormMessage className="font-bold text-xs" />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Label */}
+                <FormField
+                  control={form.control}
+                  name="label"
+                  render={({ field }) => (
+                    <FormItem className="space-y-2">
+                      <FormLabel className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
+                        Short Label
+                      </FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g., ক, খ, MCQ"
                           {...field}
                           disabled={isPending}
                           className="h-12 bg-background/50 border-border/50 rounded-xl px-4 focus:ring-primary/20 transition-all shadow-soft font-semibold"

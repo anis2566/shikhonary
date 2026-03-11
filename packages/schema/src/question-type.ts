@@ -8,8 +8,10 @@ import { nameSchema } from "./shared/fields";
 export const questionTypeFormSchema = z.object({
   name: nameSchema,
   displayName: nameSchema,
-  subjectId: z.string().uuid("Please select a subject"),
-  chapterId: z.string().uuid().nullable(),
+  label: z.string().min(1, "Label is required"),
+  subjectIds: z
+    .array(z.string().uuid())
+    .min(1, "Please select at least one subject"),
   isActive: z.boolean(),
 });
 
@@ -26,8 +28,8 @@ export type QuestionType = z.infer<typeof questionTypeSchema>;
 export const defaultQuestionTypeValues: QuestionTypeFormValues = {
   name: "",
   displayName: "",
-  subjectId: "",
-  chapterId: null,
+  label: "",
+  subjectIds: [],
   isActive: true,
 };
 

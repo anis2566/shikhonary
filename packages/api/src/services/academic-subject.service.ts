@@ -560,7 +560,7 @@ export class AcademicSubjectService {
   ): Promise<{ id: string; displayName: string }[] | undefined> {
     try {
       const where: any = { isActive: true }; // prisma "where" is hard to type precisely without internal types
-      if (classId) {
+      if (classId && classId !== "all") {
         where.classSubjects = {
           some: { classId },
         };

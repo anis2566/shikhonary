@@ -27,7 +27,7 @@ const defaultHeaderStyles: HeaderStyles = {
   },
   time: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "left" },
   totalMarks: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "right" },
-  instructions: { fontSize: 14, fontFamily: "SolaimanLipi", textAlign: "left" },
+  instructions: { fontSize: 12, fontFamily: "SolaimanLipi", textAlign: "left" },
 };
 
 const defaultMargins: MarginSettings = {
@@ -64,13 +64,13 @@ export const defaultPaperSettings: PaperSettings = {
   paperSize: "A4",
   paperOrientation: "portrait",
   margins: defaultMargins,
-  columns: 2,
+  columns: 1,
   showColumnDivider: true,
 
   // Typography
   optionStyle: "parentheses",
   fontFamily: "SolaimanLipi",
-  fontSize: 14,
+  fontSize: 12,
   fontWeight: "normal",
   lineHeight: 1.4,
   textAlign: "left",
@@ -88,4 +88,5 @@ export const defaultPaperSettings: PaperSettings = {
   address: "",
   showWatermark: false,
   watermark: "",
+  showReference: true,
 };

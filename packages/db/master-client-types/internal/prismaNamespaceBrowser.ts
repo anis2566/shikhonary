@@ -69,6 +69,7 @@ export const ModelName = {
   AcademicTopic: 'AcademicTopic',
   AcademicSubTopic: 'AcademicSubTopic',
   QuestionType: 'QuestionType',
+  SubjectQuestionType: 'SubjectQuestionType',
   Mcq: 'Mcq',
   Cq: 'Cq',
   AuditLog: 'AuditLog',
@@ -416,14 +417,24 @@ export const QuestionTypeScalarFieldEnum = {
   id: 'id',
   name: 'name',
   displayName: 'displayName',
-  subjectId: 'subjectId',
-  chapterId: 'chapterId',
+  label: 'label',
   isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type QuestionTypeScalarFieldEnum = (typeof QuestionTypeScalarFieldEnum)[keyof typeof QuestionTypeScalarFieldEnum]
+
+
+export const SubjectQuestionTypeScalarFieldEnum = {
+  id: 'id',
+  subjectId: 'subjectId',
+  questionTypeId: 'questionTypeId',
+  label: 'label',
+  createdAt: 'createdAt'
+} as const
+
+export type SubjectQuestionTypeScalarFieldEnum = (typeof SubjectQuestionTypeScalarFieldEnum)[keyof typeof SubjectQuestionTypeScalarFieldEnum]
 
 
 export const McqScalarFieldEnum = {
@@ -445,6 +456,7 @@ export const McqScalarFieldEnum = {
   chapterId: 'chapterId',
   topicId: 'topicId',
   subTopicId: 'subTopicId',
+  questionTypeId: 'questionTypeId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -657,13 +669,12 @@ export type QuestionPaperSubjectScalarFieldEnum = (typeof QuestionPaperSubjectSc
 
 export const QuestionPaperSubjectMarkDistributionScalarFieldEnum = {
   id: 'id',
+  questionTypeId: 'questionTypeId',
   paperSubjectId: 'paperSubjectId',
-  type: 'type',
   marksPerQuestion: 'marksPerQuestion',
   questionCount: 'questionCount',
   totalMarks: 'totalMarks',
   questionsToAttempt: 'questionsToAttempt',
-  sectionLabel: 'sectionLabel',
   orderIndex: 'orderIndex',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
@@ -676,6 +687,9 @@ export const QuestionPaperQuestionScalarFieldEnum = {
   id: 'id',
   questionPaperId: 'questionPaperId',
   mcqId: 'mcqId',
+  paperSubjectId: 'paperSubjectId',
+  distributionId: 'distributionId',
+  questionTypeId: 'questionTypeId',
   orderIndex: 'orderIndex',
   overrides: 'overrides',
   createdAt: 'createdAt',

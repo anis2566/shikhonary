@@ -20,11 +20,10 @@ import {
 // ─── Internal input types ─────────────────────────────────────────────────────
 
 interface DistributionInput {
-  type: string;
+  questionTypeId: string;
   marksPerQuestion: number;
   questionCount: number;
   questionsToAttempt?: number | null;
-  sectionLabel?: string | null;
   orderIndex?: number;
 }
 
@@ -74,6 +73,11 @@ export class QuestionPaperService {
             subjects: {
               include: {
                 subject: { select: { name: true, displayName: true } },
+                distributions: {
+                  include: {
+                    questionType: { select: { name: true, displayName: true, label: true } },
+                  },
+                },
               },
             },
           },
@@ -95,10 +99,14 @@ export class QuestionPaperService {
       return await (this.masterDb as any).questionPaper.findUnique({
         where: { id: validatedId },
         include: {
+          academicClass: true,
           subjects: {
             include: {
               subject: true,
               distributions: {
+                include: {
+                  questionType: true,
+                },
                 orderBy: { orderIndex: "asc" as const },
               },
             },
@@ -122,10 +130,14 @@ export class QuestionPaperService {
       return await (this.masterDb as any).questionPaper.findUnique({
         where: { id: validatedId },
         include: {
+          academicClass: true,
           subjects: {
             include: {
               subject: true,
               distributions: {
+                include: {
+                  questionType: true,
+                },
                 orderBy: { orderIndex: "asc" as const },
               },
             },
@@ -189,13 +201,12 @@ export class QuestionPaperService {
           subjectTotal,
           distributions: {
             create: distributions.map((d, idx) => ({
-              type: d.type,
+              questionTypeId: d.questionTypeId,
               marksPerQuestion: d.marksPerQuestion,
               questionCount: d.questionCount,
               totalMarks:
                 d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount),
               questionsToAttempt: d.questionsToAttempt ?? null,
-              sectionLabel: d.sectionLabel ?? null,
               orderIndex: d.orderIndex ?? idx,
             })),
           },
@@ -222,7 +233,11 @@ export class QuestionPaperService {
           subjects: {
             include: {
               subject: { select: { name: true, displayName: true } },
-              distributions: true,
+              distributions: {
+                include: {
+                  questionType: { select: { name: true, displayName: true, label: true } },
+                },
+              },
             },
           },
         },
@@ -235,31 +250,85 @@ export class QuestionPaperService {
   // ──────────────────────────────────────────────────────────────── UPDATE ──
 
   /**
-   * Updates paper metadata and optionally replaces the subject list.
-   * Does NOT touch mark distributions — use `updateMarkDistribution` for that.
+   * Updates paper metadata and optionally replaces the subject list/distributions.
    */
-  async update(id: string, input: unknown): Promise<any | undefined> {
+  async update(id: string, input: any): Promise<any | undefined> {
     try {
       const validatedId = uuidSchema.parse(id);
-      const { subjectIds, ...paperData } =
-        updateQuestionPaperSchema.parse(input);
+      const { subjectIds, subjectBreakdowns, ...paperData } = input;
 
-      return await (this.masterDb as any).questionPaper.update({
-        where: { id: validatedId },
-        data: {
-          ...paperData,
-          ...(subjectIds && {
-            subjects: {
-              // Wipe and re-create subject rows; distributions are preserved
-              // only if the subjectId is still in the new list via cascade.
-              deleteMany: {},
-              create: (subjectIds as string[]).map((sid) => ({
-                subjectId: sid,
-                subjectTotal: 0,
-              })),
+      return await (this.masterDb as any).$transaction(async (tx: any) => {
+        let grandTotal = 0;
+
+        // 1. Handle subjects and distributions if provided
+        if (subjectIds) {
+          // Build the subject-level total for each subject
+          const subjectCreateData = subjectIds.map((sid: string) => {
+            const breakdown = subjectBreakdowns?.find((b: any) => b.subjectId === sid);
+            const distributions = breakdown?.distributions ?? [];
+
+            const subjectTotal = distributions.reduce((sum: number, d: any) => {
+              const effective =
+                d.questionsToAttempt !== null && d.questionsToAttempt !== undefined
+                  ? d.questionsToAttempt
+                  : d.questionCount;
+              return sum + d.marksPerQuestion * effective;
+            }, 0);
+
+            grandTotal += subjectTotal;
+
+            return {
+              subjectId: sid,
+              subjectTotal,
+              distributions: {
+                create: distributions.map((d: any, idx: number) => ({
+                  questionTypeId: d.questionTypeId,
+                  marksPerQuestion: d.marksPerQuestion,
+                  questionCount: d.questionCount,
+                  totalMarks:
+                    d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount),
+                  questionsToAttempt: d.questionsToAttempt ?? null,
+                  orderIndex: d.orderIndex ?? idx,
+                })),
+              },
+            };
+          });
+
+          // Wipe existing subjects
+          await tx.questionPaperSubject.deleteMany({
+            where: { questionPaperId: validatedId },
+          });
+
+          // Re-create subjects with distributions
+          await tx.questionPaper.update({
+            where: { id: validatedId },
+            data: {
+              ...paperData,
+              total: grandTotal > 0 ? grandTotal : (paperData.total ?? 0),
+              subjects: {
+                create: subjectCreateData,
+              },
             },
-          }),
-        },
+          });
+        } else {
+          // Just update metadata
+          await tx.questionPaper.update({
+            where: { id: validatedId },
+            data: paperData,
+          });
+        }
+
+        return await tx.questionPaper.findUnique({
+          where: { id: validatedId },
+          include: {
+            subjects: {
+              include: {
+                subject: true,
+                distributions: true,
+              },
+            },
+          },
+        });
       });
     } catch (error) {
       handlePrismaError(error);
@@ -412,13 +481,12 @@ export class QuestionPaperService {
         await tx.questionPaperSubjectMarkDistribution.createMany({
           data: items.map((d, idx) => ({
             paperSubjectId: validatedId,
-            type: d.type,
+            questionTypeId: d.questionTypeId,
             marksPerQuestion: d.marksPerQuestion,
             questionCount: d.questionCount,
             totalMarks:
               d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount),
             questionsToAttempt: d.questionsToAttempt ?? null,
-            sectionLabel: d.sectionLabel ?? null,
             orderIndex: d.orderIndex ?? idx,
           })),
         });
@@ -471,6 +539,9 @@ export class QuestionPaperService {
         include: {
           subject: { select: { name: true, displayName: true } },
           distributions: {
+            include: {
+              questionType: { select: { name: true, displayName: true, label: true } },
+            },
             orderBy: { orderIndex: "asc" as const },
           },
         },

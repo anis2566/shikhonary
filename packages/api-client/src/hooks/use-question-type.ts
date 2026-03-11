@@ -285,3 +285,14 @@ export function useQuestionTypesForSelection(subjectId?: string) {
     select: (data) => data.data,
   });
 }
+
+/**
+ * Hook for getting question type statistics
+ */
+export function useQuestionTypeStats() {
+  const trpc = useTRPC();
+  return useQuery({
+    ...trpc.questionType.getStats.queryOptions(),
+    select: (data) => data.data,
+  });
+}

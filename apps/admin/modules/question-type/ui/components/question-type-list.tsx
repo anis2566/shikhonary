@@ -52,30 +52,38 @@ const columns: Column<QuestionTypeWithRelations>[] = [
     ),
   },
   {
-    key: "subject",
-    header: "Subject",
+    key: "label",
+    header: "Label",
     render: (item) => (
       <Badge
-        variant="outline"
-        className="bg-primary/5 text-primary border-primary/20 font-bold text-[10px] uppercase tracking-wider rounded-md"
+        variant="secondary"
+        className="bg-muted text-muted-foreground font-black text-[10px] uppercase tracking-tighter px-1.5 py-0 rounded border-border/50"
       >
-        {item.subject.displayName}
+        {item.label || "N/A"}
       </Badge>
     ),
   },
   {
-    key: "chapter",
-    header: "Chapter",
-    render: (item) =>
-      item.chapter ? (
-        <span className="text-sm text-foreground">
-          {item.chapter.displayName}
-        </span>
-      ) : (
-        <span className="text-[10px] text-muted-foreground italic">
-          Generic
-        </span>
-      ),
+    key: "subjects",
+    header: "Subjects",
+    render: (item) => (
+      <div className="flex flex-wrap gap-1 max-w-[300px]">
+        {item.subjects?.map((s) => (
+          <Badge
+            key={s.subject.id}
+            variant="outline"
+            className="bg-primary/5 text-primary border-primary/20 font-bold text-[10px] uppercase tracking-wider rounded-md"
+          >
+            {s.subject.displayName}
+          </Badge>
+        ))}
+        {(!item.subjects || item.subjects.length === 0) && (
+          <span className="text-[10px] text-muted-foreground italic">
+            No Subjects
+          </span>
+        )}
+      </div>
+    ),
   },
   {
     key: "isActive",
@@ -124,19 +132,25 @@ export function QuestionTypeList({
   handleDelete,
 }: QuestionTypeListProps) {
   const { data: questionTypesData } = useQuestionTypes();
+  const items = questionTypesData?.items ?? [];
 
   const allSelected =
-    (questionTypesData?.items.length ?? 0) > 0 &&
-    selectedIds.length === questionTypesData?.items.length;
+    items.length > 0 && items.every((item) => selectedIds.includes(item.id));
   const someSelected =
     selectedIds.length > 0 &&
-    selectedIds.length < (questionTypesData?.items.length ?? 0);
+    !allSelected &&
+    items.some((item) => selectedIds.includes(item.id));
 
   const handleSelectAll = () => {
     if (allSelected) {
-      setSelectedIds([]);
+      const currentPageIds = items.map((i) => i.id);
+      setSelectedIds(selectedIds.filter((id) => !currentPageIds.includes(id)));
     } else {
-      setSelectedIds(questionTypesData?.items.map((item) => item.id) ?? []);
+      const currentPageIds = items.map((i) => i.id);
+      const newSelectedIds = Array.from(
+        new Set([...selectedIds, ...currentPageIds]),
+      );
+      setSelectedIds(newSelectedIds);
     }
   };
 

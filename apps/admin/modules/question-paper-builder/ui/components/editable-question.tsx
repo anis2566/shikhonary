@@ -195,29 +195,25 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
             >
               <DropdownMenuItem onClick={() => onDuplicate(question)}>
                 <Copy className="w-4 h-4 mr-2" />
-                Duplicate
+                ডুপ্লিকেট করুন
               </DropdownMenuItem>
               <DropdownMenuItem
                 onClick={() => onDelete(question.id)}
                 className="text-destructive"
               >
                 <Trash2 className="w-4 h-4 mr-2" />
-                Delete
+                মুছে ফেলুন
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
       )}
 
-      {/* Question type badge — visible in edit mode, hidden in PDF export */}
-      {isEditing && (
-        <div className="page-indicator absolute -right-2 -top-1 z-10">
-          <span className="text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded-md bg-muted/60 text-muted-foreground border border-border/30">
-            {question.type === "statement"
-              ? "Statement"
-              : question.type === "multiple"
-                ? "Multi"
-                : "MCQ"}
+      {/* Question Reference — font size 10 in square brackets */}
+      {settings.showReference && question.reference && question.reference.length > 0 && (
+        <div className="absolute -right-2 -top-1 z-10">
+          <span className="text-[10px] font-medium text-muted-foreground/60 whitespace-nowrap">
+            [{question.reference.join(", ")}]
           </span>
         </div>
       )}

@@ -77,9 +77,10 @@ export const updateMarkDistributionSchema = z.object({
   paperSubjectId: uuidSchema,
   items: z.array(
     z.object({
-      type: z.string().min(1),
-      marks: z.number().min(0),
+      questionTypeId: z.string().uuid(),
+      marksPerQuestion: z.number().min(0),
       questionCount: z.number().int().min(0).optional(),
+      questionsToAttempt: z.number().int().min(0).nullable().optional(),
     }),
   ),
 });

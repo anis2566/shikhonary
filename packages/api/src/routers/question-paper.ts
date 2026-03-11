@@ -17,11 +17,10 @@ import {
 // contract; the service uses its own DistributionInput interface internally.
 
 const distributionItemSchema = z.object({
-  type: z.string().min(1),
+  questionTypeId: z.string().uuid(),
   marksPerQuestion: z.number().min(0),
   questionCount: z.number().int().min(0),
   questionsToAttempt: z.number().int().min(0).nullable().optional(),
-  sectionLabel: z.string().nullable().optional(),
   orderIndex: z.number().int().min(0).optional(),
 });
 
@@ -96,7 +95,14 @@ export const questionPaperRouter = createTRPCRouter({
     }),
 
   update: baseMutationProcedure
-    .input(z.object({ id: z.string().uuid(), data: updateQuestionPaperSchema }))
+    .input(
+      z.object({
+        id: z.string().uuid(),
+        data: updateQuestionPaperSchema.extend({
+          subjectBreakdowns: z.array(subjectBreakdownSchema).optional(),
+        }),
+      }),
+    )
     .mutation(async ({ ctx, input }) => {
       const service = new QuestionPaperService(ctx.db);
       const data = await service.update(input.id, input.data);

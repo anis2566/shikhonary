@@ -8,9 +8,6 @@ import {
   Plus,
   Sparkles,
   FileText,
-  Trash2,
-  GripVertical,
-  Award,
   BookOpen,
 } from "lucide-react";
 
@@ -25,6 +22,7 @@ import {
   useForm,
   zodResolver,
 } from "@workspace/ui/components/form";
+import { MultiSelect } from "@workspace/ui/components/multi-select";
 import { Input } from "@workspace/ui/components/input";
 import { Textarea } from "@workspace/ui/components/textarea";
 import {
@@ -34,6 +32,13 @@ import {
   CardHeader,
   CardTitle,
 } from "@workspace/ui/components/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
 import { Separator } from "@workspace/ui/components/separator";
 import { cn } from "@workspace/ui/lib/utils";
 
@@ -48,230 +53,11 @@ import {
   useAcademicSubjectsForSelection,
 } from "@workspace/api-client";
 
-// ─── Types ────────────────────────────────────────────────────────────────────
-
-interface MarkDistributionRow {
-  id: string;
-  type: string;
-  marksPerQuestion: number;
-  questionCount: number;
-  questionsToAttempt: number | null;
-  sectionLabel: string;
-}
-
-// ─── Constants ────────────────────────────────────────────────────────────────
-
-const QUESTION_TYPES = [
-  "MCQ",
-  "CQ",
-  "Short",
-  "Essay",
-  "Practical",
-  "Viva",
-  "Fill-in-the-Blank",
-  "True/False",
-] as const;
-
-// ─── Helpers ──────────────────────────────────────────────────────────────────
-
-const makeRow = (): MarkDistributionRow => ({
-  id: crypto.randomUUID(),
-  type: "MCQ",
-  marksPerQuestion: 1,
-  questionCount: 10,
-  questionsToAttempt: null,
-  sectionLabel: "",
-});
-
-const rowTotal = (r: MarkDistributionRow) =>
-  r.marksPerQuestion * (r.questionsToAttempt ?? r.questionCount);
-
-// ─── BreakdownTable ───────────────────────────────────────────────────────────
-//
-// ARCHITECTURE NOTE — why this is self-contained:
-//
-// Every previous attempt threaded an `onChange` callback from the parent into
-// this component.  Each time ANY field changed, `setBreakdowns` ran in the
-// parent, which re-rendered, which produced a new `onChange` reference, which
-// Radix Select saw as a new prop, which triggered its internal position
-// recalculation — causing another state update — infinite loop.
-//
-// Solution: state lives HERE.  The parent never writes to it.
-// At submit time the parent reads rows via `registryRef` (a stable Map ref).
-// Zero prop-drilling of callbacks → zero re-render cascade.
-
-interface BreakdownTableProps {
-  subjectId: string;
-  /** Stable ref the parent uses to read rows at submit time. */
-  registryRef: React.MutableRefObject<Map<string, () => MarkDistributionRow[]>>;
-  disabled?: boolean;
-}
-
-const BreakdownTable = React.memo(
-  ({ subjectId, registryRef, disabled }: BreakdownTableProps) => {
-    const [rows, setRows] = React.useState<MarkDistributionRow[]>([]);
-
-    // Keep registry up-to-date whenever rows change
-    React.useLayoutEffect(() => {
-      registryRef.current.set(subjectId, () => rows);
-    }, [subjectId, rows, registryRef]);
-
-    // Cleanup on unmount
-    React.useEffect(() => {
-      return () => {
-        registryRef.current.delete(subjectId);
-      };
-    }, [subjectId, registryRef]);
-
-    const update = (id: string, patch: Partial<MarkDistributionRow>) =>
-      setRows((prev) =>
-        prev.map((r) => (r.id === id ? { ...r, ...patch } : r)),
-      );
-
-    const remove = (id: string) =>
-      setRows((prev) => prev.filter((r) => r.id !== id));
-
-    const add = () => setRows((prev) => [...prev, makeRow()]);
-
-    const total = rows.reduce((s, r) => s + rowTotal(r), 0);
-
-    return (
-      <div className="space-y-3">
-        {/* Column headers */}
-        <div className="hidden md:grid grid-cols-[1.5rem_1fr_6rem_6rem_6rem_6rem_2.5rem] gap-2 px-3 py-1.5 rounded-lg bg-muted/40">
-          <span />
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
-            Type
-          </span>
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">
-            Marks/Q
-          </span>
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">
-            # Qs
-          </span>
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">
-            Attempt
-          </span>
-          <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground text-right">
-            Subtotal
-          </span>
-          <span />
-        </div>
-
-        {rows.length === 0 && (
-          <div className="py-8 text-center text-sm text-muted-foreground italic rounded-xl border border-dashed border-border/50">
-            No rows yet — click{" "}
-            <span className="font-bold text-primary">Add Row</span> below.
-          </div>
-        )}
-
-        {rows.map((row) => (
-          <div
-            key={row.id}
-            className="grid grid-cols-[1.5rem_1fr_6rem_6rem_6rem_6rem_2.5rem] gap-2 items-center px-3 py-2 rounded-xl bg-background/60 border border-border/40 hover:border-border/70 transition-colors group"
-          >
-            <GripVertical className="size-3.5 text-muted-foreground/30 cursor-grab" />
-
-            {/* Type (native select — no Radix, no re-render cascade) + section label */}
-            <div className="flex flex-col gap-1 min-w-0">
-              <select
-                value={row.type}
-                disabled={disabled}
-                onChange={(e) => update(row.id, { type: e.target.value })}
-                className="h-8 w-full rounded-lg border border-border/40 bg-background/50 px-2 text-xs font-bold text-foreground focus:outline-none focus:ring-1 focus:ring-primary/30 disabled:opacity-50"
-              >
-                {QUESTION_TYPES.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-              <Input
-                placeholder="Section label (optional)"
-                value={row.sectionLabel}
-                onChange={(e) =>
-                  update(row.id, { sectionLabel: e.target.value })
-                }
-                disabled={disabled}
-                className="h-6 text-[10px] bg-transparent border-border/30 rounded-lg px-2"
-              />
-            </div>
-
-            <Input
-              type="number"
-              min={0}
-              step={0.5}
-              value={row.marksPerQuestion}
-              onChange={(e) =>
-                update(row.id, { marksPerQuestion: Number(e.target.value) })
-              }
-              disabled={disabled}
-              className="h-8 text-xs font-bold text-right bg-transparent border-border/40 rounded-lg px-2"
-            />
-            <Input
-              type="number"
-              min={0}
-              value={row.questionCount}
-              onChange={(e) =>
-                update(row.id, { questionCount: Number(e.target.value) })
-              }
-              disabled={disabled}
-              className="h-8 text-xs font-bold text-right bg-transparent border-border/40 rounded-lg px-2"
-            />
-            <Input
-              type="number"
-              min={0}
-              placeholder="All"
-              value={row.questionsToAttempt ?? ""}
-              onChange={(e) =>
-                update(row.id, {
-                  questionsToAttempt: e.target.value
-                    ? Number(e.target.value)
-                    : null,
-                })
-              }
-              disabled={disabled}
-              className="h-8 text-xs font-bold text-right bg-transparent border-border/40 rounded-lg px-2 placeholder:text-muted-foreground/40"
-            />
-
-            <div className="text-right text-xs font-black text-primary tabular-nums">
-              {rowTotal(row)}
-            </div>
-
-            <button
-              type="button"
-              onClick={() => remove(row.id)}
-              disabled={disabled}
-              className="flex items-center justify-center size-6 rounded-lg text-muted-foreground/30 hover:text-destructive hover:bg-destructive/10 transition-all opacity-0 group-hover:opacity-100"
-            >
-              <Trash2 className="size-3.5" />
-            </button>
-          </div>
-        ))}
-
-        <div className="flex items-center justify-between pt-1">
-          <Button
-            type="button"
-            variant="outline"
-            size="sm"
-            onClick={add}
-            disabled={disabled}
-            className="h-7 px-3 text-xs font-bold rounded-lg border-dashed border-border/60 hover:border-primary/40 hover:bg-primary/5"
-          >
-            <Plus className="size-3 mr-1.5 stroke-[3]" />
-            Add Row
-          </Button>
-          <div className="flex items-center gap-2 text-sm font-black">
-            <Award className="size-4 text-primary" />
-            <span className="text-muted-foreground font-medium">Total:</span>
-            <span className="text-primary tabular-nums">{total} marks</span>
-          </div>
-        </div>
-      </div>
-    );
-  },
-);
-BreakdownTable.displayName = "BreakdownTable";
+import {
+  BreakdownTable,
+  MarkDistributionRow,
+  rowTotal,
+} from "./breakdown-table";
 
 // ─── Main form ────────────────────────────────────────────────────────────────
 
@@ -313,53 +99,56 @@ export const CreatePaperForm = () => {
     breakdownRegistry.current.clear();
   };
 
-  const handleSubjectToggle = (subjectId: string) => {
-    const isSelected = selectedSubjectIds.includes(subjectId);
-    const next = isSelected
-      ? selectedSubjectIds.filter((id) => id !== subjectId)
-      : [...selectedSubjectIds, subjectId];
+  const handleSubjectChange = (newIds: string[]) => {
+    setSelectedSubjectIds(newIds);
+    form.setValue("subjectIds", newIds);
 
-    form.setValue("subjectIds", next);
-    setSelectedSubjectIds(next);
-
-    if (isSelected) {
-      breakdownRegistry.current.delete(subjectId);
-      if (activeSubjectId === subjectId) {
-        setActiveSubjectId(next[0] ?? null);
-      }
-    } else {
-      if (!activeSubjectId) setActiveSubjectId(subjectId);
+    // If active subject was removed, or none set, pick a new one
+    if (newIds.length === 0) {
+      setActiveSubjectId(null);
+    } else if (!activeSubjectId || !newIds.includes(activeSubjectId)) {
+      setActiveSubjectId(newIds[0] || null);
     }
   };
 
-  const onSubmit = async (data: QuestionPaperFormValues) => {
-    try {
-      const payload = {
-        ...data,
-        subjectBreakdowns: selectedSubjectIds.map((sid) => {
-          const getRows = breakdownRegistry.current.get(sid);
-          const rows = getRows?.() ?? [];
-          return {
-            subjectId: sid,
-            distributions: rows.map((r) => ({
-              type: r.type,
-              marksPerQuestion: r.marksPerQuestion,
-              questionCount: r.questionCount,
-              totalMarks: rowTotal(r),
-              questionsToAttempt: r.questionsToAttempt,
-              sectionLabel: r.sectionLabel || null,
-            })),
-          };
-        }),
-      };
-      const result = await createPaper(payload as any);
-      if (result.success && result.data?.id) {
-        router.push(`/question-papers/${result.data.id}/customize`);
+  const onSubmit = React.useCallback(
+    async (data: QuestionPaperFormValues) => {
+      try {
+        const payload = {
+          ...data,
+          subjectBreakdowns: selectedSubjectIds.map((sid) => {
+            const getRows = breakdownRegistry.current.get(sid);
+            const rows = getRows?.() ?? [];
+            return {
+              subjectId: sid,
+              distributions: rows.map((r) => ({
+                questionTypeId: r.questionTypeId,
+                marksPerQuestion: r.marksPerQuestion,
+                questionCount: r.questionCount,
+                totalMarks: rowTotal(r),
+                questionsToAttempt: r.questionsToAttempt,
+              })),
+            };
+          }),
+        };
+        const result = await createPaper(payload as any);
+        if (result.success && result.data?.id) {
+          router.push(`/question-papers/${result.data.id}/customize`);
+        }
+      } catch (error) {
+        console.error(error);
       }
-    } catch (error) {
-      console.error(error);
-    }
+    },
+    [selectedSubjectIds, createPaper, router],
+  );
+
+  // Wrapper to satisfy lint vs "accessing refs during render"
+  const handleSubmission = (e: React.FormEvent) => {
+    e.preventDefault();
+    form.handleSubmit(onSubmit)(e);
   };
+
+  const subjectsData = (subjects as { id: string; displayName: string }[]) || [];
 
   return (
     <div className="max-w-4xl mx-auto p-4 lg:p-6 space-y-8 animate-in fade-in duration-500 text-foreground">
@@ -390,7 +179,7 @@ export const CreatePaperForm = () => {
       </div>
 
       <Form {...form}>
-        <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+        <form onSubmit={handleSubmission} className="space-y-6">
           {/* ── Card 1: Paper Details ── */}
           <Card className="bg-card/30 backdrop-blur-xl border-border/50 rounded-[2rem] overflow-hidden shadow-medium relative">
             <div className="absolute top-0 right-0 p-8 opacity-5 pointer-events-none">
@@ -435,24 +224,31 @@ export const CreatePaperForm = () => {
                         Class / Grade *
                       </FormLabel>
                       <FormControl>
-                        <select
+                        <Select
                           value={selectedClassId ?? ""}
-                          disabled={isPending}
-                          onChange={(e) => {
-                            field.onChange(e.target.value);
-                            handleClassChange(e.target.value);
+                          onValueChange={(val) => {
+                            field.onChange(val);
+                            handleClassChange(val);
                           }}
-                          className="h-12 w-full rounded-xl border border-border/50 bg-background/50 px-4 text-sm font-semibold text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                          disabled={isPending}
                         >
-                          <option value="" disabled>
-                            Select a class
-                          </option>
-                          {classes?.map((c: any) => (
-                            <option key={c.id} value={c.id}>
-                              {c.displayName}
-                            </option>
-                          ))}
-                        </select>
+                          <SelectTrigger className="h-12 w-full rounded-xl border border-border/50 bg-background/50 px-4 text-sm font-semibold text-foreground focus:ring-2 focus:ring-primary/20">
+                            <SelectValue placeholder="Select a class" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {classes?.map(
+                              (c: { id: string; displayName: string }) => (
+                                <SelectItem
+                                  key={c.id}
+                                  value={c.id}
+                                  className="font-semibold"
+                                >
+                                  {c.displayName}
+                                </SelectItem>
+                              ),
+                            )}
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage className="font-bold text-xs" />
                     </FormItem>
@@ -538,46 +334,35 @@ export const CreatePaperForm = () => {
               <FormField
                 control={form.control}
                 name="subjectIds"
-                render={() => (
+                render={({ field }) => (
                   <FormItem className="space-y-3">
                     <FormLabel className="text-sm font-bold uppercase tracking-wider text-muted-foreground">
                       Target Subjects *
                     </FormLabel>
-                    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                      {subjects?.map((subject: any) => {
-                        const isChecked = selectedSubjectIds.includes(
-                          subject.id,
-                        );
-                        return (
-                          <label
-                            key={subject.id}
-                            className={cn(
-                              "flex flex-row items-center gap-3 p-3 rounded-xl border border-border/50 bg-background/30 transition-all cursor-pointer hover:bg-primary/5",
-                              isChecked &&
-                                "border-primary/30 bg-primary/5 shadow-soft",
-                            )}
-                          >
-                            <input
-                              type="checkbox"
-                              checked={isChecked}
-                              onChange={() => handleSubjectToggle(subject.id)}
-                              className="size-4 rounded border-border accent-primary cursor-pointer"
-                            />
-                            <span className="text-xs font-bold">
-                              {subject.displayName}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                    {!subjects?.length && selectedClassId && (
+                    <FormControl>
+                      <MultiSelect
+                        {...field}
+                        options={subjectsData.map((s) => ({
+                          label: s.displayName,
+                          value: s.id,
+                        }))}
+                        selected={selectedSubjectIds}
+                        onChange={(vals) => {
+                          field.onChange(vals);
+                          handleSubjectChange(vals);
+                        }}
+                        placeholder={
+                          selectedClassId
+                            ? "Select subjects..."
+                            : "Please select a class first"
+                        }
+                        disabled={isPending || !selectedClassId}
+                        className="bg-background/50 border-border/50 rounded-xl"
+                      />
+                    </FormControl>
+                    {!subjectsData.length && selectedClassId && (
                       <p className="text-xs text-muted-foreground italic">
                         No subjects found for the selected class.
-                      </p>
-                    )}
-                    {!selectedClassId && (
-                      <p className="text-xs text-muted-foreground italic">
-                        Please select a class first.
                       </p>
                     )}
                     <FormMessage className="font-bold text-xs" />
@@ -628,7 +413,7 @@ export const CreatePaperForm = () => {
                 {/* Subject tabs */}
                 <div className="flex flex-wrap gap-2">
                   {selectedSubjectIds.map((sid) => {
-                    const subject = subjects?.find((s: any) => s.id === sid);
+                    const subject = subjectsData.find((s) => s.id === sid);
                     return (
                       <button
                         key={sid}
@@ -651,7 +436,7 @@ export const CreatePaperForm = () => {
 
                 {/* Render all tables; show/hide with CSS so instances are preserved */}
                 {selectedSubjectIds.map((sid) => {
-                  const subject = subjects?.find((s: any) => s.id === sid);
+                  const subject = subjectsData.find((s) => s.id === sid);
                   return (
                     <div
                       key={sid}
