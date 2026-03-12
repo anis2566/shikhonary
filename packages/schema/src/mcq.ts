@@ -31,6 +31,7 @@ export const mcqFormSchema = z.object({
   questionUrl: z.string().url().optional().or(z.literal("")),
   contextUrl: z.string().url().optional().or(z.literal("")),
   questionTypeId: uuidSchema.optional().or(z.literal("")),
+  isActive: z.boolean().optional().default(true),
 });
 
 export type MCQFormValues = z.infer<typeof mcqFormSchema>;
@@ -45,6 +46,7 @@ export const defaultMCQValues: MCQFormValues = {
   options: ["", "", "", ""],
   type: MCQ_TYPE.SINGLE,
   isMath: false,
+  isActive: true,
   reference: [],
   explanation: "",
   context: "",

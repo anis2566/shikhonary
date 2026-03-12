@@ -329,7 +329,7 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                               </p>
                             </div>
                             <Link
-                              href={`/question-papers/${paperId}/customize/resources/${d.questionType?.name.toLowerCase()}/${d.questionTypeId}`}
+                              href={`/question-papers/${paperId}/resources/${d.questionType?.name.toLowerCase()}/${d.questionTypeId}?subjectId=${s.subjectId}`}
                               className="w-full"
                             >
                               <Button

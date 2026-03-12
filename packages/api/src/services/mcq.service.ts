@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type PrismaClient } from "@workspace/db";
+import { Prisma, type PrismaClient } from "@workspace/db";
 import {
   type MCQ,
   mcqFormSchema,
@@ -29,16 +29,25 @@ export class McqService {
     sort?: string;
     subjectId?: string;
     chapterId?: string;
+    questionTypeId?: string;
     type?: string;
+    reference?: string;
     isMath?: boolean;
   }): Promise<
     PaginatedResponse<MCQ & { subject: any; chapter: any }> | undefined
   > {
     try {
       const where = buildWhere(input, ["question", "explanation"]);
+
+      if (input.search) {
+        where.OR = [...where.OR, { reference: { has: input.search } }];
+      }
+
       if (input.subjectId) where.subjectId = input.subjectId;
       if (input.chapterId) where.chapterId = input.chapterId;
+      if (input.questionTypeId) where.questionTypeId = input.questionTypeId;
       if (input.type) where.type = input.type;
+      if (input.reference) where.reference = { has: input.reference };
       if (input.isMath) where.isMath = input.isMath;
 
       const orderBy = buildOrderBy(input);
@@ -55,6 +64,70 @@ export class McqService {
         this.db.mcq.findMany({
           where,
           orderBy: stableOrderBy,
+          ...pagination,
+          include: { subject: true, chapter: true },
+        }),
+        this.db.mcq.count({ where }),
+      ]);
+
+      return createPaginatedResponse(
+        items as any,
+        total,
+        input.page,
+        input.limit,
+      );
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async getForAssignment(input: {
+    page: number;
+    limit: number;
+    search?: string;
+    subjectId: string;
+    questionTypeId: string;
+    chapterId?: string;
+    type?: string;
+    reference?: string;
+  }): Promise<
+    PaginatedResponse<MCQ & { subject: any; chapter: any }> | undefined
+  > {
+    try {
+      const where: Prisma.McqWhereInput = {
+        subjectId: input.subjectId,
+        questionTypeId: input.questionTypeId,
+        isActive: true,
+      };
+
+      if (input.chapterId) where.chapterId = input.chapterId;
+      if (input.type) where.type = input.type;
+      
+      if (input.reference) {
+        const matches = await this.db.$queryRaw<{ id: string }[]>`
+          SELECT id FROM "Mcq" 
+          WHERE EXISTS (
+            SELECT 1 FROM unnest(reference) AS ref 
+            WHERE ref ILIKE ${input.reference + "%"}
+          )
+        `;
+        where.id = { in: matches.map((m) => m.id) };
+      }
+
+      if (input.search) {
+        where.OR = [
+          { question: { contains: input.search, mode: "insensitive" } },
+          { context: { contains: input.search, mode: "insensitive" } },
+          { reference: { has: input.search } },
+        ];
+      }
+
+      const pagination = buildPagination(input);
+
+      const [items, total] = await Promise.all([
+        this.db.mcq.findMany({
+          where,
+          orderBy: { createdAt: "desc" },
           ...pagination,
           include: { subject: true, chapter: true },
         }),

@@ -3346,6 +3346,7 @@ export const McqScalarFieldEnum = {
   topicId: 'topicId',
   subTopicId: 'subTopicId',
   questionTypeId: 'questionTypeId',
+  isActive: 'isActive',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const

@@ -15,11 +15,31 @@ export const mcqRouter = createTRPCRouter({
         subjectId: zNullishString,
         chapterId: zNullishString,
         type: zNullishString,
+        reference: zNullishString,
       }),
     )
     .query(async ({ ctx, input }) => {
       const service = new McqService(ctx.db);
-      const data = await service.list(input);
+      const data = await service.list(input as any);
+      return {
+        success: true,
+        data,
+      };
+    }),
+
+  getForAssignment: adminProcedure
+    .input(
+      baseListInputSchema.extend({
+        subjectId: z.string(),
+        questionTypeId: z.string(),
+        chapterId: zNullishString,
+        type: zNullishString,
+        reference: zNullishString,
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const service = new McqService(ctx.db);
+      const data = await service.getForAssignment(input as any);
       return {
         success: true,
         data,

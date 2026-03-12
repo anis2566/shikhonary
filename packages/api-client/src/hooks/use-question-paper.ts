@@ -230,6 +230,64 @@ export function useRemoveMcqFromQuestionPaper() {
 }
 
 /**
+ * Bulk assign MCQs to a paper
+ */
+export function useBulkAssignMcqToQuestionPaper() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.questionPaper.bulkAssignMcq.mutationOptions(),
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to assign questions");
+    },
+    onSuccess: async (data: any, variables: any) => {
+      if (data.success) {
+        toast.success(data.message);
+        if (variables.questionPaperId) {
+          await queryClient.invalidateQueries({
+            queryKey: trpc.questionPaper.getById.queryKey({
+              id: variables.questionPaperId,
+            }),
+          });
+        }
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+}
+
+/**
+ * Bulk remove MCQs from a paper
+ */
+export function useBulkRemoveMcqFromQuestionPaper() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.questionPaper.bulkRemoveMcq.mutationOptions(),
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to remove questions");
+    },
+    onSuccess: async (data: any) => {
+      if (data.success) {
+        toast.success(data.message);
+        // Bust all paper details
+        await queryClient.invalidateQueries({
+          queryKey: trpc.questionPaper.getById.queryKey(),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: trpc.questionPaper.list.queryKey(),
+        });
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+}
+
+/**
  * Reorder the questions within a paper
  */
 export function useReorderQuestionPaperQuestions() {

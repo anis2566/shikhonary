@@ -177,6 +177,34 @@ export const questionPaperRouter = createTRPCRouter({
       };
     }),
 
+  bulkAssignMcq: baseMutationProcedure
+    .input(
+      z.object({
+        questionPaperId: z.string().uuid(),
+        mcqIds: z.array(z.string().uuid()),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = new QuestionPaperService(ctx.db);
+      const data = await service.bulkAssignMcqs(input);
+      return {
+        success: true,
+        message: "MCQs assigned to paper",
+        data,
+      };
+    }),
+
+  bulkRemoveMcq: baseMutationProcedure
+    .input(z.object({ ids: z.array(z.string().uuid()) }))
+    .mutation(async ({ ctx, input }) => {
+      const service = new QuestionPaperService(ctx.db);
+      await service.bulkRemoveMcqs(input.ids);
+      return {
+        success: true,
+        message: "MCQs removed from paper",
+      };
+    }),
+
   reorderQuestions: baseMutationProcedure
     .input(
       z.object({

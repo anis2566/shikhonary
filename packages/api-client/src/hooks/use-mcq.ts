@@ -257,3 +257,22 @@ export function useMCQStats(chapterId?: string) {
     select: (data: any) => data.data,
   });
 }
+/**
+ * Hook for getting MCQs for assignment to a question paper
+ */
+export function useMCQsForAssignment(filters: {
+  subjectId: string;
+  questionTypeId: string;
+  chapterId?: string;
+  type?: string;
+  reference?: string;
+  search?: string;
+  page?: number;
+  limit?: number;
+}) {
+  const trpc = useTRPC();
+  return useQuery({
+    ...trpc.mcq.getForAssignment.queryOptions(filters),
+    select: (data: any) => data.data,
+  });
+}

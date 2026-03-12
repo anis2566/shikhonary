@@ -128,6 +128,8 @@ export const mcqFilterSchema = {
     clearOnDefault: true,
   }),
   isMath: parseAsBoolean.withOptions({ clearOnDefault: true }),
+  questionTypeId: parseAsString.withOptions({ clearOnDefault: true }),
+  reference: parseAsString.withOptions({ clearOnDefault: true }),
   sort: parseAsStringEnum(Object.values(SORT)).withOptions({
     clearOnDefault: true,
   }),

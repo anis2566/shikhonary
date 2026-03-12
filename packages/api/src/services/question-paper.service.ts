@@ -391,11 +391,57 @@ export class QuestionPaperService {
     }
   }
 
+  async bulkAssignMcqs(input: {
+    questionPaperId: string;
+    mcqIds: string[];
+  }): Promise<any | undefined> {
+    try {
+      const { questionPaperId, mcqIds } = input;
+      const validatedPaperId = uuidSchema.parse(questionPaperId);
+
+      const count = await (this.masterDb as any).questionPaperQuestion.count({
+        where: { questionPaperId: validatedPaperId },
+      });
+
+      return await (this.masterDb as any).$transaction(
+        mcqIds.map((mcqId, idx) =>
+          (this.masterDb as any).questionPaperQuestion.upsert({
+            where: {
+              questionPaperId_mcqId: {
+                questionPaperId: validatedPaperId,
+                mcqId,
+              },
+            },
+            create: {
+              questionPaperId: validatedPaperId,
+              mcqId,
+              orderIndex: count + idx,
+            },
+            update: { orderIndex: count + idx },
+          }),
+        ),
+      );
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
   async removeMcq(questionPaperQuestionId: string): Promise<any | undefined> {
     try {
       const validatedId = uuidSchema.parse(questionPaperQuestionId);
       return await (this.masterDb as any).questionPaperQuestion.delete({
         where: { id: validatedId },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async bulkRemoveMcqs(ids: string[]): Promise<any | undefined> {
+    try {
+      const validatedIds = ids.map((id) => uuidSchema.parse(id));
+      return await (this.masterDb as any).questionPaperQuestion.deleteMany({
+        where: { id: { in: validatedIds } },
       });
     } catch (error) {
       handlePrismaError(error);
