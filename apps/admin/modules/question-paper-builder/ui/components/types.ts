@@ -20,6 +20,7 @@ export interface PaperQuestion {
   optionsColumns?: 1 | 2;
   subjectId?: string;
   questionTypeId?: string;
+  distributionId?: string;
   reference?: string[];
 }
 

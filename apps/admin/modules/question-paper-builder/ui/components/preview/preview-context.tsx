@@ -360,25 +360,24 @@ export const PreviewProvider: React.FC<{
   }, [settings.paperSize, settings.paperOrientation, zoom, getPaperDimensions]);
 
   // Pagination Logic
+  const computePageForLeft = useCallback((left: number, containerRect: DOMRect, container: HTMLDivElement) => {
+      const cols = settings.columns;
+      const gapElement = container.querySelector(".pagination-column-container") || container;
+      const gap = parseFloat(getComputedStyle(gapElement).columnGap) || 24;
+      const stride = (containerRect.width - gap * (cols - 1)) / cols + gap;
+      return Math.floor(Math.floor((left - containerRect.left + 1) / stride) / cols);
+  }, [settings.columns]);
+
   const computePageIndices = useCallback(
     (container: HTMLDivElement) => {
-      const cols = settings.columns;
       const items = Array.from(
         container.querySelectorAll<HTMLElement>("[data-question-index]"),
       );
       if (items.length === 0) return [];
       const rect = container.getBoundingClientRect();
-      const gap = parseFloat(getComputedStyle(container).columnGap) || 24;
-      const stride = (rect.width - gap * (cols - 1)) / cols + gap;
-      return items.map((el) =>
-        Math.floor(
-          Math.floor(
-            (el.getBoundingClientRect().left - rect.left + 1) / stride,
-          ) / cols,
-        ),
-      );
+      return items.map((el) => computePageForLeft(el.getBoundingClientRect().left, rect, container));
     },
-    [settings.columns],
+    [computePageForLeft],
   );
 
   useLayoutEffect(() => {
@@ -412,7 +411,36 @@ export const PreviewProvider: React.FC<{
       rPages[pIdx].push(q);
     });
 
-    const finalPages = [fPage, ...rPages.filter((p) => p?.length > 0)];
+    const maxRPage = restIndices.length > 0 ? Math.max(...restIndices) : -1;
+    for (let i = 0; i <= maxRPage; i++) {
+        if (!rPages[i]) rPages[i] = [];
+    }
+
+    const finalPages = [fPage, ...rPages];
+
+    const checkSentinel = (container: HTMLDivElement | null) => {
+      if (!container) return 0;
+      const sentinel = container.querySelector<HTMLElement>("[data-end-sentinel='true']");
+      if (!sentinel) return 0;
+      return computePageForLeft(sentinel.getBoundingClientRect().left, container.getBoundingClientRect(), container);
+    };
+
+    let requiredPages = finalPages.length;
+    if (end === questions.length) {
+      const sPage = checkSentinel(measureFirstQuestionsRef.current);
+      if (sPage > 0) {
+        requiredPages = 1 + sPage;
+      }
+    } else {
+      const sPage = checkSentinel(measureRestQuestionsRef.current);
+      if (sPage + 2 > requiredPages) {
+        requiredPages = sPage + 2;
+      }
+    }
+
+    while (finalPages.length < requiredPages) {
+      finalPages.push([]);
+    }
 
     requestAnimationFrame(() => {
       if (firstPageEnd !== end) setFirstPageEnd(end);
@@ -430,7 +458,9 @@ export const PreviewProvider: React.FC<{
     settings,
     getPaperDimensions,
     computePageIndices,
+    computePageForLeft,
     firstPageEnd,
+    shouldRestrictHeaderWidth,
   ]);
 
   const value = {

@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 
 interface Props {
   params: Promise<{ questionTypeId: string }>;
-  searchParams: Promise<{ subjectId: string }>;
+  searchParams: Promise<{ subjectId: string; distributionId: string }>;
 }
 
 const MCQResource = async ({ params, searchParams }: Props) => {
   const { questionTypeId } = await params;
-  const { subjectId } = await searchParams;
+  const { subjectId, distributionId } = await searchParams;
 
   return (
     <HydrateClient>
@@ -23,6 +23,7 @@ const MCQResource = async ({ params, searchParams }: Props) => {
         <MCQResourceView
           questionTypeId={questionTypeId}
           subjectId={subjectId}
+          distributionId={distributionId}
         />
       </div>
     </HydrateClient>

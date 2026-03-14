@@ -26,7 +26,7 @@ interface EditableQuestionProps {
   isDraggable?: boolean;
   onFocus?: (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>,
-    type: "question" | "option" | "statement",
+    type: "question" | "option" | "statement" | "context",
     index?: number,
     currentStyle?: ElementStyle,
   ) => void;
@@ -104,6 +104,16 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
     );
   };
 
+  const getContextStyle = (): ElementStyle => {
+    return (
+      localQuestion.contextStyle || {
+        fontSize: settings.fontSize - 1,
+        fontFamily: settings.fontFamily,
+        textAlign: "left",
+      }
+    );
+  };
+
   const handleQuestionChange = (value: string) => {
     const updated = { ...localQuestion, question: value };
     setLocalQuestion(updated);
@@ -118,6 +128,12 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
       newOptions[index] = { ...newOptions[index], text: value };
     }
     const updated = { ...localQuestion, options: newOptions };
+    setLocalQuestion(updated);
+    onUpdate(updated);
+  };
+
+  const handleContextChange = (value: string) => {
+    const updated = { ...localQuestion, context: value };
     setLocalQuestion(updated);
     onUpdate(updated);
   };
@@ -166,7 +182,7 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
       ref={setNodeRef}
       style={sortableStyle}
       className={cn(
-        "group relative py-1 transition-all",
+        "group relative py-0 transition-all",
         isEditing && "hover:bg-muted/30 rounded-lg px-2",
         isDragging && "z-50",
       )}
@@ -210,16 +226,18 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
       )}
 
       {/* Question Reference — font size 10 in square brackets */}
-      {settings.showReference && question.reference && question.reference.length > 0 && (
-        <div className="absolute -right-2 -top-1 z-10">
-          <span className="text-[10px] font-medium text-muted-foreground/60 whitespace-nowrap">
-            [{question.reference.join(", ")}]
-          </span>
-        </div>
-      )}
+      {settings.showReference &&
+        question.reference &&
+        question.reference.length > 0 && (
+          <div className="absolute -right-2 -top-1 z-10">
+            <span className="text-[10px] font-medium text-muted-foreground/60 whitespace-nowrap">
+              [{question.reference.join(", ")}]
+            </span>
+          </div>
+        )}
       <div className="flex gap-2">
         <span
-          className="font-medium shrink-0"
+          className="font-bold shrink-0"
           style={{
             fontSize: questionStyle.fontSize,
             fontFamily: questionStyle.fontFamily,
@@ -228,6 +246,59 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
           {getBengaliNumber(question.number)}।
         </span>
         <div className="flex-1">
+          {/* Context if present or contextual type */}
+          {(localQuestion.context?.trim() ||
+            localQuestion.type === "contextual") && (
+            <div className="mb-0">
+              {isEditing ? (
+                <textarea
+                  value={localQuestion.context || ""}
+                  onChange={(e) => handleContextChange(e.target.value)}
+                  onFocus={(e) =>
+                    onFocus?.(e, "context", undefined, getContextStyle())
+                  }
+                  onBlur={onBlur}
+                  ref={(el) => {
+                    if (el) {
+                      el.style.height = "auto";
+                      el.style.height = el.scrollHeight + "px";
+                    }
+                  }}
+                  className={cn(
+                    "w-full bg-muted/30 border-0 resize-none font-medium italic rounded-lg overflow-hidden",
+                    editableBaseClass,
+                    editableHoverClass,
+                    editableFocusClass,
+                  )}
+                  style={{
+                    fontSize: getContextStyle().fontSize,
+                    fontFamily: getContextStyle().fontFamily,
+                    lineHeight: settings.lineHeight,
+                    textAlign: getContextStyle()
+                      .textAlign as React.CSSProperties["textAlign"],
+                  }}
+                  rows={1}
+                  placeholder="উদ্দীপক/অনুচ্ছেদ লিখুন..."
+                />
+              ) : (
+                localQuestion.context && (
+                  <p
+                    className="m-0 font-medium italic text-foreground bg-black/5 p-1 rounded-lg"
+                    style={{
+                      fontSize: getContextStyle().fontSize,
+                      fontFamily: getContextStyle().fontFamily,
+                      lineHeight: settings.lineHeight,
+                      textAlign: getContextStyle()
+                        .textAlign as React.CSSProperties["textAlign"],
+                    }}
+                  >
+                    {localQuestion.context}
+                  </p>
+                )
+              )}
+            </div>
+          )}
+
           {isEditing ? (
             <textarea
               value={localQuestion.question}
@@ -236,8 +307,14 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
                 onFocus?.(e, "question", undefined, questionStyle)
               }
               onBlur={onBlur}
+              ref={(el) => {
+                if (el) {
+                  el.style.height = "auto";
+                  el.style.height = el.scrollHeight + "px";
+                }
+              }}
               className={cn(
-                "w-full bg-transparent border-0 resize-none font-bold",
+                "w-full bg-transparent border-0 resize-none font-bold overflow-hidden",
                 editableBaseClass,
                 editableHoverClass,
                 editableFocusClass,
@@ -249,11 +326,12 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
                 textAlign:
                   questionStyle.textAlign as React.CSSProperties["textAlign"],
               }}
-              rows={Math.ceil(localQuestion.question.length / 50) || 1}
+              rows={1}
               placeholder="প্রশ্ন লিখুন..."
             />
           ) : (
             <p
+              className="m-0 font-bold"
               style={{
                 fontSize: questionStyle.fontSize,
                 fontFamily: questionStyle.fontFamily,
@@ -268,7 +346,7 @@ export const EditableQuestion: React.FC<EditableQuestionProps> = ({
 
           {/* Statements if present */}
           {question.statements && question.statements.length > 0 && (
-            <div className="mt-1 pl-4 space-y-0">
+            <div className="mt-0 space-y-0">
               {question.statements.map((statement, idx) => {
                 const statementStyle = getStatementStyle(idx);
                 return (

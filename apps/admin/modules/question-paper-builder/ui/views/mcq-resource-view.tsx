@@ -9,7 +9,9 @@ import {
   X,
   Layers,
   LayoutGrid,
+  Dices,
 } from "lucide-react";
+import { toast } from "@workspace/ui/components/sonner";
 import {
   useQuestionPaperById,
   useAcademicChaptersForSelection,
@@ -21,7 +23,13 @@ import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import { Badge } from "@workspace/ui/components/badge";
 import { Skeleton } from "@workspace/ui/components/skeleton";
-import { Checkbox } from "@workspace/ui/components/checkbox";
+
+import {
+  MCQCard,
+  type MCQ,
+  type PaperQuestion,
+  type MCQResourceViewProps,
+} from "../components/mcq-resource";
 import {
   Select,
   SelectContent,
@@ -32,31 +40,10 @@ import {
 import { useParams } from "next/navigation";
 import { cn } from "@workspace/ui/lib/utils";
 
-interface MCQResourceViewProps {
-  questionTypeId: string;
-  subjectId: string;
-}
-
-interface MCQ {
-  id: string;
-  question: string;
-  context?: string;
-  options: string[];
-  answer: string;
-  type: string;
-  reference?: string[];
-  subject?: { displayName: string };
-  chapter?: { displayName: string };
-}
-
-interface PaperQuestion {
-  id: string;
-  mcqId: string;
-}
-
 export const MCQResourceView = ({
   questionTypeId,
   subjectId,
+  distributionId,
 }: MCQResourceViewProps) => {
   const { id: paperId } = useParams() as { id: string };
 
@@ -110,11 +97,54 @@ export const MCQResourceView = ({
   );
 
   const handleToggleSelect = (mcqId: string) => {
-    setSelectedIds((prev) =>
-      prev.includes(mcqId)
-        ? prev.filter((id) => id !== mcqId)
-        : [...prev, mcqId],
+    setSelectedIds((prev) => {
+      if (prev.includes(mcqId)) {
+        return prev.filter((id) => id !== mcqId);
+      }
+
+      const totalPlanned = selectedCount + prev.length + 1;
+      if (totalPlanned > targetCount) {
+        toast.warning(
+          `Limit reached! You only need ${targetCount} questions for this section.`,
+        );
+        return prev;
+      }
+
+      return [...prev, mcqId];
+    });
+  };
+
+  const handleRandomSelect = () => {
+    if (leftCount <= 0) {
+      toast.info("Target already met or exceeded.");
+      return;
+    }
+
+    // Get currently unselected and unassigned items from the current view
+    const availableItems = filteredItems.filter(
+      (item: MCQ) =>
+        !assignedMcqIds.includes(item.id) && !selectedIds.includes(item.id),
     );
+
+    if (availableItems.length === 0) {
+      toast.error("No more unassigned questions available in current results.");
+      return;
+    }
+
+    // Shuffle and pick
+    const shuffled = [...availableItems].sort(() => 0.5 - Math.random());
+    const toSelect = shuffled.slice(
+      0,
+      Math.min(leftCount - selectedIds.length, shuffled.length),
+    );
+
+    if (toSelect.length === 0) {
+      toast.info("Selection limit reached.");
+      return;
+    }
+
+    setSelectedIds((prev) => [...prev, ...toSelect.map((i) => i.id)]);
+    toast.success(`Randomly selected ${toSelect.length} questions.`);
   };
 
   const handleBulkAction = async (action: "add" | "remove") => {
@@ -128,6 +158,7 @@ export const MCQResourceView = ({
           await bulkAssign({
             questionPaperId: paperId,
             mcqIds: idsToAssign,
+            distributionId,
           });
         }
       } else {
@@ -145,14 +176,6 @@ export const MCQResourceView = ({
       console.error(error);
     } finally {
       setIsBulkLoading(false);
-    }
-  };
-
-  const handleSelectAll = () => {
-    if (selectedIds.length === filteredItems.length) {
-      setSelectedIds([]);
-    } else {
-      setSelectedIds(filteredItems.map((item: MCQ) => item.id));
     }
   };
 
@@ -258,13 +281,11 @@ export const MCQResourceView = ({
               <Button
                 variant="outline"
                 size="sm"
-                onClick={handleSelectAll}
-                className="h-10 rounded-xl font-bold text-xs"
+                onClick={handleRandomSelect}
+                className="h-10 rounded-xl font-bold text-xs gap-2 border-primary/20 hover:border-primary/40"
               >
-                {selectedIds.length === filteredItems.length &&
-                filteredItems.length > 0
-                  ? "Deselect All"
-                  : "Select All"}
+                <Dices className="size-3.5 text-primary" />
+                Random
               </Button>
             </div>
           </div>
@@ -380,184 +401,80 @@ export const MCQResourceView = ({
           ) : (
             filteredItems.map((mcq: MCQ) => {
               const isAssigned = assignedMcqIds.includes(mcq.id);
+              const isSelected = selectedIds.includes(mcq.id);
 
               return (
-                <div
+                <MCQCard
                   key={mcq.id}
-                  className={cn(
-                    "group relative flex flex-col bg-card/40 hover:bg-card border transition-all duration-500 rounded-[2rem] overflow-hidden p-6 gap-4",
-                    isAssigned
-                      ? "border-emerald-500/30 bg-emerald-500/[0.02] shadow-sm"
-                      : "border-border/50 hover:border-primary/30 hover:shadow-medium",
-                  )}
-                >
-                  {/* Status Indicator & Checkbox */}
-                  <div className="absolute top-4 right-4 flex items-center gap-2 z-20">
-                    <div
-                      className={cn(
-                        "size-10 flex items-center justify-center rounded-2xl border transition-all duration-300 cursor-pointer group/selection",
-                        selectedIds.includes(mcq.id)
-                          ? "bg-primary border-primary shadow-glow shadow-primary/20"
-                          : "bg-background/80 backdrop-blur-sm border-border/50 hover:border-primary/50 hover:bg-background",
-                      )}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleToggleSelect(mcq.id);
-                      }}
-                    >
-                      <Checkbox
-                        checked={selectedIds.includes(mcq.id)}
-                        onCheckedChange={() => handleToggleSelect(mcq.id)}
-                        className={cn(
-                          "size-5 rounded-md border-2 transition-colors pointer-events-none",
-                          selectedIds.includes(mcq.id)
-                            ? "border-primary-foreground bg-primary-foreground data-[state=checked]:text-primary"
-                            : "border-primary/20",
-                        )}
-                      />
-                    </div>
-                    {isAssigned && (
-                      <div className="animate-in zoom-in duration-500">
-                        <div className="bg-emerald-500 text-white rounded-full p-1 shadow-glow shadow-emerald-500/20">
-                          <Check className="size-3 stroke-[3]" />
-                        </div>
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="flex-1 space-y-3">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <Badge
-                        variant="outline"
-                        className="rounded-lg px-2 py-0.5 text-[10px] font-black uppercase text-muted-foreground bg-muted/20 border-border/50"
-                      >
-                        {mcq.chapter?.displayName || "General"}
-                      </Badge>
-                      <Badge
-                        variant="outline"
-                        className="rounded-lg px-2 py-0.5 text-[10px] font-black uppercase text-primary bg-primary/5 border-primary/20"
-                      >
-                        {mcq.type}
-                      </Badge>
-                    </div>
-
-                    {mcq.context && (
-                      <p className="text-xs font-medium text-muted-foreground/70 italic line-clamp-2 bg-muted/30 p-2 rounded-xl">
-                        {mcq.context}
-                      </p>
-                    )}
-
-                    <p className="font-bold text-sm leading-relaxed text-foreground group-hover:text-primary transition-colors">
-                      {mcq.question}
-                    </p>
-
-                    <div className="grid grid-cols-2 gap-2 pt-2">
-                      {mcq.options.slice(0, 4).map((opt, i) => (
-                        <div
-                          key={i}
-                          className="flex items-center gap-2 bg-muted/20 px-3 py-2 rounded-xl border border-border/30"
-                        >
-                          <span className="text-[10px] font-black text-primary/40">
-                            {String.fromCharCode(65 + i)}
-                          </span>
-                          <span className="text-[11px] font-bold text-muted-foreground truncate">
-                            {opt}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-
-                  {mcq.reference && mcq.reference.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5 px-1 line-clamp-2 overflow-hidden max-h-[48px]">
-                      {mcq.reference.map((ref, idx) => (
-                        <Badge
-                          key={idx}
-                          variant="secondary"
-                          className="rounded-lg px-2 py-0.5 text-[10px] font-bold bg-amber-500/10 text-amber-700 border-amber-500/20 whitespace-nowrap"
-                        >
-                          {ref}
-                        </Badge>
-                      ))}
-                    </div>
-                  )}
-                </div>
+                  mcq={mcq}
+                  isAssigned={isAssigned}
+                  isSelected={isSelected}
+                  onToggleSelect={handleToggleSelect}
+                />
               );
             })
           )}
         </div>
       </div>
 
-      {/* Bottom Fixed Bulk Actions Bar */}
+      {/* Bottom Sticky Bulk Actions Bar */}
       {selectedIds.length > 0 && (
-        <div className="fixed bottom-0 left-0 right-0 z-50 animate-in slide-in-from-bottom-full duration-500">
-          <div className="bg-card/95 backdrop-blur-3xl border-t border-primary/10 px-8 py-5 shadow-[0_-10px_40px_rgba(0,0,0,0.1)] flex items-center justify-between">
-            <div className="flex items-center gap-8">
+        <div className="sticky bottom-0 -mb-6 mt-auto -mx-4 lg:-mx-8 px-4 lg:px-8 py-5 z-50 animate-in slide-in-from-bottom-8 duration-500 bg-background/95 backdrop-blur-xl border-t border-border/50 shadow-[0_-15px_30px_-15px_rgba(0,0,0,0.1)]">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-6">
               <div className="flex flex-col">
                 <span className="text-[10px] font-black uppercase text-muted-foreground/60 tracking-wider">
                   Currently Selected
                 </span>
-                <span className="text-2xl font-black text-primary tabular-nums">
-                  {selectedIds.length.toString().padStart(2, "0")}{" "}
-                  <span className="text-xs font-bold text-muted-foreground ml-1">
-                    Items
-                  </span>
+                <span className="text-xl font-black text-primary tabular-nums">
+                  {selectedIds.length} Items
                 </span>
               </div>
 
-              <div className="h-10 w-[1px] bg-border/50" />
+              <div className="h-10 w-[1px] bg-border/50 mx-2" />
 
               <div className="flex items-center gap-3">
                 <Button
                   variant="default"
-                  size="lg"
+                  size="sm"
                   disabled={isBulkLoading}
                   onClick={() => handleBulkAction("add")}
-                  className="h-12 rounded-2xl px-8 font-black text-xs uppercase tracking-widest shadow-glow active:scale-[0.98] transition-transform"
+                  className="h-11 rounded-2xl px-6 font-black text-xs uppercase tracking-widest shadow-glow active:scale-[0.98] transition-transform"
                 >
                   {isBulkLoading ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
                     <>
-                      <Plus className="size-4 mr-2 stroke-[3]" /> Add to Paper
+                      <Plus className="size-4 mr-2 stroke-[3]" /> Add Selection
                     </>
                   )}
                 </Button>
                 <Button
                   variant="outline"
-                  size="lg"
+                  size="sm"
                   disabled={isBulkLoading}
                   onClick={() => handleBulkAction("remove")}
-                  className="h-12 rounded-2xl px-8 font-black text-xs uppercase tracking-widest border-destructive/20 text-destructive hover:bg-destructive/5 hover:border-destructive/30 active:scale-[0.98] transition-transform"
+                  className="h-11 rounded-2xl px-6 font-black text-xs uppercase tracking-widest border-destructive/20 text-destructive hover:bg-destructive/5 hover:border-destructive/30 active:scale-[0.98] transition-transform"
                 >
                   {isBulkLoading ? (
                     <Loader2 className="size-4 animate-spin" />
                   ) : (
                     <>
-                      <X className="size-4 mr-2 stroke-[3]" /> Remove All
+                      <X className="size-4 mr-2 stroke-[3]" /> Remove Selection
                     </>
                   )}
                 </Button>
               </div>
             </div>
 
-            <div className="flex items-center gap-4">
-              <Button
-                variant="ghost"
-                onClick={() => setSelectedIds([])}
-                className="h-12 px-6 rounded-2xl font-bold text-sm text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              >
-                Clear Selection
-              </Button>
-              <Button
-                variant="outline"
-                size="icon"
-                onClick={() => setSelectedIds([])}
-                className="size-12 rounded-2xl hover:bg-muted/50 border-border/50"
-              >
-                <X className="size-5" />
-              </Button>
-            </div>
+            <Button
+              variant="ghost"
+              onClick={() => setSelectedIds([])}
+              className="h-11 px-4 rounded-xl hover:bg-muted/50 text-muted-foreground hover:text-foreground font-bold text-sm"
+            >
+              Clear
+              <X className="size-4 ml-2" />
+            </Button>
           </div>
         </div>
       )}

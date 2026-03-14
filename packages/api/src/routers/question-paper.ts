@@ -182,6 +182,7 @@ export const questionPaperRouter = createTRPCRouter({
       z.object({
         questionPaperId: z.string().uuid(),
         mcqIds: z.array(z.string().uuid()),
+        distributionId: z.string().uuid(),
       }),
     )
     .mutation(async ({ ctx, input }) => {

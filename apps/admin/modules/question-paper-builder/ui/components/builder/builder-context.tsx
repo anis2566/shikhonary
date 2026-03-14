@@ -34,6 +34,7 @@ interface PQ {
   id: string;
   mcqId: string;
   mcq: MCQ;
+  distributionId?: string;
   overrides?: QuestionOverrides;
 }
 
@@ -120,6 +121,7 @@ const mapMcqToPaperQuestion = (pq: PQ, index: number): PaperQuestion => {
             : "single",
     subjectId: mcq.subjectId,
     questionTypeId: mcq.questionTypeId,
+    distributionId: pq.distributionId,
     reference: mcq.reference,
   };
 };

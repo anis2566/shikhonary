@@ -14,11 +14,13 @@ import { useBuilder } from "../builder/builder-context";
 interface PaperContentProps {
   pageQuestions: PaperQuestion[];
   pageIndex: number;
+  isMeasuring?: boolean;
 }
 
 export const PaperContent: React.FC<PaperContentProps> = ({
   pageQuestions,
   pageIndex,
+  isMeasuring = false,
 }) => {
   const {
     settings,
@@ -47,6 +49,8 @@ export const PaperContent: React.FC<PaperContentProps> = ({
     ).toLowerCase();
 
     return questions.filter((q) => {
+      if (q.distributionId && q.distributionId === distribution.id) return true;
+
       // 1. Subject Match Strategy
       // If there's only one subject in the whole paper, we accept all questions for it
       const hasSingleSubject = subjects?.length === 1;
@@ -91,9 +95,13 @@ export const PaperContent: React.FC<PaperContentProps> = ({
       const qLabels = [qType.toLowerCase()];
       if (qType === "single" || qType === "multiple") qLabels.push("mcq");
 
+      if (targetTypeName === "cq" && qLabels.includes("mcq")) return false;
+
       return qLabels.some(
         (label) =>
-          targetTypeName.includes(label) || label.includes(targetTypeName),
+          targetTypeName === label || 
+          (targetTypeName.includes(label) && label !== "mcq") || 
+          (label.includes(targetTypeName) && targetTypeName !== "cq"),
       );
     }).length;
   };
@@ -119,6 +127,9 @@ export const PaperContent: React.FC<PaperContentProps> = ({
 
       {subjects &&
         subjects.map((s) => {
+          const subjectQuestionsGlobal = questions.filter(
+            (q) => q.subjectId === s.subjectId,
+          );
           const subjectQuestions = pageQuestions.filter(
             (q) => q.subjectId === s.subjectId,
           );
@@ -126,11 +137,21 @@ export const PaperContent: React.FC<PaperContentProps> = ({
             (d) => getAddedCount(s.subjectId, d) < d.questionCount,
           );
 
-          if (
-            subjectQuestions.length === 0 &&
-            pendingDistributions.length === 0
-          )
+          const shouldShowActionButtons =
+            isEditing &&
+            pendingDistributions.length > 0 &&
+            (isMeasuring || pageIndex === pages.length - 1);
+
+          if (subjectQuestions.length === 0 && !shouldShowActionButtons) {
             return null;
+          }
+
+          const firstQuestionOfSubjectGlobal = subjectQuestionsGlobal[0];
+          const isStartOfSubject =
+            !firstQuestionOfSubjectGlobal ||
+            subjectQuestions.some(
+              (q) => q.id === firstQuestionOfSubjectGlobal.id,
+            );
 
           const subjectTotalMarks = (s.distributions || []).reduce(
             (sum, d) => sum + (d.totalMarks || 0),
@@ -143,6 +164,8 @@ export const PaperContent: React.FC<PaperContentProps> = ({
 
           subjectQuestions.forEach((q) => {
             const distribution = (s.distributions || []).find((d) => {
+              if (q.distributionId && q.distributionId === d.id) return true;
+
               const targetTypeId = d.questionTypeId;
               const targetTypeName = (d.questionType?.name || "").toLowerCase();
               const qType = q.type || "single";
@@ -160,7 +183,18 @@ export const PaperContent: React.FC<PaperContentProps> = ({
               }
               if (targetTypeName.includes("statement"))
                 return qType === "statement";
-              return targetTypeName.includes(qType.toLowerCase());
+
+              const qLabels = [qType.toLowerCase()];
+              if (qType === "single" || qType === "multiple") qLabels.push("mcq");
+
+              if (targetTypeName === "cq" && qLabels.includes("mcq")) return false;
+
+              return qLabels.some(
+                (label) =>
+                  targetTypeName === label || 
+                  (targetTypeName.includes(label) && label !== "mcq") || 
+                  (label.includes(targetTypeName) && targetTypeName !== "cq"),
+              );
             });
 
             if (distribution) {
@@ -179,7 +213,8 @@ export const PaperContent: React.FC<PaperContentProps> = ({
           return (
             <div key={s.id} className="mb-2 last:mb-0">
               {/* Subject Header Style */}
-              {(pageIndex === 0 || subjectQuestions.length > 0) && (
+              {(isStartOfSubject ||
+                (shouldShowActionButtons && subjectQuestions.length === 0)) && (
                 <div>
                   <div className="flex items-center gap-3">
                     <h4 className="font-bold text-lg border-b-2 border-black pb-0.5 min-w-[100px]">
@@ -220,7 +255,51 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                   return (
                     <div key={d.id} className="space-y-1">
                       {/* Section Label */}
-                      {(s.distributions || []).length > 1 && (
+                      {(() => {
+                        if ((s.distributions || []).length <= 1) return false;
+                        const firstQInDistGlobal = subjectQuestionsGlobal.find(
+                          (q) => {
+                            if (q.distributionId && q.distributionId === d.id) return true;
+
+                            const targetTypeId = d.questionTypeId;
+                            const targetTypeName = (
+                              d.questionType?.name || ""
+                            ).toLowerCase();
+                            const qType = q.type || "single";
+
+                            if (q.questionTypeId === targetTypeId) return true;
+                            if (
+                              targetTypeName.includes("mcq") ||
+                              targetTypeName.includes("single")
+                            ) {
+                              return (
+                                qType === "single" ||
+                                qType === "multiple" ||
+                                qType === "contextual"
+                              );
+                            }
+                            if (targetTypeName.includes("statement"))
+                              return qType === "statement";
+
+                            const qLabels = [qType.toLowerCase()];
+                            if (qType === "single" || qType === "multiple") qLabels.push("mcq");
+
+                            if (targetTypeName === "cq" && qLabels.includes("mcq")) return false;
+
+                            return qLabels.some(
+                              (label) =>
+                                targetTypeName === label || 
+                                (targetTypeName.includes(label) && label !== "mcq") || 
+                                (label.includes(targetTypeName) && targetTypeName !== "cq"),
+                            );
+                          },
+                        );
+
+                        return (
+                          firstQInDistGlobal &&
+                          group.some((q) => q.id === firstQInDistGlobal.id)
+                        );
+                      })() && (
                         <div className="flex items-center gap-2 mb-1">
                           <span className="font-black text-[10px] uppercase tracking-widest text-black/90 px-1.5 py-0.5 bg-black/[0.03] rounded border border-black/5">
                             {d.questionType?.label}
@@ -231,7 +310,13 @@ export const PaperContent: React.FC<PaperContentProps> = ({
 
                       <div className="space-y-1">
                         {group.map((q) => (
-                          <div key={q.id} style={{ breakInside: "avoid" }}>
+                          <div
+                            key={q.id}
+                            data-question-index={questions.findIndex(
+                              (prev) => prev.id === q.id,
+                            )}
+                            style={{ breakInside: "avoid" }}
+                          >
                             <EditableQuestion
                               question={
                                 questions.find((prev) => prev.id === q.id) || q
@@ -267,7 +352,13 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                       <div className="h-px flex-1 bg-black/10" />
                     </div>
                     {unmappedQuestions.map((q) => (
-                      <div key={q.id} style={{ breakInside: "avoid" }}>
+                      <div
+                        key={q.id}
+                        data-question-index={questions.findIndex(
+                          (prev) => prev.id === q.id,
+                        )}
+                        style={{ breakInside: "avoid" }}
+                      >
                         <EditableQuestion
                           question={
                             questions.find((prev) => prev.id === q.id) || q
@@ -294,61 +385,58 @@ export const PaperContent: React.FC<PaperContentProps> = ({
               </div>
 
               {/* Action Buttons Section for this subject - Only on the last page */}
-              {isEditing &&
-                pendingDistributions.length > 0 &&
-                pageIndex === pages.length - 1 && (
-                  <div
-                    className="space-y-2 mt-4 no-print"
-                    style={{ breakInside: "avoid" }}
-                  >
-                    <h5 className="text-[10px] font-black uppercase tracking-widest text-black/30 px-1 mb-1">
-                      বাকি প্রশ্ন - {s.subject?.displayName}
-                    </h5>
-                    <div className="grid grid-cols-1 gap-2">
-                      {pendingDistributions.map((d) => {
-                        const addedCount = getAddedCount(s.subjectId, d);
-                        return (
-                          <div
-                            key={d.id}
-                            className="flex flex-col gap-2 group p-3 rounded-xl border border-dashed border-black/10 hover:border-black/30 hover:bg-black/[0.02] transition-all"
-                          >
-                            <div className="space-y-0.5">
-                              <div className="flex items-center gap-2">
-                                <span className="font-bold text-sm">
-                                  {d.questionType?.name || "প্রশ্নের ধরণ"}
-                                </span>
-                                <span className="text-[9px] font-black uppercase tracking-wider bg-black/5 px-1.5 py-0.5 rounded text-black/50">
-                                  {addedCount > 0 ? "আংশিক" : "প্রয়োজনীয়"}
-                                </span>
-                              </div>
-                              <p className="text-[10px] text-black/60 font-medium">
-                                {toBengaliDigits(d.questionCount)}টি প্রশ্ন —
-                                প্রতিটির মান{" "}
-                                {toBengaliDigits(d.marksPerQuestion)} — মোট{" "}
-                                {toBengaliDigits(d.totalMarks)} নম্বর
-                              </p>
+              {shouldShowActionButtons && (
+                <div
+                  className="space-y-2 mt-4 no-print"
+                  style={{ breakInside: "avoid" }}
+                >
+                  <h5 className="text-[10px] font-black uppercase tracking-widest text-black/30 px-1 mb-1">
+                    বাকি প্রশ্ন - {s.subject?.displayName}
+                  </h5>
+                  <div className="grid grid-cols-1 gap-2">
+                    {pendingDistributions.map((d) => {
+                      const addedCount = getAddedCount(s.subjectId, d);
+                      return (
+                        <div
+                          key={d.id}
+                          className="flex flex-col gap-2 group p-3 rounded-xl border border-dashed border-black/10 hover:border-black/30 hover:bg-black/[0.02] transition-all"
+                        >
+                          <div className="space-y-0.5">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-sm">
+                                {d.questionType?.name || "প্রশ্নের ধরণ"}
+                              </span>
+                              <span className="text-[9px] font-black uppercase tracking-wider bg-black/5 px-1.5 py-0.5 rounded text-black/50">
+                                {addedCount > 0 ? "আংশিক" : "প্রয়োজনীয়"}
+                              </span>
                             </div>
-                            <Link
-                              href={`/question-papers/${paperId}/resources/${d.questionType?.name.toLowerCase()}/${d.questionTypeId}?subjectId=${s.subjectId}`}
-                              className="w-full"
-                            >
-                              <Button
-                                variant="outline"
-                                size="sm"
-                                className="w-full h-10 rounded-lg border-black/10 font-bold text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-sm"
-                              >
-                                <Plus className="w-2.5 h-2.5 mr-1 stroke-[3]" />
-                                প্রশ্ন নির্বাচন করুন (
-                                {toBengaliDigits(addedCount)}/
-                                {toBengaliDigits(d.questionCount)})
-                              </Button>
-                            </Link>
+                            <p className="text-[10px] text-black/60 font-medium">
+                              {toBengaliDigits(d.questionCount)}টি প্রশ্ন —
+                              প্রতিটির মান {toBengaliDigits(d.marksPerQuestion)}{" "}
+                              — মোট {toBengaliDigits(d.totalMarks)} নম্বর
+                            </p>
                           </div>
-                        );
-                      })}
-                    </div>
+                          <Link
+                            href={`/question-papers/${paperId}/resources/${d.questionType?.name.toLowerCase()}/${d.questionTypeId}?subjectId=${s.subjectId}&distributionId=${d.id}`}
+                            className="w-full"
+                          >
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="w-full h-10 rounded-lg border-black/10 font-bold text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-sm"
+                            >
+                              <Plus className="w-2.5 h-2.5 mr-1 stroke-[3]" />
+                              প্রশ্ন নির্বাচন করুন (
+                              {toBengaliDigits(addedCount)}/
+                              {toBengaliDigits(d.questionCount)})
+                            </Button>
+                          </Link>
+                        </div>
+                      );
+                    })}
                   </div>
-                )}
+                </div>
+              )}
             </div>
           );
         })}
@@ -357,7 +445,13 @@ export const PaperContent: React.FC<PaperContentProps> = ({
       {pageQuestions
         .filter((pq) => !subjects?.some((s) => s.subjectId === pq.subjectId))
         .map((q) => (
-          <div key={q.id} style={{ breakInside: "avoid" }}>
+          <div
+            key={q.id}
+            data-question-index={questions.findIndex(
+              (prev) => prev.id === q.id,
+            )}
+            style={{ breakInside: "avoid" }}
+          >
             <EditableQuestion
               question={questions.find((prev) => prev.id === q.id) || q}
               settings={settings}
@@ -375,6 +469,13 @@ export const PaperContent: React.FC<PaperContentProps> = ({
             />
           </div>
         ))}
+
+      {/* Sentinel to measure total overflow including action buttons */}
+      <div
+        data-end-sentinel="true"
+        className="h-[1px] w-full invisible shrink-0"
+        style={{ breakInside: "avoid" }}
+      />
     </div>
   );
 };

@@ -75,7 +75,9 @@ export class QuestionPaperService {
                 subject: { select: { name: true, displayName: true } },
                 distributions: {
                   include: {
-                    questionType: { select: { name: true, displayName: true, label: true } },
+                    questionType: {
+                      select: { name: true, displayName: true, label: true },
+                    },
                   },
                 },
               },
@@ -235,7 +237,9 @@ export class QuestionPaperService {
               subject: { select: { name: true, displayName: true } },
               distributions: {
                 include: {
-                  questionType: { select: { name: true, displayName: true, label: true } },
+                  questionType: {
+                    select: { name: true, displayName: true, label: true },
+                  },
                 },
               },
             },
@@ -264,12 +268,15 @@ export class QuestionPaperService {
         if (subjectIds) {
           // Build the subject-level total for each subject
           const subjectCreateData = subjectIds.map((sid: string) => {
-            const breakdown = subjectBreakdowns?.find((b: any) => b.subjectId === sid);
+            const breakdown = subjectBreakdowns?.find(
+              (b: any) => b.subjectId === sid,
+            );
             const distributions = breakdown?.distributions ?? [];
 
             const subjectTotal = distributions.reduce((sum: number, d: any) => {
               const effective =
-                d.questionsToAttempt !== null && d.questionsToAttempt !== undefined
+                d.questionsToAttempt !== null &&
+                d.questionsToAttempt !== undefined
                   ? d.questionsToAttempt
                   : d.questionCount;
               return sum + d.marksPerQuestion * effective;
@@ -286,7 +293,8 @@ export class QuestionPaperService {
                   marksPerQuestion: d.marksPerQuestion,
                   questionCount: d.questionCount,
                   totalMarks:
-                    d.marksPerQuestion * (d.questionsToAttempt ?? d.questionCount),
+                    d.marksPerQuestion *
+                    (d.questionsToAttempt ?? d.questionCount),
                   questionsToAttempt: d.questionsToAttempt ?? null,
                   orderIndex: d.orderIndex ?? idx,
                 })),
@@ -394,9 +402,10 @@ export class QuestionPaperService {
   async bulkAssignMcqs(input: {
     questionPaperId: string;
     mcqIds: string[];
+    distributionId: string;
   }): Promise<any | undefined> {
     try {
-      const { questionPaperId, mcqIds } = input;
+      const { questionPaperId, mcqIds, distributionId } = input;
       const validatedPaperId = uuidSchema.parse(questionPaperId);
 
       const count = await (this.masterDb as any).questionPaperQuestion.count({
@@ -415,6 +424,7 @@ export class QuestionPaperService {
             create: {
               questionPaperId: validatedPaperId,
               mcqId,
+              distributionId,
               orderIndex: count + idx,
             },
             update: { orderIndex: count + idx },
@@ -586,7 +596,9 @@ export class QuestionPaperService {
           subject: { select: { name: true, displayName: true } },
           distributions: {
             include: {
-              questionType: { select: { name: true, displayName: true, label: true } },
+              questionType: {
+                select: { name: true, displayName: true, label: true },
+              },
             },
             orderBy: { orderIndex: "asc" as const },
           },

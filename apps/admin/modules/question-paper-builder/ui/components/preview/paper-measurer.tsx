@@ -1,31 +1,31 @@
 "use client";
 
 import React from "react";
-import { EditableQuestion } from "../editable-question";
 import { usePreview } from "./preview-context";
 import { PaperHeader } from "./paper-header";
+import { PaperContent } from "./paper-content";
 
 export const PaperMeasurer: React.FC = () => {
-  const { 
-    getPaperDimensions, 
-    getPaperStyle, 
-    settings, 
-    shouldRestrictHeaderWidth, 
-    measureHeaderRef, 
-    measureFirstQuestionsRef, 
+  const {
+    getPaperDimensions,
+    getPaperStyle,
+    settings,
+    shouldRestrictHeaderWidth,
+    measureHeaderRef,
+    measureFirstQuestionsRef,
     measureRestQuestionsRef,
     questions,
-    onUpdateQuestion,
-    onDeleteQuestion,
-    onDuplicateQuestion,
-    isEditing,
-    firstPageEnd
+    firstPageEnd,
   } = usePreview();
 
   const paperDims = getPaperDimensions();
 
   return (
-    <div aria-hidden className="absolute left-[-99999px] top-0 pointer-events-none opacity-0" style={{ width: `${paperDims.width}mm` }}>
+    <div
+      aria-hidden
+      className="absolute left-[-99999px] top-0 pointer-events-none opacity-0"
+      style={{ width: `${paperDims.width}mm` }}
+    >
       {/* First-page measurement */}
       <div
         className="bg-white"
@@ -35,32 +35,19 @@ export const PaperMeasurer: React.FC = () => {
         }}
       >
         {!shouldRestrictHeaderWidth && (
-          <div ref={measureHeaderRef}><PaperHeader /></div>
+          <div ref={measureHeaderRef}>
+            <PaperHeader />
+          </div>
         )}
         <div
           ref={measureFirstQuestionsRef}
-          style={{
-            columnCount: settings.columns,
-            columnGap: "1.5rem",
-            columnFill: "auto",
-            width: "100%",
-            overflow: "visible",
-          }}
+          className="w-full h-full flex flex-col"
         >
-          {shouldRestrictHeaderWidth && <PaperHeader />}
-          {questions.map((question, idx) => (
-            <div key={question.id} data-question-index={idx} style={{ breakInside: "avoid" }}>
-              <EditableQuestion
-                question={question}
-                settings={settings}
-                onUpdate={onUpdateQuestion}
-                onDelete={onDeleteQuestion}
-                onDuplicate={onDuplicateQuestion}
-                isEditing={isEditing}
-                isDraggable={false}
-              />
-            </div>
-          ))}
+          <PaperContent
+            pageQuestions={questions}
+            pageIndex={0}
+            isMeasuring={true}
+          />
         </div>
       </div>
 
@@ -74,27 +61,13 @@ export const PaperMeasurer: React.FC = () => {
       >
         <div
           ref={measureRestQuestionsRef}
-          style={{
-            columnCount: settings.columns,
-            columnGap: "1.5rem",
-            columnFill: "auto",
-            width: "100%",
-            overflow: "visible",
-          }}
+          className="w-full h-full flex flex-col"
         >
-          {questions.slice(firstPageEnd).map((question, idx) => (
-            <div key={question.id} data-question-index={idx} style={{ breakInside: "avoid" }}>
-              <EditableQuestion
-                question={question}
-                settings={settings}
-                onUpdate={onUpdateQuestion}
-                onDelete={onDeleteQuestion}
-                onDuplicate={onDuplicateQuestion}
-                isEditing={isEditing}
-                isDraggable={false}
-              />
-            </div>
-          ))}
+          <PaperContent
+            pageQuestions={questions.slice(firstPageEnd)}
+            pageIndex={1}
+            isMeasuring={true}
+          />
         </div>
       </div>
     </div>
