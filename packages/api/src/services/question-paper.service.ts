@@ -3,6 +3,7 @@ import {
   questionPaperFormSchema,
   updateQuestionPaperSchema,
   assignMcqSchema,
+  assignCqSchema,
   reorderQuestionsSchema,
   uuidSchema,
 } from "@workspace/schema";
@@ -151,6 +152,14 @@ export class QuestionPaperService {
                 include: {
                   subject: true,
                   chapter: true,
+                },
+              },
+              cq: {
+                include: {
+                  subject: true,
+                  chapter: true,
+                  answer: true,
+                  attachments: true,
                 },
               },
             },
@@ -394,6 +403,66 @@ export class QuestionPaperService {
         create: { questionPaperId, mcqId, orderIndex: resolvedIndex },
         update: { orderIndex: resolvedIndex },
       });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async assignCq(input: unknown): Promise<any | undefined> {
+    try {
+      const { questionPaperId, cqId, orderIndex } =
+        assignCqSchema.parse(input);
+
+      let resolvedIndex = orderIndex;
+      if (resolvedIndex === undefined || resolvedIndex === null) {
+        const count = await (this.masterDb as any).questionPaperQuestion.count({
+          where: { questionPaperId },
+        });
+        resolvedIndex = count;
+      }
+
+      return await (this.masterDb as any).questionPaperQuestion.upsert({
+        where: { questionPaperId_cqId: { questionPaperId, cqId } },
+        create: { questionPaperId, cqId, orderIndex: resolvedIndex },
+        update: { orderIndex: resolvedIndex },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async bulkAssignCqs(input: {
+    questionPaperId: string;
+    cqIds: string[];
+    distributionId: string;
+  }): Promise<any | undefined> {
+    try {
+      const { questionPaperId, cqIds, distributionId } = input;
+      const validatedPaperId = uuidSchema.parse(questionPaperId);
+
+      const count = await (this.masterDb as any).questionPaperQuestion.count({
+        where: { questionPaperId: validatedPaperId },
+      });
+
+      return await (this.masterDb as any).$transaction(
+        cqIds.map((cqId, idx) =>
+          (this.masterDb as any).questionPaperQuestion.upsert({
+            where: {
+              questionPaperId_cqId: {
+                questionPaperId: validatedPaperId,
+                cqId,
+              },
+            },
+            create: {
+              questionPaperId: validatedPaperId,
+              cqId,
+              distributionId,
+              orderIndex: count + idx,
+            },
+            update: { orderIndex: count + idx },
+          }),
+        ),
+      );
     } catch (error) {
       handlePrismaError(error);
     }

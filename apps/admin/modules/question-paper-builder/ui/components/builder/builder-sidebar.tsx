@@ -2,11 +2,11 @@
 
 import React from "react";
 import { Settings, Library, ListOrdered } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
+import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { SettingsSidebar } from "../settings-sidebar";
 import { McqPicker } from "../mcq-picker";
 import { QuestionReorderList } from "../question-reorder-list";
-import { useBuilder } from "./builder-context";
+import { useBuilder, PQ } from "./builder-context";
 
 export const BuilderSidebar: React.FC = () => {
   const { 
@@ -22,7 +22,9 @@ export const BuilderSidebar: React.FC = () => {
     isExporting
   } = useBuilder();
 
-  const assignedMcqIds = (paper?.questions ?? []).map((pq: any) => pq.mcqId);
+  const assignedMcqIds = (paper?.questions ?? [])
+    .map((pq: PQ) => pq.mcqId)
+    .filter((id): id is string => !!id);
 
   return (
     <div className="w-[380px] border-l bg-background hidden xl:flex flex-col shadow-xl z-10 relative h-full overflow-hidden">

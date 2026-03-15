@@ -1,15 +1,18 @@
 "use client";
 
-import React, { createContext, useContext, useState, useCallback, useMemo, useEffect, useRef } from "react";
-import { useRouter } from "next/navigation";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useCallback,
+  useMemo,
+  useEffect,
+  useRef,
+} from "react";
 import { toast } from "@workspace/ui/components/sonner";
 import jsPDF from "jspdf";
 import { toJpeg } from "html-to-image";
-import { 
-  PaperQuestion, 
-  PaperSettings, 
-  ElementStyle 
-} from "../types";
+import { PaperQuestion, PaperSettings, ElementStyle, PaperSubjectBreakdown } from "../types";
 import { defaultPaperSettings } from "../mock-data";
 import {
   useQuestionPaperById,
@@ -20,27 +23,48 @@ import {
   useUpdateQuestionOverrides,
 } from "@workspace/api-client";
 import { MCQ_TYPE } from "@workspace/utils";
-import { type MCQ } from "@workspace/schema";
+import { type MCQ, type CQ } from "@workspace/schema";
 import { toBengaliDigits } from "../preview/preview-utils";
 
 interface QuestionOverrides {
+  question?: string;
+  context?: string;
   questionStyle?: ElementStyle;
   options?: { style?: ElementStyle }[];
+  contextStyle?: ElementStyle;
+  subQuestionStyles?: ElementStyle[];
+  subQuestions?: { text?: string; marks?: number }[];
   statementStyles?: ElementStyle[];
   optionsColumns?: 1 | 2;
 }
 
-interface PQ {
+export interface PQ {
   id: string;
-  mcqId: string;
-  mcq: MCQ;
+  mcqId?: string;
+  cqId?: string;
+  mcq?: MCQ;
+  cq?: CQ;
   distributionId?: string;
   overrides?: QuestionOverrides;
 }
 
+export interface Paper {
+  id: string;
+  title?: string;
+  examName?: string;
+  total?: number;
+  timeInMinutes?: number | null;
+  settings?: any;
+  questions?: PQ[];
+  subjects?: PaperSubjectBreakdown[];
+  academicClass?: { displayName: string };
+  status?: string;
+  subjectName?: string;
+}
+
 interface BuilderContextType {
   paperId: string;
-  paper: any;
+  paper: Paper | null;
   isLoading: boolean;
   settings: PaperSettings;
   questions: PaperQuestion[];
@@ -54,10 +78,12 @@ interface BuilderContextType {
   sheetOpen: boolean;
   deleteTarget: { id: string; question: string } | null;
   showShortcuts: boolean;
-  
+
   // Actions
   setIsEditing: (v: boolean | ((p: boolean) => boolean)) => void;
-  setZoom: (v: number | "auto" | ((p: number | "auto") => number | "auto")) => void;
+  setZoom: (
+    v: number | "auto" | ((p: number | "auto") => number | "auto"),
+  ) => void;
   setSidebarTab: (v: "settings" | "picker" | "reorder") => void;
   setSheetOpen: (v: boolean) => void;
   setDeleteTarget: (v: { id: string; question: string } | null) => void;
@@ -66,7 +92,9 @@ interface BuilderContextType {
   handleUpdateQuestion: (updated: PaperQuestion) => void;
   handleDeleteQuestion: (id: string) => void;
   confirmDeleteQuestion: () => Promise<void>;
-  handleReorderQuestions: (reorderedQuestions: PaperQuestion[]) => Promise<void>;
+  handleReorderQuestions: (
+    reorderedQuestions: PaperQuestion[],
+  ) => Promise<void>;
   handleGlobalSave: () => Promise<void>;
   handleExportPdf: () => Promise<void>;
 }
@@ -81,54 +109,102 @@ export const useBuilder = () => {
   return context;
 };
 
-const mapMcqToPaperQuestion = (pq: PQ, index: number): PaperQuestion => {
-  const mcq = pq.mcq;
-  if (!mcq) {
+const mapToPaperQuestion = (pq: PQ, index: number): PaperQuestion => {
+  if (pq.mcq) {
+    const mcq = pq.mcq;
+    const optionLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"];
+    const overrides = pq.overrides || {};
+
     return {
       id: pq.id,
       number: index + 1,
-      question: "Question missing",
-      options: [],
-      type: "single",
+      question: overrides.question || mcq.question,
+      questionStyle: overrides.questionStyle,
+      options: (mcq.options || []).map((text: string, i: number) => ({
+        label: optionLabels[i] || String.fromCharCode(65 + i),
+        text,
+        style: overrides.options?.[i]?.style,
+      })),
+      statementStyles: overrides.statementStyles,
+      optionsColumns: overrides.optionsColumns,
+      correctAnswer: mcq.answer,
+      context: overrides.context || mcq.context,
+      contextStyle: overrides.contextStyle,
+      statements: mcq.statements,
+      type:
+        mcq.type === MCQ_TYPE.SINGLE
+          ? "single"
+          : mcq.type === MCQ_TYPE.MULTIPLE
+            ? "multiple"
+            : mcq.type === MCQ_TYPE.CONTEXTUAL
+              ? "contextual"
+              : "single",
+      subjectId: mcq.subjectId,
+      questionTypeId: mcq.questionTypeId,
+      distributionId: pq.distributionId,
+      reference: mcq.reference,
     };
   }
 
-  const optionLabels = ["ক", "খ", "গ", "ঘ", "ঙ", "চ", "ছ", "জ"];
-  const overrides = pq.overrides || {};
+  if (pq.cq) {
+    const cq = pq.cq;
+    const overrides = pq.overrides || {};
+
+    return {
+      id: pq.id,
+      number: index + 1,
+      question: overrides.question || "", 
+      questionStyle: overrides.questionStyle,
+      options: [],
+      context: overrides.context || cq.context,
+      contextStyle: overrides.contextStyle,
+      type: "creative",
+      subjectId: cq.subjectId,
+      questionTypeId: cq.questionTypeId || undefined,
+      distributionId: pq.distributionId,
+      reference: cq.reference,
+      subQuestions: [
+        {
+          label: "ক",
+          text: overrides.subQuestions?.[0]?.text || cq.questionA,
+          marks: overrides.subQuestions?.[0]?.marks || 1,
+          style: overrides.subQuestionStyles?.[0],
+        },
+        {
+          label: "খ",
+          text: overrides.subQuestions?.[1]?.text || cq.questionB,
+          marks: overrides.subQuestions?.[1]?.marks || 2,
+          style: overrides.subQuestionStyles?.[1],
+        },
+        {
+          label: "গ",
+          text: overrides.subQuestions?.[2]?.text || cq.questionC,
+          marks: overrides.subQuestions?.[2]?.marks || 3,
+          style: overrides.subQuestionStyles?.[2],
+        },
+        {
+          label: "ঘ",
+          text: overrides.subQuestions?.[3]?.text || cq.questionD,
+          marks: overrides.subQuestions?.[3]?.marks || 4,
+          style: overrides.subQuestionStyles?.[3],
+        },
+      ],
+    };
+  }
 
   return {
     id: pq.id,
     number: index + 1,
-    question: mcq.question,
-    questionStyle: overrides.questionStyle,
-    options: (mcq.options || []).map((text: string, i: number) => ({
-      label: optionLabels[i] || String.fromCharCode(65 + i),
-      text,
-      style: overrides.options?.[i]?.style,
-    })),
-    statementStyles: overrides.statementStyles,
-    optionsColumns: overrides.optionsColumns,
-    correctAnswer: mcq.answer,
-    context: mcq.context,
-    statements: mcq.statements,
-    type:
-      mcq.type === MCQ_TYPE.SINGLE
-        ? "single"
-        : mcq.type === MCQ_TYPE.MULTIPLE
-          ? "multiple"
-          : mcq.type === MCQ_TYPE.CONTEXTUAL
-            ? "contextual"
-            : "single",
-    subjectId: mcq.subjectId,
-    questionTypeId: mcq.questionTypeId,
-    distributionId: pq.distributionId,
-    reference: mcq.reference,
+    question: "Question missing",
+    options: [],
+    type: "single",
   };
 };
 
-export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactNode }> = ({ paperId, children }) => {
-  const router = useRouter();
-
+export const BuilderProvider: React.FC<{
+  paperId: string;
+  children: React.ReactNode;
+}> = ({ paperId, children }) => {
   // Queries & Mutations
   const { data: paper, isLoading } = useQuestionPaperById(paperId);
   const { mutateAsync: updateQuestionPaper } = useUpdateQuestionPaper();
@@ -142,10 +218,17 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
   const [isExporting, setIsExporting] = useState(false);
   const [zoom, setZoom] = useState<number | "auto">("auto");
   const [shuffleSeed, setShuffleSeed] = useState(Date.now());
-  const [sidebarTab, setSidebarTab] = useState<"settings" | "picker" | "reorder">("settings");
+  const [sidebarTab, setSidebarTab] = useState<
+    "settings" | "picker" | "reorder"
+  >("settings");
   const [sheetOpen, setSheetOpen] = useState(false);
-  const [deleteTarget, setDeleteTarget] = useState<{ id: string; question: string } | null>(null);
-  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">("idle");
+  const [deleteTarget, setDeleteTarget] = useState<{
+    id: string;
+    question: string;
+  } | null>(null);
+  const [saveStatus, setSaveStatus] = useState<"idle" | "saving" | "saved">(
+    "idle",
+  );
   const saveStatusTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [showShortcuts, setShowShortcuts] = useState(false);
   const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
@@ -162,21 +245,29 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
       const dbSettings = (paper.settings as unknown as PaperSettings) || {};
       const resolvedSubjectName = paper.subjects
         ? paper.subjects
-            .map((s: { subject: { displayName: string } }) => s.subject.displayName)
+            .map(
+              (s: { subject: { displayName: string } }) =>
+                s.subject.displayName,
+            )
             .join(", ")
         : "";
 
       setSettings({
         ...defaultPaperSettings,
         ...dbSettings,
-        className: paper.academicClass?.displayName || dbSettings.className || "",
+        className:
+          paper.academicClass?.displayName || dbSettings.className || "",
         subjectName: resolvedSubjectName || dbSettings.subjectName || "",
         chapterName: dbSettings.chapterName || "",
         examName: paper.examName || dbSettings.examName || "",
         institutionName: dbSettings.institutionName || "",
         setCode: dbSettings.setCode || "ক",
         totalMarks: dbSettings.totalMarks || paper.total || 0,
-        time: dbSettings.time || (paper.timeInMinutes !== undefined && paper.timeInMinutes !== null ? `${toBengaliDigits(paper.timeInMinutes)} মিনিট` : ""),
+        time:
+          dbSettings.time ||
+          (paper.timeInMinutes !== undefined && paper.timeInMinutes !== null
+            ? `${toBengaliDigits(paper.timeInMinutes)} মিনিট`
+            : ""),
       });
       isInitialSyncRef.current = false;
     }
@@ -185,7 +276,7 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
   useEffect(() => {
     if (paper?.questions) {
       const mapped = paper.questions.map((q: PQ, i: number) =>
-        mapMcqToPaperQuestion(q, i),
+        mapToPaperQuestion(q, i),
       );
       setQuestions(mapped);
     }
@@ -232,7 +323,12 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
     }
 
     return processed;
-  }, [questions, settings.shuffleQuestions, settings.shuffleOptions, shuffleSeed]);
+  }, [
+    questions,
+    settings.shuffleQuestions,
+    settings.shuffleOptions,
+    shuffleSeed,
+  ]);
 
   const handleSettingsChange = useCallback(
     (newSettings: PaperSettings) => {
@@ -304,18 +400,61 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
         },
       });
 
-      const savePromises = questions.map((q) => {
-        const overrides = {
-          questionStyle: q.questionStyle,
-          options: q.options.map((opt) => ({ style: opt.style })),
-          statementStyles: q.statementStyles,
-          optionsColumns: q.optionsColumns,
-        };
-        return updateOverrides({
-          id: q.id,
-          overrides: overrides as Record<string, unknown>,
-        });
-      });
+      const savePromises = questions
+        .map((q) => {
+          const overrides: Record<string, unknown> = {};
+          let hasChanges = false;
+
+          if (q.question) {
+            overrides.question = q.question;
+            hasChanges = true;
+          }
+          if (q.questionStyle) {
+            overrides.questionStyle = q.questionStyle;
+            hasChanges = true;
+          }
+          if (q.options?.some(opt => opt.style)) {
+            overrides.options = q.options.map((opt) => ({ style: opt.style }));
+            hasChanges = true;
+          }
+          if (q.context) {
+            overrides.context = q.context;
+            hasChanges = true;
+          }
+          if (q.contextStyle) {
+            overrides.contextStyle = q.contextStyle;
+            hasChanges = true;
+          }
+          if (q.subQuestions) {
+            if (q.subQuestions.some(sq => sq.style)) {
+              overrides.subQuestionStyles = q.subQuestions.map((sq) => sq.style);
+              hasChanges = true;
+            }
+            if (q.subQuestions.some(sq => sq.text)) {
+              overrides.subQuestions = q.subQuestions.map((sq) => ({
+                text: sq.text,
+                marks: sq.marks,
+              }));
+              hasChanges = true;
+            }
+          }
+          if (q.statementStyles && q.statementStyles.length > 0) {
+            overrides.statementStyles = q.statementStyles;
+            hasChanges = true;
+          }
+          if (q.optionsColumns) {
+            overrides.optionsColumns = q.optionsColumns;
+            hasChanges = true;
+          }
+
+          if (!hasChanges) return null;
+
+          return updateOverrides({
+            id: q.id,
+            overrides: overrides as Record<string, unknown>,
+          });
+        })
+        .filter((p): p is Promise<any> => p !== null);
 
       const orderItems = questions.map((q, idx) => ({
         id: q.id,
@@ -333,13 +472,24 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
       toast.success("All changes saved successfully");
 
       if (saveStatusTimerRef.current) clearTimeout(saveStatusTimerRef.current);
-      saveStatusTimerRef.current = setTimeout(() => setSaveStatus("idle"), 2000);
+      saveStatusTimerRef.current = setTimeout(
+        () => setSaveStatus("idle"),
+        2000,
+      );
     } catch (e) {
       console.error(e);
       setSaveStatus("idle");
       toast.error("Failed to save changes");
     }
-  }, [paperId, settings, questions, updateSettings, updateQuestionPaper, updateOverrides, reorder]);
+  }, [
+    paperId,
+    settings,
+    questions,
+    updateSettings,
+    updateQuestionPaper,
+    updateOverrides,
+    reorder,
+  ]);
 
   const handleExportPdf = useCallback(async () => {
     if (isExporting) return;
@@ -398,15 +548,24 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
       await new Promise((resolve) => setTimeout(resolve, 1100));
       await document.fonts.ready;
 
-      const pageElements = document.querySelectorAll('[id^="paper-preview-page-"]');
+      const pageElements = document.querySelectorAll(
+        '[id^="paper-preview-page-"]',
+      );
       if (!pageElements.length) {
-        throw new Error("No pages found. Make sure the paper preview is rendered.");
+        throw new Error(
+          "No pages found. Make sure the paper preview is rendered.",
+        );
       }
 
       const pdf = new jsPDF({
         orientation: settings.paperOrientation,
         unit: "mm",
-        format: settings.paperSize.toLowerCase() as any,
+        format: settings.paperSize.toLowerCase() as
+          | "a3"
+          | "a4"
+          | "a5"
+          | "letter"
+          | "legal",
         compress: true,
       });
 
@@ -426,7 +585,12 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
           filter: (node) => {
             if (node instanceof HTMLElement) {
               const cls = node.className;
-              if (typeof cls === "string" && (cls.includes("page-indicator") || cls.includes("no-print") || cls.includes("group-hover"))) {
+              if (
+                typeof cls === "string" &&
+                (cls.includes("page-indicator") ||
+                  cls.includes("no-print") ||
+                  cls.includes("group-hover"))
+              ) {
                 return false;
               }
             }
@@ -435,15 +599,28 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
         });
 
         if (i > 0) pdf.addPage();
-        pdf.addImage(imgData, "JPEG", 0, 0, pageWidth, pageHeight, undefined, "SLOW");
+        pdf.addImage(
+          imgData,
+          "JPEG",
+          0,
+          0,
+          pageWidth,
+          pageHeight,
+          undefined,
+          "SLOW",
+        );
       }
 
-      const safeTitle = (paper?.title || "question-paper").replace(/[^a-z0-9]/gi, "_").toLowerCase();
+      const safeTitle = (paper?.title || "question-paper")
+        .replace(/[^a-z0-9]/gi, "_")
+        .toLowerCase();
       pdf.save(`${safeTitle}-${Date.now()}.pdf`);
       toast.success("PDF saved successfully!");
     } catch (error: unknown) {
       console.error("PDF Export Error:", error);
-      toast.error(`Export failed: ${error instanceof Error ? error.message : String(error)}`);
+      toast.error(
+        `Export failed: ${error instanceof Error ? error.message : String(error)}`,
+      );
     } finally {
       document.getElementById("pdf-export-color-override")?.remove();
       setZoom(originalZoom);
@@ -455,7 +632,7 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
 
   const value = {
     paperId,
-    paper,
+    paper: paper as unknown as Paper,
     isLoading,
     settings,
     questions,
@@ -484,5 +661,7 @@ export const BuilderProvider: React.FC<{ paperId: string; children: React.ReactN
     handleExportPdf,
   };
 
-  return <BuilderContext.Provider value={value}>{children}</BuilderContext.Provider>;
+  return (
+    <BuilderContext.Provider value={value}>{children}</BuilderContext.Provider>
+  );
 };

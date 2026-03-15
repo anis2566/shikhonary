@@ -72,6 +72,8 @@ export const ModelName = {
   SubjectQuestionType: 'SubjectQuestionType',
   Mcq: 'Mcq',
   Cq: 'Cq',
+  CqAttachment: 'CqAttachment',
+  CqAnswer: 'CqAnswer',
   AuditLog: 'AuditLog',
   SystemSetting: 'SystemSetting',
   Notification: 'Notification',
@@ -474,16 +476,48 @@ export const CqScalarFieldEnum = {
   context: 'context',
   marks: 'marks',
   isActive: 'isActive',
-  classId: 'classId',
+  reference: 'reference',
+  session: 'session',
+  source: 'source',
   subjectId: 'subjectId',
   chapterId: 'chapterId',
   topicId: 'topicId',
   subTopicId: 'subTopicId',
+  questionTypeId: 'questionTypeId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type CqScalarFieldEnum = (typeof CqScalarFieldEnum)[keyof typeof CqScalarFieldEnum]
+
+
+export const CqAttachmentScalarFieldEnum = {
+  id: 'id',
+  cqId: 'cqId',
+  url: 'url',
+  type: 'type',
+  caption: 'caption',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CqAttachmentScalarFieldEnum = (typeof CqAttachmentScalarFieldEnum)[keyof typeof CqAttachmentScalarFieldEnum]
+
+
+export const CqAnswerScalarFieldEnum = {
+  id: 'id',
+  cqId: 'cqId',
+  answerA: 'answerA',
+  answerB: 'answerB',
+  answerC: 'answerC',
+  answerD: 'answerD',
+  explanation: 'explanation',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CqAnswerScalarFieldEnum = (typeof CqAnswerScalarFieldEnum)[keyof typeof CqAnswerScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {
@@ -688,6 +722,7 @@ export const QuestionPaperQuestionScalarFieldEnum = {
   id: 'id',
   questionPaperId: 'questionPaperId',
   mcqId: 'mcqId',
+  cqId: 'cqId',
   paperSubjectId: 'paperSubjectId',
   distributionId: 'distributionId',
   questionTypeId: 'questionTypeId',

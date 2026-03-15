@@ -340,7 +340,6 @@ model AcademicClass {
     updatedAt   DateTime @updatedAt
 
     classSubjects  AcademicClassSubject[]
-    cqs            Cq[]
     questionPapers QuestionPaper[]
 
     @@index([isActive])
@@ -467,6 +466,7 @@ model QuestionType {
 
     subjects      SubjectQuestionType[]
     mcqs          Mcq[]
+    cqs           Cq[]
     distributions QuestionPaperSubjectMarkDistribution[]
     questions     QuestionPaperQuestion[]
 
@@ -554,28 +554,70 @@ model Cq {
     context   String?
     marks     Float   @default(10)
     isActive  Boolean @default(true)
+    reference String[] @default([])
+    session   Int?
+    source    String?
 
-    classId    String
     subjectId  String
     chapterId  String
     topicId    String?
     subTopicId String?
 
     // FIX: Restrict on required FKs, SetNull on optional FKs (same rationale as Mcq)
-    class    AcademicClass     @relation(fields: [classId], references: [id], onDelete: Restrict)
     subject  AcademicSubject   @relation(fields: [subjectId], references: [id], onDelete: Restrict)
     chapter  AcademicChapter   @relation(fields: [chapterId], references: [id], onDelete: Restrict)
     topic    AcademicTopic?    @relation(fields: [topicId], references: [id], onDelete: SetNull)
     subtopic AcademicSubTopic? @relation(fields: [subTopicId], references: [id], onDelete: SetNull)
 
+    questionTypeId String?
+    questionType   QuestionType? @relation(fields: [questionTypeId], references: [id], onDelete: SetNull)
+
+    // --- Added Relations ---
+    attachments    CqAttachment[]
+    answer         CqAnswer?
+    questionPapers QuestionPaperQuestion[]
+
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
     @@index([chapterId])
-    @@index([classId])
     @@index([isActive])
     @@index([subjectId])
     @@map("cq")
+}
+
+model CqAttachment {
+    id   String @id @default(uuid())
+    cqId String
+    cq   Cq     @relation(fields: [cqId], references: [id], onDelete: Cascade)
+
+    url      String
+    type     String  @default("image") // "image", "pdf", etc.
+    caption  String?
+    position Int     @default(0)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@index([cqId])
+    @@map("cq_attachment")
+}
+
+model CqAnswer {
+    id   String @id @default(uuid())
+    cqId String @unique
+    cq   Cq     @relation(fields: [cqId], references: [id], onDelete: Cascade)
+
+    answerA     String?
+    answerB     String?
+    answerC     String?
+    answerD     String?
+    explanation String?
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("cq_answer")
 }
 
 // NOTE: AuditLog and Notification intentionally use bare String FKs for
@@ -933,8 +975,12 @@ model QuestionPaperQuestion {
     id              String        @id @default(uuid())
     questionPaperId String
     questionPaper   QuestionPaper @relation(fields: [questionPaperId], references: [id], onDelete: Cascade)
-    mcqId           String
-    mcq             Mcq           @relation(fields: [mcqId], references: [id], onDelete: Cascade)
+
+    mcqId String?
+    mcq   Mcq?    @relation(fields: [mcqId], references: [id], onDelete: Cascade)
+
+    cqId String?
+    cq   Cq?     @relation(fields: [cqId], references: [id], onDelete: Cascade)
 
     // TRACKING: Associate with subject and distribution breakdown
     paperSubjectId String?
@@ -954,7 +1000,9 @@ model QuestionPaperQuestion {
     updatedAt DateTime @updatedAt
 
     @@unique([questionPaperId, mcqId])
+    @@unique([questionPaperId, cqId])
     @@index([questionPaperId])
     @@index([mcqId])
+    @@index([cqId])
     @@map("question_paper_question")
 }

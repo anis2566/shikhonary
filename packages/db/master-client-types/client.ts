@@ -145,6 +145,16 @@ export type Mcq = Prisma.McqModel
  */
 export type Cq = Prisma.CqModel
 /**
+ * Model CqAttachment
+ * 
+ */
+export type CqAttachment = Prisma.CqAttachmentModel
+/**
+ * Model CqAnswer
+ * 
+ */
+export type CqAnswer = Prisma.CqAnswerModel
+/**
  * Model AuditLog
  * 
  */

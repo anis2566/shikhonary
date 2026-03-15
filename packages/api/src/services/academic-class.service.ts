@@ -380,7 +380,13 @@ export class AcademicClassService {
             },
           },
         }),
-        this.db.cq.count({ where: { classId: validatedId } }),
+        this.db.cq.count({
+          where: {
+            subject: {
+              classSubjects: { some: { classId: validatedId } },
+            },
+          },
+        }),
       ]);
 
       return {
@@ -465,7 +471,13 @@ export class AcademicClassService {
             },
           },
         }),
-        this.db.cq.count({ where: { classId: validatedId } }),
+        this.db.cq.count({
+          where: {
+            subject: {
+              classSubjects: { some: { classId: validatedId } },
+            },
+          },
+        }),
       ]);
 
       const subjects = subjectsData;

@@ -307,17 +307,29 @@ export const PreviewProvider: React.FC<{
         if (!q) return;
         const updated = { ...q };
         if (activeContext.type === "question") updated.questionStyle = newStyle;
+        else if (activeContext.type === "context") updated.contextStyle = newStyle;
         else if (
           activeContext.type === "option" &&
           activeContext.optionIndex !== undefined
         ) {
-          const opts = [...updated.options];
-          if (opts[activeContext.optionIndex])
-            opts[activeContext.optionIndex] = {
-              ...opts[activeContext.optionIndex]!,
-              style: newStyle,
-            };
-          updated.options = opts;
+          if (q.type === "creative") {
+            const sqs = [...(updated.subQuestions || [])];
+            if (sqs[activeContext.optionIndex]) {
+              sqs[activeContext.optionIndex] = {
+                ...sqs[activeContext.optionIndex]!,
+                style: newStyle,
+              };
+            }
+            updated.subQuestions = sqs;
+          } else {
+            const opts = [...updated.options];
+            if (opts[activeContext.optionIndex])
+              opts[activeContext.optionIndex] = {
+                ...opts[activeContext.optionIndex]!,
+                style: newStyle,
+              };
+            updated.options = opts;
+          }
         } else if (
           activeContext.type === "statement" &&
           activeContext.statementIndex !== undefined

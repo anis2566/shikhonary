@@ -394,9 +394,7 @@ export const ModelName = {
   Announcement: 'Announcement',
   Notification: 'Notification',
   ExamAnalytics: 'ExamAnalytics',
-  StudentAnalytics: 'StudentAnalytics',
-  QuestionPaper: 'QuestionPaper',
-  QuestionPaperQuestion: 'QuestionPaperQuestion'
+  StudentAnalytics: 'StudentAnalytics'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -412,7 +410,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "student" | "batch" | "teacher" | "exam" | "examAttempt" | "answerHistory" | "attendance" | "announcement" | "notification" | "examAnalytics" | "studentAnalytics" | "questionPaper" | "questionPaperQuestion"
+    modelProps: "student" | "batch" | "teacher" | "exam" | "examAttempt" | "answerHistory" | "attendance" | "announcement" | "notification" | "examAnalytics" | "studentAnalytics"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1230,154 +1228,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    QuestionPaper: {
-      payload: Prisma.$QuestionPaperPayload<ExtArgs>
-      fields: Prisma.QuestionPaperFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.QuestionPaperFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.QuestionPaperFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>
-        }
-        findFirst: {
-          args: Prisma.QuestionPaperFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.QuestionPaperFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>
-        }
-        findMany: {
-          args: Prisma.QuestionPaperFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>[]
-        }
-        create: {
-          args: Prisma.QuestionPaperCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>
-        }
-        createMany: {
-          args: Prisma.QuestionPaperCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.QuestionPaperCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>[]
-        }
-        delete: {
-          args: Prisma.QuestionPaperDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>
-        }
-        update: {
-          args: Prisma.QuestionPaperUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>
-        }
-        deleteMany: {
-          args: Prisma.QuestionPaperDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.QuestionPaperUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.QuestionPaperUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>[]
-        }
-        upsert: {
-          args: Prisma.QuestionPaperUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperPayload>
-        }
-        aggregate: {
-          args: Prisma.QuestionPaperAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateQuestionPaper>
-        }
-        groupBy: {
-          args: Prisma.QuestionPaperGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.QuestionPaperGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.QuestionPaperCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.QuestionPaperCountAggregateOutputType> | number
-        }
-      }
-    }
-    QuestionPaperQuestion: {
-      payload: Prisma.$QuestionPaperQuestionPayload<ExtArgs>
-      fields: Prisma.QuestionPaperQuestionFieldRefs
-      operations: {
-        findUnique: {
-          args: Prisma.QuestionPaperQuestionFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload> | null
-        }
-        findUniqueOrThrow: {
-          args: Prisma.QuestionPaperQuestionFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>
-        }
-        findFirst: {
-          args: Prisma.QuestionPaperQuestionFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload> | null
-        }
-        findFirstOrThrow: {
-          args: Prisma.QuestionPaperQuestionFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>
-        }
-        findMany: {
-          args: Prisma.QuestionPaperQuestionFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>[]
-        }
-        create: {
-          args: Prisma.QuestionPaperQuestionCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>
-        }
-        createMany: {
-          args: Prisma.QuestionPaperQuestionCreateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        createManyAndReturn: {
-          args: Prisma.QuestionPaperQuestionCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>[]
-        }
-        delete: {
-          args: Prisma.QuestionPaperQuestionDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>
-        }
-        update: {
-          args: Prisma.QuestionPaperQuestionUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>
-        }
-        deleteMany: {
-          args: Prisma.QuestionPaperQuestionDeleteManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateMany: {
-          args: Prisma.QuestionPaperQuestionUpdateManyArgs<ExtArgs>
-          result: BatchPayload
-        }
-        updateManyAndReturn: {
-          args: Prisma.QuestionPaperQuestionUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>[]
-        }
-        upsert: {
-          args: Prisma.QuestionPaperQuestionUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$QuestionPaperQuestionPayload>
-        }
-        aggregate: {
-          args: Prisma.QuestionPaperQuestionAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateQuestionPaperQuestion>
-        }
-        groupBy: {
-          args: Prisma.QuestionPaperQuestionGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.QuestionPaperQuestionGroupByOutputType>[]
-        }
-        count: {
-          args: Prisma.QuestionPaperQuestionCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.QuestionPaperQuestionCountAggregateOutputType> | number
-        }
-      }
-    }
   }
 } & {
   other: {
@@ -1696,38 +1546,6 @@ export const StudentAnalyticsScalarFieldEnum = {
 export type StudentAnalyticsScalarFieldEnum = (typeof StudentAnalyticsScalarFieldEnum)[keyof typeof StudentAnalyticsScalarFieldEnum]
 
 
-export const QuestionPaperScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  examName: 'examName',
-  description: 'description',
-  className: 'className',
-  subjectName: 'subjectName',
-  chapterName: 'chapterName',
-  settings: 'settings',
-  status: 'status',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type QuestionPaperScalarFieldEnum = (typeof QuestionPaperScalarFieldEnum)[keyof typeof QuestionPaperScalarFieldEnum]
-
-
-export const QuestionPaperQuestionScalarFieldEnum = {
-  id: 'id',
-  questionPaperId: 'questionPaperId',
-  mcqId: 'mcqId',
-  orderIndex: 'orderIndex',
-  overrides: 'overrides',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type QuestionPaperQuestionScalarFieldEnum = (typeof QuestionPaperQuestionScalarFieldEnum)[keyof typeof QuestionPaperQuestionScalarFieldEnum]
-
-
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -1963,8 +1781,6 @@ export type GlobalOmitConfig = {
   notification?: Prisma.NotificationOmit
   examAnalytics?: Prisma.ExamAnalyticsOmit
   studentAnalytics?: Prisma.StudentAnalyticsOmit
-  questionPaper?: Prisma.QuestionPaperOmit
-  questionPaperQuestion?: Prisma.QuestionPaperQuestionOmit
 }
 
 /* Types for Logging */

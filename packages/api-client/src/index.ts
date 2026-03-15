@@ -8,6 +8,7 @@ export * from "./hooks/use-academic-chapter";
 export * from "./hooks/use-academic-topic";
 export * from "./hooks/use-academic-subtopic";
 export * from "./hooks/use-mcq";
+export * from "./hooks/use-cq";
 export * from "./hooks/use-student";
 export * from "./hooks/use-batch";
 export * from "./hooks/use-tenant";

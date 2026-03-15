@@ -72,13 +72,3 @@ export type ExamAnalytics = Prisma.ExamAnalyticsModel
  * 
  */
 export type StudentAnalytics = Prisma.StudentAnalyticsModel
-/**
- * Model QuestionPaper
- * 
- */
-export type QuestionPaper = Prisma.QuestionPaperModel
-/**
- * Model QuestionPaperQuestion
- * 
- */
-export type QuestionPaperQuestion = Prisma.QuestionPaperQuestionModel

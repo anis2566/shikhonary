@@ -200,6 +200,7 @@ export type QuestionTypeWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"QuestionType"> | Date | string
   subjects?: Prisma.SubjectQuestionTypeListRelationFilter
   mcqs?: Prisma.McqListRelationFilter
+  cqs?: Prisma.CqListRelationFilter
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionListRelationFilter
   questions?: Prisma.QuestionPaperQuestionListRelationFilter
 }
@@ -214,6 +215,7 @@ export type QuestionTypeOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   subjects?: Prisma.SubjectQuestionTypeOrderByRelationAggregateInput
   mcqs?: Prisma.McqOrderByRelationAggregateInput
+  cqs?: Prisma.CqOrderByRelationAggregateInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionOrderByRelationAggregateInput
   questions?: Prisma.QuestionPaperQuestionOrderByRelationAggregateInput
 }
@@ -231,6 +233,7 @@ export type QuestionTypeWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"QuestionType"> | Date | string
   subjects?: Prisma.SubjectQuestionTypeListRelationFilter
   mcqs?: Prisma.McqListRelationFilter
+  cqs?: Prisma.CqListRelationFilter
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionListRelationFilter
   questions?: Prisma.QuestionPaperQuestionListRelationFilter
 }, "id">
@@ -271,6 +274,7 @@ export type QuestionTypeCreateInput = {
   updatedAt?: Date | string
   subjects?: Prisma.SubjectQuestionTypeCreateNestedManyWithoutQuestionTypeInput
   mcqs?: Prisma.McqCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqCreateNestedManyWithoutQuestionTypeInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedManyWithoutQuestionTypeInput
   questions?: Prisma.QuestionPaperQuestionCreateNestedManyWithoutQuestionTypeInput
 }
@@ -285,6 +289,7 @@ export type QuestionTypeUncheckedCreateInput = {
   updatedAt?: Date | string
   subjects?: Prisma.SubjectQuestionTypeUncheckedCreateNestedManyWithoutQuestionTypeInput
   mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqUncheckedCreateNestedManyWithoutQuestionTypeInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedCreateNestedManyWithoutQuestionTypeInput
   questions?: Prisma.QuestionPaperQuestionUncheckedCreateNestedManyWithoutQuestionTypeInput
 }
@@ -299,6 +304,7 @@ export type QuestionTypeUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.SubjectQuestionTypeUpdateManyWithoutQuestionTypeNestedInput
   mcqs?: Prisma.McqUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUpdateManyWithoutQuestionTypeNestedInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUpdateManyWithoutQuestionTypeNestedInput
   questions?: Prisma.QuestionPaperQuestionUpdateManyWithoutQuestionTypeNestedInput
 }
@@ -313,6 +319,7 @@ export type QuestionTypeUncheckedUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.SubjectQuestionTypeUncheckedUpdateManyWithoutQuestionTypeNestedInput
   mcqs?: Prisma.McqUncheckedUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUncheckedUpdateManyWithoutQuestionTypeNestedInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedUpdateManyWithoutQuestionTypeNestedInput
   questions?: Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionTypeNestedInput
 }
@@ -417,6 +424,22 @@ export type QuestionTypeUpdateOneWithoutMcqsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionTypeUpdateToOneWithWhereWithoutMcqsInput, Prisma.QuestionTypeUpdateWithoutMcqsInput>, Prisma.QuestionTypeUncheckedUpdateWithoutMcqsInput>
 }
 
+export type QuestionTypeCreateNestedOneWithoutCqsInput = {
+  create?: Prisma.XOR<Prisma.QuestionTypeCreateWithoutCqsInput, Prisma.QuestionTypeUncheckedCreateWithoutCqsInput>
+  connectOrCreate?: Prisma.QuestionTypeCreateOrConnectWithoutCqsInput
+  connect?: Prisma.QuestionTypeWhereUniqueInput
+}
+
+export type QuestionTypeUpdateOneWithoutCqsNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionTypeCreateWithoutCqsInput, Prisma.QuestionTypeUncheckedCreateWithoutCqsInput>
+  connectOrCreate?: Prisma.QuestionTypeCreateOrConnectWithoutCqsInput
+  upsert?: Prisma.QuestionTypeUpsertWithoutCqsInput
+  disconnect?: Prisma.QuestionTypeWhereInput | boolean
+  delete?: Prisma.QuestionTypeWhereInput | boolean
+  connect?: Prisma.QuestionTypeWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.QuestionTypeUpdateToOneWithWhereWithoutCqsInput, Prisma.QuestionTypeUpdateWithoutCqsInput>, Prisma.QuestionTypeUncheckedUpdateWithoutCqsInput>
+}
+
 export type QuestionTypeCreateNestedOneWithoutDistributionsInput = {
   create?: Prisma.XOR<Prisma.QuestionTypeCreateWithoutDistributionsInput, Prisma.QuestionTypeUncheckedCreateWithoutDistributionsInput>
   connectOrCreate?: Prisma.QuestionTypeCreateOrConnectWithoutDistributionsInput
@@ -456,6 +479,7 @@ export type QuestionTypeCreateWithoutSubjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   mcqs?: Prisma.McqCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqCreateNestedManyWithoutQuestionTypeInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedManyWithoutQuestionTypeInput
   questions?: Prisma.QuestionPaperQuestionCreateNestedManyWithoutQuestionTypeInput
 }
@@ -469,6 +493,7 @@ export type QuestionTypeUncheckedCreateWithoutSubjectsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqUncheckedCreateNestedManyWithoutQuestionTypeInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedCreateNestedManyWithoutQuestionTypeInput
   questions?: Prisma.QuestionPaperQuestionUncheckedCreateNestedManyWithoutQuestionTypeInput
 }
@@ -498,6 +523,7 @@ export type QuestionTypeUpdateWithoutSubjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mcqs?: Prisma.McqUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUpdateManyWithoutQuestionTypeNestedInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUpdateManyWithoutQuestionTypeNestedInput
   questions?: Prisma.QuestionPaperQuestionUpdateManyWithoutQuestionTypeNestedInput
 }
@@ -511,6 +537,7 @@ export type QuestionTypeUncheckedUpdateWithoutSubjectsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   mcqs?: Prisma.McqUncheckedUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUncheckedUpdateManyWithoutQuestionTypeNestedInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedUpdateManyWithoutQuestionTypeNestedInput
   questions?: Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionTypeNestedInput
 }
@@ -524,6 +551,7 @@ export type QuestionTypeCreateWithoutMcqsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subjects?: Prisma.SubjectQuestionTypeCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqCreateNestedManyWithoutQuestionTypeInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedManyWithoutQuestionTypeInput
   questions?: Prisma.QuestionPaperQuestionCreateNestedManyWithoutQuestionTypeInput
 }
@@ -537,6 +565,7 @@ export type QuestionTypeUncheckedCreateWithoutMcqsInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   subjects?: Prisma.SubjectQuestionTypeUncheckedCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqUncheckedCreateNestedManyWithoutQuestionTypeInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedCreateNestedManyWithoutQuestionTypeInput
   questions?: Prisma.QuestionPaperQuestionUncheckedCreateNestedManyWithoutQuestionTypeInput
 }
@@ -566,6 +595,7 @@ export type QuestionTypeUpdateWithoutMcqsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.SubjectQuestionTypeUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUpdateManyWithoutQuestionTypeNestedInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUpdateManyWithoutQuestionTypeNestedInput
   questions?: Prisma.QuestionPaperQuestionUpdateManyWithoutQuestionTypeNestedInput
 }
@@ -579,6 +609,79 @@ export type QuestionTypeUncheckedUpdateWithoutMcqsInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.SubjectQuestionTypeUncheckedUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUncheckedUpdateManyWithoutQuestionTypeNestedInput
+  distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedUpdateManyWithoutQuestionTypeNestedInput
+  questions?: Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionTypeNestedInput
+}
+
+export type QuestionTypeCreateWithoutCqsInput = {
+  id?: string
+  name: string
+  displayName: string
+  label: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subjects?: Prisma.SubjectQuestionTypeCreateNestedManyWithoutQuestionTypeInput
+  mcqs?: Prisma.McqCreateNestedManyWithoutQuestionTypeInput
+  distributions?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedManyWithoutQuestionTypeInput
+  questions?: Prisma.QuestionPaperQuestionCreateNestedManyWithoutQuestionTypeInput
+}
+
+export type QuestionTypeUncheckedCreateWithoutCqsInput = {
+  id?: string
+  name: string
+  displayName: string
+  label: string
+  isActive?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  subjects?: Prisma.SubjectQuestionTypeUncheckedCreateNestedManyWithoutQuestionTypeInput
+  mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutQuestionTypeInput
+  distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedCreateNestedManyWithoutQuestionTypeInput
+  questions?: Prisma.QuestionPaperQuestionUncheckedCreateNestedManyWithoutQuestionTypeInput
+}
+
+export type QuestionTypeCreateOrConnectWithoutCqsInput = {
+  where: Prisma.QuestionTypeWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuestionTypeCreateWithoutCqsInput, Prisma.QuestionTypeUncheckedCreateWithoutCqsInput>
+}
+
+export type QuestionTypeUpsertWithoutCqsInput = {
+  update: Prisma.XOR<Prisma.QuestionTypeUpdateWithoutCqsInput, Prisma.QuestionTypeUncheckedUpdateWithoutCqsInput>
+  create: Prisma.XOR<Prisma.QuestionTypeCreateWithoutCqsInput, Prisma.QuestionTypeUncheckedCreateWithoutCqsInput>
+  where?: Prisma.QuestionTypeWhereInput
+}
+
+export type QuestionTypeUpdateToOneWithWhereWithoutCqsInput = {
+  where?: Prisma.QuestionTypeWhereInput
+  data: Prisma.XOR<Prisma.QuestionTypeUpdateWithoutCqsInput, Prisma.QuestionTypeUncheckedUpdateWithoutCqsInput>
+}
+
+export type QuestionTypeUpdateWithoutCqsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subjects?: Prisma.SubjectQuestionTypeUpdateManyWithoutQuestionTypeNestedInput
+  mcqs?: Prisma.McqUpdateManyWithoutQuestionTypeNestedInput
+  distributions?: Prisma.QuestionPaperSubjectMarkDistributionUpdateManyWithoutQuestionTypeNestedInput
+  questions?: Prisma.QuestionPaperQuestionUpdateManyWithoutQuestionTypeNestedInput
+}
+
+export type QuestionTypeUncheckedUpdateWithoutCqsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  displayName?: Prisma.StringFieldUpdateOperationsInput | string
+  label?: Prisma.StringFieldUpdateOperationsInput | string
+  isActive?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  subjects?: Prisma.SubjectQuestionTypeUncheckedUpdateManyWithoutQuestionTypeNestedInput
+  mcqs?: Prisma.McqUncheckedUpdateManyWithoutQuestionTypeNestedInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedUpdateManyWithoutQuestionTypeNestedInput
   questions?: Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionTypeNestedInput
 }
@@ -593,6 +696,7 @@ export type QuestionTypeCreateWithoutDistributionsInput = {
   updatedAt?: Date | string
   subjects?: Prisma.SubjectQuestionTypeCreateNestedManyWithoutQuestionTypeInput
   mcqs?: Prisma.McqCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqCreateNestedManyWithoutQuestionTypeInput
   questions?: Prisma.QuestionPaperQuestionCreateNestedManyWithoutQuestionTypeInput
 }
 
@@ -606,6 +710,7 @@ export type QuestionTypeUncheckedCreateWithoutDistributionsInput = {
   updatedAt?: Date | string
   subjects?: Prisma.SubjectQuestionTypeUncheckedCreateNestedManyWithoutQuestionTypeInput
   mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqUncheckedCreateNestedManyWithoutQuestionTypeInput
   questions?: Prisma.QuestionPaperQuestionUncheckedCreateNestedManyWithoutQuestionTypeInput
 }
 
@@ -635,6 +740,7 @@ export type QuestionTypeUpdateWithoutDistributionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.SubjectQuestionTypeUpdateManyWithoutQuestionTypeNestedInput
   mcqs?: Prisma.McqUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUpdateManyWithoutQuestionTypeNestedInput
   questions?: Prisma.QuestionPaperQuestionUpdateManyWithoutQuestionTypeNestedInput
 }
 
@@ -648,6 +754,7 @@ export type QuestionTypeUncheckedUpdateWithoutDistributionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.SubjectQuestionTypeUncheckedUpdateManyWithoutQuestionTypeNestedInput
   mcqs?: Prisma.McqUncheckedUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUncheckedUpdateManyWithoutQuestionTypeNestedInput
   questions?: Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionTypeNestedInput
 }
 
@@ -661,6 +768,7 @@ export type QuestionTypeCreateWithoutQuestionsInput = {
   updatedAt?: Date | string
   subjects?: Prisma.SubjectQuestionTypeCreateNestedManyWithoutQuestionTypeInput
   mcqs?: Prisma.McqCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqCreateNestedManyWithoutQuestionTypeInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedManyWithoutQuestionTypeInput
 }
 
@@ -674,6 +782,7 @@ export type QuestionTypeUncheckedCreateWithoutQuestionsInput = {
   updatedAt?: Date | string
   subjects?: Prisma.SubjectQuestionTypeUncheckedCreateNestedManyWithoutQuestionTypeInput
   mcqs?: Prisma.McqUncheckedCreateNestedManyWithoutQuestionTypeInput
+  cqs?: Prisma.CqUncheckedCreateNestedManyWithoutQuestionTypeInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedCreateNestedManyWithoutQuestionTypeInput
 }
 
@@ -703,6 +812,7 @@ export type QuestionTypeUpdateWithoutQuestionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.SubjectQuestionTypeUpdateManyWithoutQuestionTypeNestedInput
   mcqs?: Prisma.McqUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUpdateManyWithoutQuestionTypeNestedInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUpdateManyWithoutQuestionTypeNestedInput
 }
 
@@ -716,6 +826,7 @@ export type QuestionTypeUncheckedUpdateWithoutQuestionsInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   subjects?: Prisma.SubjectQuestionTypeUncheckedUpdateManyWithoutQuestionTypeNestedInput
   mcqs?: Prisma.McqUncheckedUpdateManyWithoutQuestionTypeNestedInput
+  cqs?: Prisma.CqUncheckedUpdateManyWithoutQuestionTypeNestedInput
   distributions?: Prisma.QuestionPaperSubjectMarkDistributionUncheckedUpdateManyWithoutQuestionTypeNestedInput
 }
 
@@ -727,6 +838,7 @@ export type QuestionTypeUncheckedUpdateWithoutQuestionsInput = {
 export type QuestionTypeCountOutputType = {
   subjects: number
   mcqs: number
+  cqs: number
   distributions: number
   questions: number
 }
@@ -734,6 +846,7 @@ export type QuestionTypeCountOutputType = {
 export type QuestionTypeCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subjects?: boolean | QuestionTypeCountOutputTypeCountSubjectsArgs
   mcqs?: boolean | QuestionTypeCountOutputTypeCountMcqsArgs
+  cqs?: boolean | QuestionTypeCountOutputTypeCountCqsArgs
   distributions?: boolean | QuestionTypeCountOutputTypeCountDistributionsArgs
   questions?: boolean | QuestionTypeCountOutputTypeCountQuestionsArgs
 }
@@ -765,6 +878,13 @@ export type QuestionTypeCountOutputTypeCountMcqsArgs<ExtArgs extends runtime.Typ
 /**
  * QuestionTypeCountOutputType without action
  */
+export type QuestionTypeCountOutputTypeCountCqsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CqWhereInput
+}
+
+/**
+ * QuestionTypeCountOutputType without action
+ */
 export type QuestionTypeCountOutputTypeCountDistributionsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   where?: Prisma.QuestionPaperSubjectMarkDistributionWhereInput
 }
@@ -787,6 +907,7 @@ export type QuestionTypeSelect<ExtArgs extends runtime.Types.Extensions.Internal
   updatedAt?: boolean
   subjects?: boolean | Prisma.QuestionType$subjectsArgs<ExtArgs>
   mcqs?: boolean | Prisma.QuestionType$mcqsArgs<ExtArgs>
+  cqs?: boolean | Prisma.QuestionType$cqsArgs<ExtArgs>
   distributions?: boolean | Prisma.QuestionType$distributionsArgs<ExtArgs>
   questions?: boolean | Prisma.QuestionType$questionsArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionTypeCountOutputTypeDefaultArgs<ExtArgs>
@@ -826,6 +947,7 @@ export type QuestionTypeOmit<ExtArgs extends runtime.Types.Extensions.InternalAr
 export type QuestionTypeInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   subjects?: boolean | Prisma.QuestionType$subjectsArgs<ExtArgs>
   mcqs?: boolean | Prisma.QuestionType$mcqsArgs<ExtArgs>
+  cqs?: boolean | Prisma.QuestionType$cqsArgs<ExtArgs>
   distributions?: boolean | Prisma.QuestionType$distributionsArgs<ExtArgs>
   questions?: boolean | Prisma.QuestionType$questionsArgs<ExtArgs>
   _count?: boolean | Prisma.QuestionTypeCountOutputTypeDefaultArgs<ExtArgs>
@@ -838,6 +960,7 @@ export type $QuestionTypePayload<ExtArgs extends runtime.Types.Extensions.Intern
   objects: {
     subjects: Prisma.$SubjectQuestionTypePayload<ExtArgs>[]
     mcqs: Prisma.$McqPayload<ExtArgs>[]
+    cqs: Prisma.$CqPayload<ExtArgs>[]
     distributions: Prisma.$QuestionPaperSubjectMarkDistributionPayload<ExtArgs>[]
     questions: Prisma.$QuestionPaperQuestionPayload<ExtArgs>[]
   }
@@ -1245,6 +1368,7 @@ export interface Prisma__QuestionTypeClient<T, Null = never, ExtArgs extends run
   readonly [Symbol.toStringTag]: "PrismaPromise"
   subjects<T extends Prisma.QuestionType$subjectsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionType$subjectsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$SubjectQuestionTypePayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   mcqs<T extends Prisma.QuestionType$mcqsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionType$mcqsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$McqPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  cqs<T extends Prisma.QuestionType$cqsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionType$cqsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CqPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   distributions<T extends Prisma.QuestionType$distributionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionType$distributionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   questions<T extends Prisma.QuestionType$questionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionType$questionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$QuestionPaperQuestionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1716,6 +1840,30 @@ export type QuestionType$mcqsArgs<ExtArgs extends runtime.Types.Extensions.Inter
   take?: number
   skip?: number
   distinct?: Prisma.McqScalarFieldEnum | Prisma.McqScalarFieldEnum[]
+}
+
+/**
+ * QuestionType.cqs
+ */
+export type QuestionType$cqsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Cq
+   */
+  select?: Prisma.CqSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Cq
+   */
+  omit?: Prisma.CqOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CqInclude<ExtArgs> | null
+  where?: Prisma.CqWhereInput
+  orderBy?: Prisma.CqOrderByWithRelationInput | Prisma.CqOrderByWithRelationInput[]
+  cursor?: Prisma.CqWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CqScalarFieldEnum | Prisma.CqScalarFieldEnum[]
 }
 
 /**

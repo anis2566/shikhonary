@@ -38,6 +38,7 @@ export type QuestionPaperQuestionMinAggregateOutputType = {
   id: string | null
   questionPaperId: string | null
   mcqId: string | null
+  cqId: string | null
   paperSubjectId: string | null
   distributionId: string | null
   questionTypeId: string | null
@@ -50,6 +51,7 @@ export type QuestionPaperQuestionMaxAggregateOutputType = {
   id: string | null
   questionPaperId: string | null
   mcqId: string | null
+  cqId: string | null
   paperSubjectId: string | null
   distributionId: string | null
   questionTypeId: string | null
@@ -62,6 +64,7 @@ export type QuestionPaperQuestionCountAggregateOutputType = {
   id: number
   questionPaperId: number
   mcqId: number
+  cqId: number
   paperSubjectId: number
   distributionId: number
   questionTypeId: number
@@ -85,6 +88,7 @@ export type QuestionPaperQuestionMinAggregateInputType = {
   id?: true
   questionPaperId?: true
   mcqId?: true
+  cqId?: true
   paperSubjectId?: true
   distributionId?: true
   questionTypeId?: true
@@ -97,6 +101,7 @@ export type QuestionPaperQuestionMaxAggregateInputType = {
   id?: true
   questionPaperId?: true
   mcqId?: true
+  cqId?: true
   paperSubjectId?: true
   distributionId?: true
   questionTypeId?: true
@@ -109,6 +114,7 @@ export type QuestionPaperQuestionCountAggregateInputType = {
   id?: true
   questionPaperId?: true
   mcqId?: true
+  cqId?: true
   paperSubjectId?: true
   distributionId?: true
   questionTypeId?: true
@@ -208,7 +214,8 @@ export type QuestionPaperQuestionGroupByArgs<ExtArgs extends runtime.Types.Exten
 export type QuestionPaperQuestionGroupByOutputType = {
   id: string
   questionPaperId: string
-  mcqId: string
+  mcqId: string | null
+  cqId: string | null
   paperSubjectId: string | null
   distributionId: string | null
   questionTypeId: string | null
@@ -244,7 +251,8 @@ export type QuestionPaperQuestionWhereInput = {
   NOT?: Prisma.QuestionPaperQuestionWhereInput | Prisma.QuestionPaperQuestionWhereInput[]
   id?: Prisma.StringFilter<"QuestionPaperQuestion"> | string
   questionPaperId?: Prisma.StringFilter<"QuestionPaperQuestion"> | string
-  mcqId?: Prisma.StringFilter<"QuestionPaperQuestion"> | string
+  mcqId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
+  cqId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   paperSubjectId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   distributionId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   questionTypeId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
@@ -253,7 +261,8 @@ export type QuestionPaperQuestionWhereInput = {
   createdAt?: Prisma.DateTimeFilter<"QuestionPaperQuestion"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"QuestionPaperQuestion"> | Date | string
   questionPaper?: Prisma.XOR<Prisma.QuestionPaperScalarRelationFilter, Prisma.QuestionPaperWhereInput>
-  mcq?: Prisma.XOR<Prisma.McqScalarRelationFilter, Prisma.McqWhereInput>
+  mcq?: Prisma.XOR<Prisma.McqNullableScalarRelationFilter, Prisma.McqWhereInput> | null
+  cq?: Prisma.XOR<Prisma.CqNullableScalarRelationFilter, Prisma.CqWhereInput> | null
   paperSubject?: Prisma.XOR<Prisma.QuestionPaperSubjectNullableScalarRelationFilter, Prisma.QuestionPaperSubjectWhereInput> | null
   distribution?: Prisma.XOR<Prisma.QuestionPaperSubjectMarkDistributionNullableScalarRelationFilter, Prisma.QuestionPaperSubjectMarkDistributionWhereInput> | null
   questionType?: Prisma.XOR<Prisma.QuestionTypeNullableScalarRelationFilter, Prisma.QuestionTypeWhereInput> | null
@@ -262,7 +271,8 @@ export type QuestionPaperQuestionWhereInput = {
 export type QuestionPaperQuestionOrderByWithRelationInput = {
   id?: Prisma.SortOrder
   questionPaperId?: Prisma.SortOrder
-  mcqId?: Prisma.SortOrder
+  mcqId?: Prisma.SortOrderInput | Prisma.SortOrder
+  cqId?: Prisma.SortOrderInput | Prisma.SortOrder
   paperSubjectId?: Prisma.SortOrderInput | Prisma.SortOrder
   distributionId?: Prisma.SortOrderInput | Prisma.SortOrder
   questionTypeId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -272,6 +282,7 @@ export type QuestionPaperQuestionOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   questionPaper?: Prisma.QuestionPaperOrderByWithRelationInput
   mcq?: Prisma.McqOrderByWithRelationInput
+  cq?: Prisma.CqOrderByWithRelationInput
   paperSubject?: Prisma.QuestionPaperSubjectOrderByWithRelationInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionOrderByWithRelationInput
   questionType?: Prisma.QuestionTypeOrderByWithRelationInput
@@ -280,11 +291,13 @@ export type QuestionPaperQuestionOrderByWithRelationInput = {
 export type QuestionPaperQuestionWhereUniqueInput = Prisma.AtLeast<{
   id?: string
   questionPaperId_mcqId?: Prisma.QuestionPaperQuestionQuestionPaperIdMcqIdCompoundUniqueInput
+  questionPaperId_cqId?: Prisma.QuestionPaperQuestionQuestionPaperIdCqIdCompoundUniqueInput
   AND?: Prisma.QuestionPaperQuestionWhereInput | Prisma.QuestionPaperQuestionWhereInput[]
   OR?: Prisma.QuestionPaperQuestionWhereInput[]
   NOT?: Prisma.QuestionPaperQuestionWhereInput | Prisma.QuestionPaperQuestionWhereInput[]
   questionPaperId?: Prisma.StringFilter<"QuestionPaperQuestion"> | string
-  mcqId?: Prisma.StringFilter<"QuestionPaperQuestion"> | string
+  mcqId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
+  cqId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   paperSubjectId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   distributionId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   questionTypeId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
@@ -293,16 +306,18 @@ export type QuestionPaperQuestionWhereUniqueInput = Prisma.AtLeast<{
   createdAt?: Prisma.DateTimeFilter<"QuestionPaperQuestion"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"QuestionPaperQuestion"> | Date | string
   questionPaper?: Prisma.XOR<Prisma.QuestionPaperScalarRelationFilter, Prisma.QuestionPaperWhereInput>
-  mcq?: Prisma.XOR<Prisma.McqScalarRelationFilter, Prisma.McqWhereInput>
+  mcq?: Prisma.XOR<Prisma.McqNullableScalarRelationFilter, Prisma.McqWhereInput> | null
+  cq?: Prisma.XOR<Prisma.CqNullableScalarRelationFilter, Prisma.CqWhereInput> | null
   paperSubject?: Prisma.XOR<Prisma.QuestionPaperSubjectNullableScalarRelationFilter, Prisma.QuestionPaperSubjectWhereInput> | null
   distribution?: Prisma.XOR<Prisma.QuestionPaperSubjectMarkDistributionNullableScalarRelationFilter, Prisma.QuestionPaperSubjectMarkDistributionWhereInput> | null
   questionType?: Prisma.XOR<Prisma.QuestionTypeNullableScalarRelationFilter, Prisma.QuestionTypeWhereInput> | null
-}, "id" | "questionPaperId_mcqId">
+}, "id" | "questionPaperId_mcqId" | "questionPaperId_cqId">
 
 export type QuestionPaperQuestionOrderByWithAggregationInput = {
   id?: Prisma.SortOrder
   questionPaperId?: Prisma.SortOrder
-  mcqId?: Prisma.SortOrder
+  mcqId?: Prisma.SortOrderInput | Prisma.SortOrder
+  cqId?: Prisma.SortOrderInput | Prisma.SortOrder
   paperSubjectId?: Prisma.SortOrderInput | Prisma.SortOrder
   distributionId?: Prisma.SortOrderInput | Prisma.SortOrder
   questionTypeId?: Prisma.SortOrderInput | Prisma.SortOrder
@@ -323,7 +338,8 @@ export type QuestionPaperQuestionScalarWhereWithAggregatesInput = {
   NOT?: Prisma.QuestionPaperQuestionScalarWhereWithAggregatesInput | Prisma.QuestionPaperQuestionScalarWhereWithAggregatesInput[]
   id?: Prisma.StringWithAggregatesFilter<"QuestionPaperQuestion"> | string
   questionPaperId?: Prisma.StringWithAggregatesFilter<"QuestionPaperQuestion"> | string
-  mcqId?: Prisma.StringWithAggregatesFilter<"QuestionPaperQuestion"> | string
+  mcqId?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaperQuestion"> | string | null
+  cqId?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaperQuestion"> | string | null
   paperSubjectId?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaperQuestion"> | string | null
   distributionId?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaperQuestion"> | string | null
   questionTypeId?: Prisma.StringNullableWithAggregatesFilter<"QuestionPaperQuestion"> | string | null
@@ -340,7 +356,8 @@ export type QuestionPaperQuestionCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   questionPaper: Prisma.QuestionPaperCreateNestedOneWithoutQuestionsInput
-  mcq: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  mcq?: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  cq?: Prisma.CqCreateNestedOneWithoutQuestionPapersInput
   paperSubject?: Prisma.QuestionPaperSubjectCreateNestedOneWithoutQuestionsInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedOneWithoutQuestionsInput
   questionType?: Prisma.QuestionTypeCreateNestedOneWithoutQuestionsInput
@@ -349,7 +366,8 @@ export type QuestionPaperQuestionCreateInput = {
 export type QuestionPaperQuestionUncheckedCreateInput = {
   id?: string
   questionPaperId: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   paperSubjectId?: string | null
   distributionId?: string | null
   questionTypeId?: string | null
@@ -366,7 +384,8 @@ export type QuestionPaperQuestionUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   questionPaper?: Prisma.QuestionPaperUpdateOneRequiredWithoutQuestionsNestedInput
-  mcq?: Prisma.McqUpdateOneRequiredWithoutQuestionPapersNestedInput
+  mcq?: Prisma.McqUpdateOneWithoutQuestionPapersNestedInput
+  cq?: Prisma.CqUpdateOneWithoutQuestionPapersNestedInput
   paperSubject?: Prisma.QuestionPaperSubjectUpdateOneWithoutQuestionsNestedInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionUpdateOneWithoutQuestionsNestedInput
   questionType?: Prisma.QuestionTypeUpdateOneWithoutQuestionsNestedInput
@@ -375,7 +394,8 @@ export type QuestionPaperQuestionUpdateInput = {
 export type QuestionPaperQuestionUncheckedUpdateInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -388,7 +408,8 @@ export type QuestionPaperQuestionUncheckedUpdateInput = {
 export type QuestionPaperQuestionCreateManyInput = {
   id?: string
   questionPaperId: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   paperSubjectId?: string | null
   distributionId?: string | null
   questionTypeId?: string | null
@@ -409,7 +430,8 @@ export type QuestionPaperQuestionUpdateManyMutationInput = {
 export type QuestionPaperQuestionUncheckedUpdateManyInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -434,10 +456,16 @@ export type QuestionPaperQuestionQuestionPaperIdMcqIdCompoundUniqueInput = {
   mcqId: string
 }
 
+export type QuestionPaperQuestionQuestionPaperIdCqIdCompoundUniqueInput = {
+  questionPaperId: string
+  cqId: string
+}
+
 export type QuestionPaperQuestionCountOrderByAggregateInput = {
   id?: Prisma.SortOrder
   questionPaperId?: Prisma.SortOrder
   mcqId?: Prisma.SortOrder
+  cqId?: Prisma.SortOrder
   paperSubjectId?: Prisma.SortOrder
   distributionId?: Prisma.SortOrder
   questionTypeId?: Prisma.SortOrder
@@ -455,6 +483,7 @@ export type QuestionPaperQuestionMaxOrderByAggregateInput = {
   id?: Prisma.SortOrder
   questionPaperId?: Prisma.SortOrder
   mcqId?: Prisma.SortOrder
+  cqId?: Prisma.SortOrder
   paperSubjectId?: Prisma.SortOrder
   distributionId?: Prisma.SortOrder
   questionTypeId?: Prisma.SortOrder
@@ -467,6 +496,7 @@ export type QuestionPaperQuestionMinOrderByAggregateInput = {
   id?: Prisma.SortOrder
   questionPaperId?: Prisma.SortOrder
   mcqId?: Prisma.SortOrder
+  cqId?: Prisma.SortOrder
   paperSubjectId?: Prisma.SortOrder
   distributionId?: Prisma.SortOrder
   questionTypeId?: Prisma.SortOrder
@@ -560,6 +590,48 @@ export type QuestionPaperQuestionUncheckedUpdateManyWithoutMcqNestedInput = {
   connect?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
   update?: Prisma.QuestionPaperQuestionUpdateWithWhereUniqueWithoutMcqInput | Prisma.QuestionPaperQuestionUpdateWithWhereUniqueWithoutMcqInput[]
   updateMany?: Prisma.QuestionPaperQuestionUpdateManyWithWhereWithoutMcqInput | Prisma.QuestionPaperQuestionUpdateManyWithWhereWithoutMcqInput[]
+  deleteMany?: Prisma.QuestionPaperQuestionScalarWhereInput | Prisma.QuestionPaperQuestionScalarWhereInput[]
+}
+
+export type QuestionPaperQuestionCreateNestedManyWithoutCqInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperQuestionCreateWithoutCqInput, Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput> | Prisma.QuestionPaperQuestionCreateWithoutCqInput[] | Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput[]
+  connectOrCreate?: Prisma.QuestionPaperQuestionCreateOrConnectWithoutCqInput | Prisma.QuestionPaperQuestionCreateOrConnectWithoutCqInput[]
+  createMany?: Prisma.QuestionPaperQuestionCreateManyCqInputEnvelope
+  connect?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+}
+
+export type QuestionPaperQuestionUncheckedCreateNestedManyWithoutCqInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperQuestionCreateWithoutCqInput, Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput> | Prisma.QuestionPaperQuestionCreateWithoutCqInput[] | Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput[]
+  connectOrCreate?: Prisma.QuestionPaperQuestionCreateOrConnectWithoutCqInput | Prisma.QuestionPaperQuestionCreateOrConnectWithoutCqInput[]
+  createMany?: Prisma.QuestionPaperQuestionCreateManyCqInputEnvelope
+  connect?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+}
+
+export type QuestionPaperQuestionUpdateManyWithoutCqNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperQuestionCreateWithoutCqInput, Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput> | Prisma.QuestionPaperQuestionCreateWithoutCqInput[] | Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput[]
+  connectOrCreate?: Prisma.QuestionPaperQuestionCreateOrConnectWithoutCqInput | Prisma.QuestionPaperQuestionCreateOrConnectWithoutCqInput[]
+  upsert?: Prisma.QuestionPaperQuestionUpsertWithWhereUniqueWithoutCqInput | Prisma.QuestionPaperQuestionUpsertWithWhereUniqueWithoutCqInput[]
+  createMany?: Prisma.QuestionPaperQuestionCreateManyCqInputEnvelope
+  set?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+  disconnect?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+  delete?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+  connect?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+  update?: Prisma.QuestionPaperQuestionUpdateWithWhereUniqueWithoutCqInput | Prisma.QuestionPaperQuestionUpdateWithWhereUniqueWithoutCqInput[]
+  updateMany?: Prisma.QuestionPaperQuestionUpdateManyWithWhereWithoutCqInput | Prisma.QuestionPaperQuestionUpdateManyWithWhereWithoutCqInput[]
+  deleteMany?: Prisma.QuestionPaperQuestionScalarWhereInput | Prisma.QuestionPaperQuestionScalarWhereInput[]
+}
+
+export type QuestionPaperQuestionUncheckedUpdateManyWithoutCqNestedInput = {
+  create?: Prisma.XOR<Prisma.QuestionPaperQuestionCreateWithoutCqInput, Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput> | Prisma.QuestionPaperQuestionCreateWithoutCqInput[] | Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput[]
+  connectOrCreate?: Prisma.QuestionPaperQuestionCreateOrConnectWithoutCqInput | Prisma.QuestionPaperQuestionCreateOrConnectWithoutCqInput[]
+  upsert?: Prisma.QuestionPaperQuestionUpsertWithWhereUniqueWithoutCqInput | Prisma.QuestionPaperQuestionUpsertWithWhereUniqueWithoutCqInput[]
+  createMany?: Prisma.QuestionPaperQuestionCreateManyCqInputEnvelope
+  set?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+  disconnect?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+  delete?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+  connect?: Prisma.QuestionPaperQuestionWhereUniqueInput | Prisma.QuestionPaperQuestionWhereUniqueInput[]
+  update?: Prisma.QuestionPaperQuestionUpdateWithWhereUniqueWithoutCqInput | Prisma.QuestionPaperQuestionUpdateWithWhereUniqueWithoutCqInput[]
+  updateMany?: Prisma.QuestionPaperQuestionUpdateManyWithWhereWithoutCqInput | Prisma.QuestionPaperQuestionUpdateManyWithWhereWithoutCqInput[]
   deleteMany?: Prisma.QuestionPaperQuestionScalarWhereInput | Prisma.QuestionPaperQuestionScalarWhereInput[]
 }
 
@@ -696,7 +768,8 @@ export type QuestionPaperQuestionCreateWithoutQuestionTypeInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   questionPaper: Prisma.QuestionPaperCreateNestedOneWithoutQuestionsInput
-  mcq: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  mcq?: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  cq?: Prisma.CqCreateNestedOneWithoutQuestionPapersInput
   paperSubject?: Prisma.QuestionPaperSubjectCreateNestedOneWithoutQuestionsInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedOneWithoutQuestionsInput
 }
@@ -704,7 +777,8 @@ export type QuestionPaperQuestionCreateWithoutQuestionTypeInput = {
 export type QuestionPaperQuestionUncheckedCreateWithoutQuestionTypeInput = {
   id?: string
   questionPaperId: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   paperSubjectId?: string | null
   distributionId?: string | null
   orderIndex?: number
@@ -745,7 +819,8 @@ export type QuestionPaperQuestionScalarWhereInput = {
   NOT?: Prisma.QuestionPaperQuestionScalarWhereInput | Prisma.QuestionPaperQuestionScalarWhereInput[]
   id?: Prisma.StringFilter<"QuestionPaperQuestion"> | string
   questionPaperId?: Prisma.StringFilter<"QuestionPaperQuestion"> | string
-  mcqId?: Prisma.StringFilter<"QuestionPaperQuestion"> | string
+  mcqId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
+  cqId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   paperSubjectId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   distributionId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
   questionTypeId?: Prisma.StringNullableFilter<"QuestionPaperQuestion"> | string | null
@@ -762,6 +837,7 @@ export type QuestionPaperQuestionCreateWithoutMcqInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   questionPaper: Prisma.QuestionPaperCreateNestedOneWithoutQuestionsInput
+  cq?: Prisma.CqCreateNestedOneWithoutQuestionPapersInput
   paperSubject?: Prisma.QuestionPaperSubjectCreateNestedOneWithoutQuestionsInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedOneWithoutQuestionsInput
   questionType?: Prisma.QuestionTypeCreateNestedOneWithoutQuestionsInput
@@ -770,6 +846,7 @@ export type QuestionPaperQuestionCreateWithoutMcqInput = {
 export type QuestionPaperQuestionUncheckedCreateWithoutMcqInput = {
   id?: string
   questionPaperId: string
+  cqId?: string | null
   paperSubjectId?: string | null
   distributionId?: string | null
   questionTypeId?: string | null
@@ -805,13 +882,66 @@ export type QuestionPaperQuestionUpdateManyWithWhereWithoutMcqInput = {
   data: Prisma.XOR<Prisma.QuestionPaperQuestionUpdateManyMutationInput, Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutMcqInput>
 }
 
+export type QuestionPaperQuestionCreateWithoutCqInput = {
+  id?: string
+  orderIndex?: number
+  overrides?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  questionPaper: Prisma.QuestionPaperCreateNestedOneWithoutQuestionsInput
+  mcq?: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  paperSubject?: Prisma.QuestionPaperSubjectCreateNestedOneWithoutQuestionsInput
+  distribution?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedOneWithoutQuestionsInput
+  questionType?: Prisma.QuestionTypeCreateNestedOneWithoutQuestionsInput
+}
+
+export type QuestionPaperQuestionUncheckedCreateWithoutCqInput = {
+  id?: string
+  questionPaperId: string
+  mcqId?: string | null
+  paperSubjectId?: string | null
+  distributionId?: string | null
+  questionTypeId?: string | null
+  orderIndex?: number
+  overrides?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type QuestionPaperQuestionCreateOrConnectWithoutCqInput = {
+  where: Prisma.QuestionPaperQuestionWhereUniqueInput
+  create: Prisma.XOR<Prisma.QuestionPaperQuestionCreateWithoutCqInput, Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput>
+}
+
+export type QuestionPaperQuestionCreateManyCqInputEnvelope = {
+  data: Prisma.QuestionPaperQuestionCreateManyCqInput | Prisma.QuestionPaperQuestionCreateManyCqInput[]
+  skipDuplicates?: boolean
+}
+
+export type QuestionPaperQuestionUpsertWithWhereUniqueWithoutCqInput = {
+  where: Prisma.QuestionPaperQuestionWhereUniqueInput
+  update: Prisma.XOR<Prisma.QuestionPaperQuestionUpdateWithoutCqInput, Prisma.QuestionPaperQuestionUncheckedUpdateWithoutCqInput>
+  create: Prisma.XOR<Prisma.QuestionPaperQuestionCreateWithoutCqInput, Prisma.QuestionPaperQuestionUncheckedCreateWithoutCqInput>
+}
+
+export type QuestionPaperQuestionUpdateWithWhereUniqueWithoutCqInput = {
+  where: Prisma.QuestionPaperQuestionWhereUniqueInput
+  data: Prisma.XOR<Prisma.QuestionPaperQuestionUpdateWithoutCqInput, Prisma.QuestionPaperQuestionUncheckedUpdateWithoutCqInput>
+}
+
+export type QuestionPaperQuestionUpdateManyWithWhereWithoutCqInput = {
+  where: Prisma.QuestionPaperQuestionScalarWhereInput
+  data: Prisma.XOR<Prisma.QuestionPaperQuestionUpdateManyMutationInput, Prisma.QuestionPaperQuestionUncheckedUpdateManyWithoutCqInput>
+}
+
 export type QuestionPaperQuestionCreateWithoutQuestionPaperInput = {
   id?: string
   orderIndex?: number
   overrides?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Date | string
   updatedAt?: Date | string
-  mcq: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  mcq?: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  cq?: Prisma.CqCreateNestedOneWithoutQuestionPapersInput
   paperSubject?: Prisma.QuestionPaperSubjectCreateNestedOneWithoutQuestionsInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedOneWithoutQuestionsInput
   questionType?: Prisma.QuestionTypeCreateNestedOneWithoutQuestionsInput
@@ -819,7 +949,8 @@ export type QuestionPaperQuestionCreateWithoutQuestionPaperInput = {
 
 export type QuestionPaperQuestionUncheckedCreateWithoutQuestionPaperInput = {
   id?: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   paperSubjectId?: string | null
   distributionId?: string | null
   questionTypeId?: string | null
@@ -862,7 +993,8 @@ export type QuestionPaperQuestionCreateWithoutPaperSubjectInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   questionPaper: Prisma.QuestionPaperCreateNestedOneWithoutQuestionsInput
-  mcq: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  mcq?: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  cq?: Prisma.CqCreateNestedOneWithoutQuestionPapersInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionCreateNestedOneWithoutQuestionsInput
   questionType?: Prisma.QuestionTypeCreateNestedOneWithoutQuestionsInput
 }
@@ -870,7 +1002,8 @@ export type QuestionPaperQuestionCreateWithoutPaperSubjectInput = {
 export type QuestionPaperQuestionUncheckedCreateWithoutPaperSubjectInput = {
   id?: string
   questionPaperId: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   distributionId?: string | null
   questionTypeId?: string | null
   orderIndex?: number
@@ -912,7 +1045,8 @@ export type QuestionPaperQuestionCreateWithoutDistributionInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   questionPaper: Prisma.QuestionPaperCreateNestedOneWithoutQuestionsInput
-  mcq: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  mcq?: Prisma.McqCreateNestedOneWithoutQuestionPapersInput
+  cq?: Prisma.CqCreateNestedOneWithoutQuestionPapersInput
   paperSubject?: Prisma.QuestionPaperSubjectCreateNestedOneWithoutQuestionsInput
   questionType?: Prisma.QuestionTypeCreateNestedOneWithoutQuestionsInput
 }
@@ -920,7 +1054,8 @@ export type QuestionPaperQuestionCreateWithoutDistributionInput = {
 export type QuestionPaperQuestionUncheckedCreateWithoutDistributionInput = {
   id?: string
   questionPaperId: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   paperSubjectId?: string | null
   questionTypeId?: string | null
   orderIndex?: number
@@ -958,7 +1093,8 @@ export type QuestionPaperQuestionUpdateManyWithWhereWithoutDistributionInput = {
 export type QuestionPaperQuestionCreateManyQuestionTypeInput = {
   id?: string
   questionPaperId: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   paperSubjectId?: string | null
   distributionId?: string | null
   orderIndex?: number
@@ -974,7 +1110,8 @@ export type QuestionPaperQuestionUpdateWithoutQuestionTypeInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   questionPaper?: Prisma.QuestionPaperUpdateOneRequiredWithoutQuestionsNestedInput
-  mcq?: Prisma.McqUpdateOneRequiredWithoutQuestionPapersNestedInput
+  mcq?: Prisma.McqUpdateOneWithoutQuestionPapersNestedInput
+  cq?: Prisma.CqUpdateOneWithoutQuestionPapersNestedInput
   paperSubject?: Prisma.QuestionPaperSubjectUpdateOneWithoutQuestionsNestedInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionUpdateOneWithoutQuestionsNestedInput
 }
@@ -982,7 +1119,8 @@ export type QuestionPaperQuestionUpdateWithoutQuestionTypeInput = {
 export type QuestionPaperQuestionUncheckedUpdateWithoutQuestionTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
@@ -994,7 +1132,8 @@ export type QuestionPaperQuestionUncheckedUpdateWithoutQuestionTypeInput = {
 export type QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionTypeInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1006,6 +1145,7 @@ export type QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionTypeInput = {
 export type QuestionPaperQuestionCreateManyMcqInput = {
   id?: string
   questionPaperId: string
+  cqId?: string | null
   paperSubjectId?: string | null
   distributionId?: string | null
   questionTypeId?: string | null
@@ -1022,6 +1162,7 @@ export type QuestionPaperQuestionUpdateWithoutMcqInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   questionPaper?: Prisma.QuestionPaperUpdateOneRequiredWithoutQuestionsNestedInput
+  cq?: Prisma.CqUpdateOneWithoutQuestionPapersNestedInput
   paperSubject?: Prisma.QuestionPaperSubjectUpdateOneWithoutQuestionsNestedInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionUpdateOneWithoutQuestionsNestedInput
   questionType?: Prisma.QuestionTypeUpdateOneWithoutQuestionsNestedInput
@@ -1030,6 +1171,7 @@ export type QuestionPaperQuestionUpdateWithoutMcqInput = {
 export type QuestionPaperQuestionUncheckedUpdateWithoutMcqInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1042,6 +1184,59 @@ export type QuestionPaperQuestionUncheckedUpdateWithoutMcqInput = {
 export type QuestionPaperQuestionUncheckedUpdateManyWithoutMcqInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  overrides?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type QuestionPaperQuestionCreateManyCqInput = {
+  id?: string
+  questionPaperId: string
+  mcqId?: string | null
+  paperSubjectId?: string | null
+  distributionId?: string | null
+  questionTypeId?: string | null
+  orderIndex?: number
+  overrides?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type QuestionPaperQuestionUpdateWithoutCqInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  overrides?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  questionPaper?: Prisma.QuestionPaperUpdateOneRequiredWithoutQuestionsNestedInput
+  mcq?: Prisma.McqUpdateOneWithoutQuestionPapersNestedInput
+  paperSubject?: Prisma.QuestionPaperSubjectUpdateOneWithoutQuestionsNestedInput
+  distribution?: Prisma.QuestionPaperSubjectMarkDistributionUpdateOneWithoutQuestionsNestedInput
+  questionType?: Prisma.QuestionTypeUpdateOneWithoutQuestionsNestedInput
+}
+
+export type QuestionPaperQuestionUncheckedUpdateWithoutCqInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
+  overrides?: Prisma.JsonNullValueInput | runtime.InputJsonValue
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type QuestionPaperQuestionUncheckedUpdateManyWithoutCqInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1053,7 +1248,8 @@ export type QuestionPaperQuestionUncheckedUpdateManyWithoutMcqInput = {
 
 export type QuestionPaperQuestionCreateManyQuestionPaperInput = {
   id?: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   paperSubjectId?: string | null
   distributionId?: string | null
   questionTypeId?: string | null
@@ -1069,7 +1265,8 @@ export type QuestionPaperQuestionUpdateWithoutQuestionPaperInput = {
   overrides?: Prisma.JsonNullValueInput | runtime.InputJsonValue
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
-  mcq?: Prisma.McqUpdateOneRequiredWithoutQuestionPapersNestedInput
+  mcq?: Prisma.McqUpdateOneWithoutQuestionPapersNestedInput
+  cq?: Prisma.CqUpdateOneWithoutQuestionPapersNestedInput
   paperSubject?: Prisma.QuestionPaperSubjectUpdateOneWithoutQuestionsNestedInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionUpdateOneWithoutQuestionsNestedInput
   questionType?: Prisma.QuestionTypeUpdateOneWithoutQuestionsNestedInput
@@ -1077,7 +1274,8 @@ export type QuestionPaperQuestionUpdateWithoutQuestionPaperInput = {
 
 export type QuestionPaperQuestionUncheckedUpdateWithoutQuestionPaperInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1089,7 +1287,8 @@ export type QuestionPaperQuestionUncheckedUpdateWithoutQuestionPaperInput = {
 
 export type QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionPaperInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1102,7 +1301,8 @@ export type QuestionPaperQuestionUncheckedUpdateManyWithoutQuestionPaperInput = 
 export type QuestionPaperQuestionCreateManyPaperSubjectInput = {
   id?: string
   questionPaperId: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   distributionId?: string | null
   questionTypeId?: string | null
   orderIndex?: number
@@ -1118,7 +1318,8 @@ export type QuestionPaperQuestionUpdateWithoutPaperSubjectInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   questionPaper?: Prisma.QuestionPaperUpdateOneRequiredWithoutQuestionsNestedInput
-  mcq?: Prisma.McqUpdateOneRequiredWithoutQuestionPapersNestedInput
+  mcq?: Prisma.McqUpdateOneWithoutQuestionPapersNestedInput
+  cq?: Prisma.CqUpdateOneWithoutQuestionPapersNestedInput
   distribution?: Prisma.QuestionPaperSubjectMarkDistributionUpdateOneWithoutQuestionsNestedInput
   questionType?: Prisma.QuestionTypeUpdateOneWithoutQuestionsNestedInput
 }
@@ -1126,7 +1327,8 @@ export type QuestionPaperQuestionUpdateWithoutPaperSubjectInput = {
 export type QuestionPaperQuestionUncheckedUpdateWithoutPaperSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1138,7 +1340,8 @@ export type QuestionPaperQuestionUncheckedUpdateWithoutPaperSubjectInput = {
 export type QuestionPaperQuestionUncheckedUpdateManyWithoutPaperSubjectInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   distributionId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1150,7 +1353,8 @@ export type QuestionPaperQuestionUncheckedUpdateManyWithoutPaperSubjectInput = {
 export type QuestionPaperQuestionCreateManyDistributionInput = {
   id?: string
   questionPaperId: string
-  mcqId: string
+  mcqId?: string | null
+  cqId?: string | null
   paperSubjectId?: string | null
   questionTypeId?: string | null
   orderIndex?: number
@@ -1166,7 +1370,8 @@ export type QuestionPaperQuestionUpdateWithoutDistributionInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   questionPaper?: Prisma.QuestionPaperUpdateOneRequiredWithoutQuestionsNestedInput
-  mcq?: Prisma.McqUpdateOneRequiredWithoutQuestionPapersNestedInput
+  mcq?: Prisma.McqUpdateOneWithoutQuestionPapersNestedInput
+  cq?: Prisma.CqUpdateOneWithoutQuestionPapersNestedInput
   paperSubject?: Prisma.QuestionPaperSubjectUpdateOneWithoutQuestionsNestedInput
   questionType?: Prisma.QuestionTypeUpdateOneWithoutQuestionsNestedInput
 }
@@ -1174,7 +1379,8 @@ export type QuestionPaperQuestionUpdateWithoutDistributionInput = {
 export type QuestionPaperQuestionUncheckedUpdateWithoutDistributionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1186,7 +1392,8 @@ export type QuestionPaperQuestionUncheckedUpdateWithoutDistributionInput = {
 export type QuestionPaperQuestionUncheckedUpdateManyWithoutDistributionInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   questionPaperId?: Prisma.StringFieldUpdateOperationsInput | string
-  mcqId?: Prisma.StringFieldUpdateOperationsInput | string
+  mcqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  cqId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   paperSubjectId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   questionTypeId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   orderIndex?: Prisma.IntFieldUpdateOperationsInput | number
@@ -1201,6 +1408,7 @@ export type QuestionPaperQuestionSelect<ExtArgs extends runtime.Types.Extensions
   id?: boolean
   questionPaperId?: boolean
   mcqId?: boolean
+  cqId?: boolean
   paperSubjectId?: boolean
   distributionId?: boolean
   questionTypeId?: boolean
@@ -1209,7 +1417,8 @@ export type QuestionPaperQuestionSelect<ExtArgs extends runtime.Types.Extensions
   createdAt?: boolean
   updatedAt?: boolean
   questionPaper?: boolean | Prisma.QuestionPaperDefaultArgs<ExtArgs>
-  mcq?: boolean | Prisma.McqDefaultArgs<ExtArgs>
+  mcq?: boolean | Prisma.QuestionPaperQuestion$mcqArgs<ExtArgs>
+  cq?: boolean | Prisma.QuestionPaperQuestion$cqArgs<ExtArgs>
   paperSubject?: boolean | Prisma.QuestionPaperQuestion$paperSubjectArgs<ExtArgs>
   distribution?: boolean | Prisma.QuestionPaperQuestion$distributionArgs<ExtArgs>
   questionType?: boolean | Prisma.QuestionPaperQuestion$questionTypeArgs<ExtArgs>
@@ -1219,6 +1428,7 @@ export type QuestionPaperQuestionSelectCreateManyAndReturn<ExtArgs extends runti
   id?: boolean
   questionPaperId?: boolean
   mcqId?: boolean
+  cqId?: boolean
   paperSubjectId?: boolean
   distributionId?: boolean
   questionTypeId?: boolean
@@ -1227,7 +1437,8 @@ export type QuestionPaperQuestionSelectCreateManyAndReturn<ExtArgs extends runti
   createdAt?: boolean
   updatedAt?: boolean
   questionPaper?: boolean | Prisma.QuestionPaperDefaultArgs<ExtArgs>
-  mcq?: boolean | Prisma.McqDefaultArgs<ExtArgs>
+  mcq?: boolean | Prisma.QuestionPaperQuestion$mcqArgs<ExtArgs>
+  cq?: boolean | Prisma.QuestionPaperQuestion$cqArgs<ExtArgs>
   paperSubject?: boolean | Prisma.QuestionPaperQuestion$paperSubjectArgs<ExtArgs>
   distribution?: boolean | Prisma.QuestionPaperQuestion$distributionArgs<ExtArgs>
   questionType?: boolean | Prisma.QuestionPaperQuestion$questionTypeArgs<ExtArgs>
@@ -1237,6 +1448,7 @@ export type QuestionPaperQuestionSelectUpdateManyAndReturn<ExtArgs extends runti
   id?: boolean
   questionPaperId?: boolean
   mcqId?: boolean
+  cqId?: boolean
   paperSubjectId?: boolean
   distributionId?: boolean
   questionTypeId?: boolean
@@ -1245,7 +1457,8 @@ export type QuestionPaperQuestionSelectUpdateManyAndReturn<ExtArgs extends runti
   createdAt?: boolean
   updatedAt?: boolean
   questionPaper?: boolean | Prisma.QuestionPaperDefaultArgs<ExtArgs>
-  mcq?: boolean | Prisma.McqDefaultArgs<ExtArgs>
+  mcq?: boolean | Prisma.QuestionPaperQuestion$mcqArgs<ExtArgs>
+  cq?: boolean | Prisma.QuestionPaperQuestion$cqArgs<ExtArgs>
   paperSubject?: boolean | Prisma.QuestionPaperQuestion$paperSubjectArgs<ExtArgs>
   distribution?: boolean | Prisma.QuestionPaperQuestion$distributionArgs<ExtArgs>
   questionType?: boolean | Prisma.QuestionPaperQuestion$questionTypeArgs<ExtArgs>
@@ -1255,6 +1468,7 @@ export type QuestionPaperQuestionSelectScalar = {
   id?: boolean
   questionPaperId?: boolean
   mcqId?: boolean
+  cqId?: boolean
   paperSubjectId?: boolean
   distributionId?: boolean
   questionTypeId?: boolean
@@ -1264,24 +1478,27 @@ export type QuestionPaperQuestionSelectScalar = {
   updatedAt?: boolean
 }
 
-export type QuestionPaperQuestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "questionPaperId" | "mcqId" | "paperSubjectId" | "distributionId" | "questionTypeId" | "orderIndex" | "overrides" | "createdAt" | "updatedAt", ExtArgs["result"]["questionPaperQuestion"]>
+export type QuestionPaperQuestionOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "questionPaperId" | "mcqId" | "cqId" | "paperSubjectId" | "distributionId" | "questionTypeId" | "orderIndex" | "overrides" | "createdAt" | "updatedAt", ExtArgs["result"]["questionPaperQuestion"]>
 export type QuestionPaperQuestionInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   questionPaper?: boolean | Prisma.QuestionPaperDefaultArgs<ExtArgs>
-  mcq?: boolean | Prisma.McqDefaultArgs<ExtArgs>
+  mcq?: boolean | Prisma.QuestionPaperQuestion$mcqArgs<ExtArgs>
+  cq?: boolean | Prisma.QuestionPaperQuestion$cqArgs<ExtArgs>
   paperSubject?: boolean | Prisma.QuestionPaperQuestion$paperSubjectArgs<ExtArgs>
   distribution?: boolean | Prisma.QuestionPaperQuestion$distributionArgs<ExtArgs>
   questionType?: boolean | Prisma.QuestionPaperQuestion$questionTypeArgs<ExtArgs>
 }
 export type QuestionPaperQuestionIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   questionPaper?: boolean | Prisma.QuestionPaperDefaultArgs<ExtArgs>
-  mcq?: boolean | Prisma.McqDefaultArgs<ExtArgs>
+  mcq?: boolean | Prisma.QuestionPaperQuestion$mcqArgs<ExtArgs>
+  cq?: boolean | Prisma.QuestionPaperQuestion$cqArgs<ExtArgs>
   paperSubject?: boolean | Prisma.QuestionPaperQuestion$paperSubjectArgs<ExtArgs>
   distribution?: boolean | Prisma.QuestionPaperQuestion$distributionArgs<ExtArgs>
   questionType?: boolean | Prisma.QuestionPaperQuestion$questionTypeArgs<ExtArgs>
 }
 export type QuestionPaperQuestionIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   questionPaper?: boolean | Prisma.QuestionPaperDefaultArgs<ExtArgs>
-  mcq?: boolean | Prisma.McqDefaultArgs<ExtArgs>
+  mcq?: boolean | Prisma.QuestionPaperQuestion$mcqArgs<ExtArgs>
+  cq?: boolean | Prisma.QuestionPaperQuestion$cqArgs<ExtArgs>
   paperSubject?: boolean | Prisma.QuestionPaperQuestion$paperSubjectArgs<ExtArgs>
   distribution?: boolean | Prisma.QuestionPaperQuestion$distributionArgs<ExtArgs>
   questionType?: boolean | Prisma.QuestionPaperQuestion$questionTypeArgs<ExtArgs>
@@ -1291,7 +1508,8 @@ export type $QuestionPaperQuestionPayload<ExtArgs extends runtime.Types.Extensio
   name: "QuestionPaperQuestion"
   objects: {
     questionPaper: Prisma.$QuestionPaperPayload<ExtArgs>
-    mcq: Prisma.$McqPayload<ExtArgs>
+    mcq: Prisma.$McqPayload<ExtArgs> | null
+    cq: Prisma.$CqPayload<ExtArgs> | null
     paperSubject: Prisma.$QuestionPaperSubjectPayload<ExtArgs> | null
     distribution: Prisma.$QuestionPaperSubjectMarkDistributionPayload<ExtArgs> | null
     questionType: Prisma.$QuestionTypePayload<ExtArgs> | null
@@ -1299,7 +1517,8 @@ export type $QuestionPaperQuestionPayload<ExtArgs extends runtime.Types.Extensio
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
     questionPaperId: string
-    mcqId: string
+    mcqId: string | null
+    cqId: string | null
     paperSubjectId: string | null
     distributionId: string | null
     questionTypeId: string | null
@@ -1702,7 +1921,8 @@ readonly fields: QuestionPaperQuestionFieldRefs;
 export interface Prisma__QuestionPaperQuestionClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   questionPaper<T extends Prisma.QuestionPaperDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionPaperDefaultArgs<ExtArgs>>): Prisma.Prisma__QuestionPaperClient<runtime.Types.Result.GetResult<Prisma.$QuestionPaperPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
-  mcq<T extends Prisma.McqDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.McqDefaultArgs<ExtArgs>>): Prisma.Prisma__McqClient<runtime.Types.Result.GetResult<Prisma.$McqPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  mcq<T extends Prisma.QuestionPaperQuestion$mcqArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionPaperQuestion$mcqArgs<ExtArgs>>): Prisma.Prisma__McqClient<runtime.Types.Result.GetResult<Prisma.$McqPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+  cq<T extends Prisma.QuestionPaperQuestion$cqArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionPaperQuestion$cqArgs<ExtArgs>>): Prisma.Prisma__CqClient<runtime.Types.Result.GetResult<Prisma.$CqPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   paperSubject<T extends Prisma.QuestionPaperQuestion$paperSubjectArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionPaperQuestion$paperSubjectArgs<ExtArgs>>): Prisma.Prisma__QuestionPaperSubjectClient<runtime.Types.Result.GetResult<Prisma.$QuestionPaperSubjectPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   distribution<T extends Prisma.QuestionPaperQuestion$distributionArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionPaperQuestion$distributionArgs<ExtArgs>>): Prisma.Prisma__QuestionPaperSubjectMarkDistributionClient<runtime.Types.Result.GetResult<Prisma.$QuestionPaperSubjectMarkDistributionPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   questionType<T extends Prisma.QuestionPaperQuestion$questionTypeArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.QuestionPaperQuestion$questionTypeArgs<ExtArgs>>): Prisma.Prisma__QuestionTypeClient<runtime.Types.Result.GetResult<Prisma.$QuestionTypePayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
@@ -1738,6 +1958,7 @@ export interface QuestionPaperQuestionFieldRefs {
   readonly id: Prisma.FieldRef<"QuestionPaperQuestion", 'String'>
   readonly questionPaperId: Prisma.FieldRef<"QuestionPaperQuestion", 'String'>
   readonly mcqId: Prisma.FieldRef<"QuestionPaperQuestion", 'String'>
+  readonly cqId: Prisma.FieldRef<"QuestionPaperQuestion", 'String'>
   readonly paperSubjectId: Prisma.FieldRef<"QuestionPaperQuestion", 'String'>
   readonly distributionId: Prisma.FieldRef<"QuestionPaperQuestion", 'String'>
   readonly questionTypeId: Prisma.FieldRef<"QuestionPaperQuestion", 'String'>
@@ -2138,6 +2359,44 @@ export type QuestionPaperQuestionDeleteManyArgs<ExtArgs extends runtime.Types.Ex
    * Limit how many QuestionPaperQuestions to delete.
    */
   limit?: number
+}
+
+/**
+ * QuestionPaperQuestion.mcq
+ */
+export type QuestionPaperQuestion$mcqArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Mcq
+   */
+  select?: Prisma.McqSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Mcq
+   */
+  omit?: Prisma.McqOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.McqInclude<ExtArgs> | null
+  where?: Prisma.McqWhereInput
+}
+
+/**
+ * QuestionPaperQuestion.cq
+ */
+export type QuestionPaperQuestion$cqArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the Cq
+   */
+  select?: Prisma.CqSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the Cq
+   */
+  omit?: Prisma.CqOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CqInclude<ExtArgs> | null
+  where?: Prisma.CqWhereInput
 }
 
 /**

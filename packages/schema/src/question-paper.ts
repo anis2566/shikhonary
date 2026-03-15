@@ -59,6 +59,14 @@ export const assignMcqSchema = z.object({
 
 export type AssignMcqInput = z.infer<typeof assignMcqSchema>;
 
+export const assignCqSchema = z.object({
+  questionPaperId: uuidSchema,
+  cqId: uuidSchema,
+  orderIndex: z.number().int().min(0).optional(),
+});
+
+export type AssignCqInput = z.infer<typeof assignCqSchema>;
+
 export const removeMcqSchema = z.object({
   questionPaperQuestionId: uuidSchema,
 });

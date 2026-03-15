@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, Lock as LockIcon } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { EditableQuestion } from "../editable-question";
 import { usePreview } from "./preview-context";
@@ -10,6 +10,7 @@ import { toBengaliDigits } from "./preview-utils";
 import { PaperQuestion, PaperSubjectAction } from "../types";
 import { PaperHeader } from "./paper-header";
 import { useBuilder } from "../builder/builder-context";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface PaperContentProps {
   pageQuestions: PaperQuestion[];
@@ -91,6 +92,15 @@ export const PaperContent: React.FC<PaperContentProps> = ({
         return qType === "statement";
       }
 
+      // CQ Group
+      if (
+        targetTypeName === "cq" ||
+        targetTypeName.includes("creative") ||
+        targetTypeName.includes("সৃজনশীল")
+      ) {
+        return qType === "creative";
+      }
+
       // Final loose name match
       const qLabels = [qType.toLowerCase()];
       if (qType === "single" || qType === "multiple") qLabels.push("mcq");
@@ -99,12 +109,80 @@ export const PaperContent: React.FC<PaperContentProps> = ({
 
       return qLabels.some(
         (label) =>
-          targetTypeName === label || 
-          (targetTypeName.includes(label) && label !== "mcq") || 
+          targetTypeName === label ||
+          (targetTypeName.includes(label) && label !== "mcq") ||
           (label.includes(targetTypeName) && targetTypeName !== "cq"),
       );
     }).length;
   };
+
+  const getAddedMarks = (
+    subjectId: string,
+    distribution: PaperSubjectAction,
+  ) => {
+    const targetTypeId = distribution.questionTypeId;
+    const targetTypeName = (
+      distribution.questionType?.name || ""
+    ).toLowerCase();
+
+    return questions
+      .filter((q) => {
+        if (q.distributionId && q.distributionId === distribution.id)
+          return true;
+        const hasSingleSubject = subjects?.length === 1;
+        if (!hasSingleSubject) {
+          if (q.subjectId && q.subjectId !== subjectId) return false;
+        }
+        if (
+          q.questionTypeId &&
+          targetTypeId &&
+          q.questionTypeId === targetTypeId
+        )
+          return true;
+        const qType = q.type || "single";
+        if (
+          targetTypeName.includes("mcq") ||
+          targetTypeName.includes("single") ||
+          targetTypeName.includes("multi") ||
+          targetTypeName.includes("objective")
+        ) {
+          return (
+            qType === "single" || qType === "multiple" || qType === "contextual"
+          );
+        }
+        if (
+          targetTypeName === "cq" ||
+          targetTypeName.includes("creative") ||
+          targetTypeName.includes("সৃজনশীল")
+        ) {
+          return qType === "creative";
+        }
+        return false;
+      })
+      .reduce((sum, q) => {
+        if (q.subQuestions && q.subQuestions.length > 0) {
+          return sum + q.subQuestions.reduce((s, sq) => s + sq.marks, 0);
+        }
+        return sum + distribution.marksPerQuestion;
+      }, 0);
+  };
+
+  const allPendingDistributions = (subjects || []).flatMap((s) => {
+    return (s.distributions || []).filter((d) => {
+      const addedCount = getAddedCount(s.subjectId, d);
+      const addedMarks = getAddedMarks(s.subjectId, d);
+      const countPending = addedCount < d.questionCount;
+      const marksPending =
+        addedMarks < (d.totalMarks || d.questionCount * d.marksPerQuestion);
+      const isCQ =
+        d.questionType?.name?.toLowerCase().includes("creative") ||
+        d.questionType?.name?.toLowerCase().includes("cq") ||
+        d.questionType?.name?.includes("সৃজনশীল");
+      return isCQ ? marksPending && countPending : countPending;
+    });
+  });
+
+  const firstPendingDistId = allPendingDistributions[0]?.id;
 
   return (
     <div
@@ -133,9 +211,29 @@ export const PaperContent: React.FC<PaperContentProps> = ({
           const subjectQuestions = pageQuestions.filter(
             (q) => q.subjectId === s.subjectId,
           );
-          const pendingDistributions = (s.distributions || []).filter(
-            (d) => getAddedCount(s.subjectId, d) < d.questionCount,
-          );
+          const pendingDistributions = (s.distributions || []).filter((d) => {
+            const addedCount = getAddedCount(s.subjectId, d);
+            const addedMarks = getAddedMarks(s.subjectId, d);
+
+            // Question count not met
+            const countPending = addedCount < d.questionCount;
+            // Total marks target not met (especially important for CQs with variable marks)
+            const marksPending =
+              addedMarks <
+              (d.totalMarks || d.questionCount * d.marksPerQuestion);
+
+            // If it's a CQ, we prioritize mark fulfillment over strict count if count seems misconfigured
+            const isCQ =
+              d.questionType?.name?.toLowerCase().includes("creative") ||
+              d.questionType?.name?.toLowerCase().includes("cq") ||
+              d.questionType?.name?.includes("সৃজনশীল");
+
+            if (isCQ) {
+              return marksPending && countPending;
+            }
+
+            return countPending;
+          });
 
           const shouldShowActionButtons =
             isEditing &&
@@ -184,15 +282,25 @@ export const PaperContent: React.FC<PaperContentProps> = ({
               if (targetTypeName.includes("statement"))
                 return qType === "statement";
 
-              const qLabels = [qType.toLowerCase()];
-              if (qType === "single" || qType === "multiple") qLabels.push("mcq");
+              if (
+                targetTypeName === "cq" ||
+                targetTypeName.includes("creative") ||
+                targetTypeName.includes("সৃজনশীল")
+              ) {
+                return qType === "creative";
+              }
 
-              if (targetTypeName === "cq" && qLabels.includes("mcq")) return false;
+              const qLabels = [qType.toLowerCase()];
+              if (qType === "single" || qType === "multiple")
+                qLabels.push("mcq");
+
+              if (targetTypeName === "cq" && qLabels.includes("mcq"))
+                return false;
 
               return qLabels.some(
                 (label) =>
-                  targetTypeName === label || 
-                  (targetTypeName.includes(label) && label !== "mcq") || 
+                  targetTypeName === label ||
+                  (targetTypeName.includes(label) && label !== "mcq") ||
                   (label.includes(targetTypeName) && targetTypeName !== "cq"),
               );
             });
@@ -228,21 +336,34 @@ export const PaperContent: React.FC<PaperContentProps> = ({
 
                   {/* Mark Distribution Row */}
                   <div className="flex flex-col gap-1 mt-1 px-1">
-                    {(s.distributions || []).map((d) => (
-                      <div
-                        key={d.id}
-                        className="flex items-center justify-between text-[13px] font-bold"
-                      >
-                        <span className="uppercase tracking-tight text-black/80">
-                          {d.questionType?.label}
-                        </span>
-                        <span className="text-black/50">
-                          {toBengaliDigits(d.questionCount)} ×{" "}
-                          {toBengaliDigits(d.marksPerQuestion)} ={" "}
-                          {toBengaliDigits(d.totalMarks)}
-                        </span>
-                      </div>
-                    ))}
+                    {(s.distributions || []).map((d) => {
+                      const isCQ =
+                        d.questionType?.name?.toLowerCase() === "cq" ||
+                        d.questionType?.name
+                          ?.toLowerCase()
+                          .includes("creative") ||
+                        d.questionType?.name?.includes("সৃজনশীল") ||
+                        d.questionType?.label?.toLowerCase().includes("cq") ||
+                        d.questionType?.label?.includes("সৃজনশীল");
+
+                      if (isCQ) return null;
+
+                      return (
+                        <div
+                          key={d.id}
+                          className="flex items-center justify-between text-[13px] font-bold"
+                        >
+                          <span className="uppercase tracking-tight text-black/80">
+                            {d.questionType?.label}
+                          </span>
+                          <span className="text-black/50">
+                            {toBengaliDigits(d.questionCount)} ×{" "}
+                            {toBengaliDigits(d.marksPerQuestion)} ={" "}
+                            {toBengaliDigits(d.totalMarks)}
+                          </span>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               )}
@@ -259,7 +380,8 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                         if ((s.distributions || []).length <= 1) return false;
                         const firstQInDistGlobal = subjectQuestionsGlobal.find(
                           (q) => {
-                            if (q.distributionId && q.distributionId === d.id) return true;
+                            if (q.distributionId && q.distributionId === d.id)
+                              return true;
 
                             const targetTypeId = d.questionTypeId;
                             const targetTypeName = (
@@ -282,15 +404,22 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                               return qType === "statement";
 
                             const qLabels = [qType.toLowerCase()];
-                            if (qType === "single" || qType === "multiple") qLabels.push("mcq");
+                            if (qType === "single" || qType === "multiple")
+                              qLabels.push("mcq");
 
-                            if (targetTypeName === "cq" && qLabels.includes("mcq")) return false;
+                            if (
+                              targetTypeName === "cq" &&
+                              qLabels.includes("mcq")
+                            )
+                              return false;
 
                             return qLabels.some(
                               (label) =>
-                                targetTypeName === label || 
-                                (targetTypeName.includes(label) && label !== "mcq") || 
-                                (label.includes(targetTypeName) && targetTypeName !== "cq"),
+                                targetTypeName === label ||
+                                (targetTypeName.includes(label) &&
+                                  label !== "mcq") ||
+                                (label.includes(targetTypeName) &&
+                                  targetTypeName !== "cq"),
                             );
                           },
                         );
@@ -299,14 +428,23 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                           firstQInDistGlobal &&
                           group.some((q) => q.id === firstQInDistGlobal.id)
                         );
-                      })() && (
-                        <div className="flex items-center gap-2 mb-1">
-                          <span className="font-black text-[10px] uppercase tracking-widest text-black/90 px-1.5 py-0.5 bg-black/[0.03] rounded border border-black/5">
-                            {d.questionType?.label}
-                          </span>
-                          <div className="h-px flex-1 bg-black/10" />
-                        </div>
-                      )}
+                      })() &&
+                        !(
+                          d.questionType?.name?.toLowerCase() === "cq" ||
+                          d.questionType?.name
+                            ?.toLowerCase()
+                            .includes("creative") ||
+                          d.questionType?.name?.includes("সৃজনশীল") ||
+                          d.questionType?.label?.toLowerCase().includes("cq") ||
+                          d.questionType?.label?.includes("সৃজনশীল")
+                        ) && (
+                          <div className="flex items-center gap-2 mb-1">
+                            <span className="font-black text-[10px] uppercase tracking-widest text-black/90 px-1.5 py-0.5 bg-black/[0.03] rounded border border-black/5">
+                              {d.questionType?.label}
+                            </span>
+                            <div className="h-px flex-1 bg-black/10" />
+                          </div>
+                        )}
 
                       <div className="space-y-1">
                         {group.map((q) => (
@@ -396,39 +534,90 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                   <div className="grid grid-cols-1 gap-2">
                     {pendingDistributions.map((d) => {
                       const addedCount = getAddedCount(s.subjectId, d);
+                      const isFirstPending = d.id === firstPendingDistId;
                       return (
                         <div
                           key={d.id}
-                          className="flex flex-col gap-2 group p-3 rounded-xl border border-dashed border-black/10 hover:border-black/30 hover:bg-black/[0.02] transition-all"
+                          className={cn(
+                            "flex flex-col gap-2 group p-3 rounded-xl border transition-all relative overflow-hidden",
+                            isFirstPending
+                              ? "border-dashed border-black/10 hover:border-black/30 hover:bg-black/[0.02] shadow-sm"
+                              : "border-solid border-black/5 bg-black/[0.02]",
+                          )}
                         >
+                          {!isFirstPending && (
+                            <div className="absolute top-0 right-0 p-2 opacity-10">
+                              <LockIcon className="w-8 h-8 rotate-12" />
+                            </div>
+                          )}
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-2">
-                              <span className="font-bold text-sm">
+                              <span className={cn(
+                                "font-bold text-sm",
+                                !isFirstPending && "text-black/40"
+                              )}>
                                 {d.questionType?.name || "প্রশ্নের ধরণ"}
                               </span>
-                              <span className="text-[9px] font-black uppercase tracking-wider bg-black/5 px-1.5 py-0.5 rounded text-black/50">
-                                {addedCount > 0 ? "আংশিক" : "প্রয়োজনীয়"}
+                              <span
+                                className={cn(
+                                  "text-[9px] font-black uppercase tracking-wider px-1.5 py-0.5 rounded",
+                                  isFirstPending
+                                    ? "bg-black/5 text-black/50"
+                                    : "bg-black/5 text-black/20",
+                                )}
+                              >
+                                {!isFirstPending
+                                  ? "অপেক্ষমান"
+                                  : addedCount > 0
+                                    ? "আংশিক"
+                                    : "প্রয়োজনীয়"}
                               </span>
                             </div>
-                            <p className="text-[10px] text-black/60 font-medium">
+                            <p className={cn(
+                              "text-[10px] font-medium",
+                              isFirstPending ? "text-black/60" : "text-black/30"
+                            )}>
                               {toBengaliDigits(d.questionCount)}টি প্রশ্ন —
                               প্রতিটির মান {toBengaliDigits(d.marksPerQuestion)}{" "}
                               — মোট {toBengaliDigits(d.totalMarks)} নম্বর
                             </p>
                           </div>
                           <Link
-                            href={`/question-papers/${paperId}/resources/${d.questionType?.name.toLowerCase()}/${d.questionTypeId}?subjectId=${s.subjectId}&distributionId=${d.id}`}
-                            className="w-full"
+                            href={
+                              isFirstPending
+                                ? `/question-papers/${paperId}/resources/${d.questionType?.name.toLowerCase()}/${d.questionTypeId}?subjectId=${s.subjectId}&distributionId=${d.id}`
+                                : "#"
+                            }
+                            className={cn(
+                              "w-full",
+                              !isFirstPending &&
+                                "pointer-events-none cursor-not-allowed",
+                            )}
                           >
                             <Button
-                              variant="outline"
+                              variant={isFirstPending ? "outline" : "ghost"}
                               size="sm"
-                              className="w-full h-10 rounded-lg border-black/10 font-bold text-[11px] uppercase tracking-widest hover:bg-black hover:text-white transition-all shadow-sm"
+                              disabled={!isFirstPending}
+                              className={cn(
+                                "w-full h-10 rounded-lg font-bold text-[11px] uppercase tracking-widest transition-all shadow-sm",
+                                isFirstPending
+                                  ? "border-black/10 hover:bg-black hover:text-white"
+                                  : "border-transparent bg-black/[0.03] text-black/30",
+                              )}
                             >
-                              <Plus className="w-2.5 h-2.5 mr-1 stroke-[3]" />
-                              প্রশ্ন নির্বাচন করুন (
-                              {toBengaliDigits(addedCount)}/
-                              {toBengaliDigits(d.questionCount)})
+                              {isFirstPending ? (
+                                <>
+                                  <Plus className="w-2.5 h-2.5 mr-1 stroke-[3]" />
+                                  প্রশ্ন নির্বাচন করুন (
+                                  {toBengaliDigits(addedCount)}/
+                                  {toBengaliDigits(d.questionCount)})
+                                </>
+                              ) : (
+                                <>
+                                  <LockIcon className="w-3 h-3 mr-1.5 opacity-50" />
+                                  আগের ধাপ শেষ করুন
+                                </>
+                              )}
                             </Button>
                           </Link>
                         </div>

@@ -23,6 +23,7 @@ export const cqFormSchema = z.object({
   reference: z.array(z.string()).optional(),
   session: z.coerce.number().int().min(1900).max(2100),
   source: z.string().optional().or(z.literal("")),
+  questionTypeId: uuidSchema.optional().or(z.literal("")),
 });
 
 export type CQFormValues = z.infer<typeof cqFormSchema>;
@@ -45,6 +46,15 @@ export const defaultCQValues: CQFormValues = {
   reference: [],
   session: new Date().getFullYear(),
   source: "",
+  questionTypeId: "",
 };
 
 export const updateCQSchema = cqFormSchema.partial();
+
+export const cqSchema = cqFormSchema.extend({
+  id: uuidSchema,
+  createdAt: z.date(),
+  updatedAt: z.date(),
+});
+
+export type CQ = z.infer<typeof cqSchema>;

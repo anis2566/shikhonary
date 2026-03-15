@@ -740,9 +740,9 @@ export type McqSumOrderByAggregateInput = {
   session?: Prisma.SortOrder
 }
 
-export type McqScalarRelationFilter = {
-  is?: Prisma.McqWhereInput
-  isNot?: Prisma.McqWhereInput
+export type McqNullableScalarRelationFilter = {
+  is?: Prisma.McqWhereInput | null
+  isNot?: Prisma.McqWhereInput | null
 }
 
 export type McqCreateNestedManyWithoutSubjectInput = {
@@ -988,10 +988,12 @@ export type McqCreateNestedOneWithoutQuestionPapersInput = {
   connect?: Prisma.McqWhereUniqueInput
 }
 
-export type McqUpdateOneRequiredWithoutQuestionPapersNestedInput = {
+export type McqUpdateOneWithoutQuestionPapersNestedInput = {
   create?: Prisma.XOR<Prisma.McqCreateWithoutQuestionPapersInput, Prisma.McqUncheckedCreateWithoutQuestionPapersInput>
   connectOrCreate?: Prisma.McqCreateOrConnectWithoutQuestionPapersInput
   upsert?: Prisma.McqUpsertWithoutQuestionPapersInput
+  disconnect?: Prisma.McqWhereInput | boolean
+  delete?: Prisma.McqWhereInput | boolean
   connect?: Prisma.McqWhereUniqueInput
   update?: Prisma.XOR<Prisma.XOR<Prisma.McqUpdateToOneWithWhereWithoutQuestionPapersInput, Prisma.McqUpdateWithoutQuestionPapersInput>, Prisma.McqUncheckedUpdateWithoutQuestionPapersInput>
 }

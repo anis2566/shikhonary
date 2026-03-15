@@ -7,6 +7,7 @@ import { academicChapterRouter } from "../routers/academic-chapter";
 import { academicTopicRouter } from "../routers/academic-topic";
 import { academicSubTopicRouter } from "../routers/academic-subtopic";
 import { mcqRouter } from "../routers/mcq";
+import { cqRouter } from "../routers/cq";
 import { studentRouter } from "../routers/student";
 import { batchRouter } from "../routers/batch";
 import { academicTreeRouter } from "../routers/academic-tree";
@@ -31,6 +32,7 @@ export const appRouter = t.router({
   academicTopic: academicTopicRouter,
   academicSubTopic: academicSubTopicRouter,
   mcq: mcqRouter,
+  cq: cqRouter,
   student: studentRouter,
   batch: batchRouter,
   academicTree: academicTreeRouter,

@@ -405,6 +405,8 @@ export const ModelName = {
   SubjectQuestionType: 'SubjectQuestionType',
   Mcq: 'Mcq',
   Cq: 'Cq',
+  CqAttachment: 'CqAttachment',
+  CqAnswer: 'CqAnswer',
   AuditLog: 'AuditLog',
   SystemSetting: 'SystemSetting',
   Notification: 'Notification',
@@ -433,7 +435,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "account" | "verification" | "tenant" | "tenantMember" | "tenantInvitation" | "subscriptionPlan" | "subscription" | "subscriptionHistory" | "invoice" | "academicClass" | "academicSubject" | "academicClassSubject" | "academicChapter" | "academicTopic" | "academicSubTopic" | "questionType" | "subjectQuestionType" | "mcq" | "cq" | "auditLog" | "systemSetting" | "notification" | "pdfIngestionJob" | "book" | "chapter" | "contentBlock" | "contentBlockMedia" | "audioCache" | "questionPaper" | "questionPaperSubject" | "questionPaperSubjectMarkDistribution" | "questionPaperQuestion"
+    modelProps: "user" | "session" | "account" | "verification" | "tenant" | "tenantMember" | "tenantInvitation" | "subscriptionPlan" | "subscription" | "subscriptionHistory" | "invoice" | "academicClass" | "academicSubject" | "academicClassSubject" | "academicChapter" | "academicTopic" | "academicSubTopic" | "questionType" | "subjectQuestionType" | "mcq" | "cq" | "cqAttachment" | "cqAnswer" | "auditLog" | "systemSetting" | "notification" | "pdfIngestionJob" | "book" | "chapter" | "contentBlock" | "contentBlockMedia" | "audioCache" | "questionPaper" | "questionPaperSubject" | "questionPaperSubjectMarkDistribution" | "questionPaperQuestion"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1991,6 +1993,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CqAttachment: {
+      payload: Prisma.$CqAttachmentPayload<ExtArgs>
+      fields: Prisma.CqAttachmentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CqAttachmentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CqAttachmentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>
+        }
+        findFirst: {
+          args: Prisma.CqAttachmentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CqAttachmentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>
+        }
+        findMany: {
+          args: Prisma.CqAttachmentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>[]
+        }
+        create: {
+          args: Prisma.CqAttachmentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>
+        }
+        createMany: {
+          args: Prisma.CqAttachmentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CqAttachmentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>[]
+        }
+        delete: {
+          args: Prisma.CqAttachmentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>
+        }
+        update: {
+          args: Prisma.CqAttachmentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>
+        }
+        deleteMany: {
+          args: Prisma.CqAttachmentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CqAttachmentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CqAttachmentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>[]
+        }
+        upsert: {
+          args: Prisma.CqAttachmentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAttachmentPayload>
+        }
+        aggregate: {
+          args: Prisma.CqAttachmentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCqAttachment>
+        }
+        groupBy: {
+          args: Prisma.CqAttachmentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CqAttachmentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CqAttachmentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CqAttachmentCountAggregateOutputType> | number
+        }
+      }
+    }
+    CqAnswer: {
+      payload: Prisma.$CqAnswerPayload<ExtArgs>
+      fields: Prisma.CqAnswerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CqAnswerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CqAnswerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>
+        }
+        findFirst: {
+          args: Prisma.CqAnswerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CqAnswerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>
+        }
+        findMany: {
+          args: Prisma.CqAnswerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>[]
+        }
+        create: {
+          args: Prisma.CqAnswerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>
+        }
+        createMany: {
+          args: Prisma.CqAnswerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CqAnswerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>[]
+        }
+        delete: {
+          args: Prisma.CqAnswerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>
+        }
+        update: {
+          args: Prisma.CqAnswerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>
+        }
+        deleteMany: {
+          args: Prisma.CqAnswerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CqAnswerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CqAnswerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>[]
+        }
+        upsert: {
+          args: Prisma.CqAnswerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CqAnswerPayload>
+        }
+        aggregate: {
+          args: Prisma.CqAnswerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCqAnswer>
+        }
+        groupBy: {
+          args: Prisma.CqAnswerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CqAnswerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CqAnswerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CqAnswerCountAggregateOutputType> | number
+        }
+      }
+    }
     AuditLog: {
       payload: Prisma.$AuditLogPayload<ExtArgs>
       fields: Prisma.AuditLogFieldRefs
@@ -3363,16 +3513,48 @@ export const CqScalarFieldEnum = {
   context: 'context',
   marks: 'marks',
   isActive: 'isActive',
-  classId: 'classId',
+  reference: 'reference',
+  session: 'session',
+  source: 'source',
   subjectId: 'subjectId',
   chapterId: 'chapterId',
   topicId: 'topicId',
   subTopicId: 'subTopicId',
+  questionTypeId: 'questionTypeId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
 export type CqScalarFieldEnum = (typeof CqScalarFieldEnum)[keyof typeof CqScalarFieldEnum]
+
+
+export const CqAttachmentScalarFieldEnum = {
+  id: 'id',
+  cqId: 'cqId',
+  url: 'url',
+  type: 'type',
+  caption: 'caption',
+  position: 'position',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CqAttachmentScalarFieldEnum = (typeof CqAttachmentScalarFieldEnum)[keyof typeof CqAttachmentScalarFieldEnum]
+
+
+export const CqAnswerScalarFieldEnum = {
+  id: 'id',
+  cqId: 'cqId',
+  answerA: 'answerA',
+  answerB: 'answerB',
+  answerC: 'answerC',
+  answerD: 'answerD',
+  explanation: 'explanation',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CqAnswerScalarFieldEnum = (typeof CqAnswerScalarFieldEnum)[keyof typeof CqAnswerScalarFieldEnum]
 
 
 export const AuditLogScalarFieldEnum = {
@@ -3577,6 +3759,7 @@ export const QuestionPaperQuestionScalarFieldEnum = {
   id: 'id',
   questionPaperId: 'questionPaperId',
   mcqId: 'mcqId',
+  cqId: 'cqId',
   paperSubjectId: 'paperSubjectId',
   distributionId: 'distributionId',
   questionTypeId: 'questionTypeId',
@@ -3835,6 +4018,8 @@ export type GlobalOmitConfig = {
   subjectQuestionType?: Prisma.SubjectQuestionTypeOmit
   mcq?: Prisma.McqOmit
   cq?: Prisma.CqOmit
+  cqAttachment?: Prisma.CqAttachmentOmit
+  cqAnswer?: Prisma.CqAnswerOmit
   auditLog?: Prisma.AuditLogOmit
   systemSetting?: Prisma.SystemSettingOmit
   notification?: Prisma.NotificationOmit

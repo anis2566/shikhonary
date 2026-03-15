@@ -16,12 +16,13 @@ export interface PaperQuestion {
   contextStyle?: ElementStyle;
   statements?: string[];
   statementStyles?: ElementStyle[];
-  type: "single" | "multiple" | "assertion" | "statement" | "contextual";
+  type: "single" | "multiple" | "assertion" | "statement" | "contextual" | "creative";
   optionsColumns?: 1 | 2;
   subjectId?: string;
   questionTypeId?: string;
   distributionId?: string;
   reference?: string[];
+  subQuestions?: { label: string; text: string; marks: number; style?: ElementStyle }[];
 }
 
 export interface HeaderStyles {

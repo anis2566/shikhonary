@@ -61,9 +61,7 @@ export const ModelName = {
   Announcement: 'Announcement',
   Notification: 'Notification',
   ExamAnalytics: 'ExamAnalytics',
-  StudentAnalytics: 'StudentAnalytics',
-  QuestionPaper: 'QuestionPaper',
-  QuestionPaperQuestion: 'QuestionPaperQuestion'
+  StudentAnalytics: 'StudentAnalytics'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -359,38 +357,6 @@ export const StudentAnalyticsScalarFieldEnum = {
 } as const
 
 export type StudentAnalyticsScalarFieldEnum = (typeof StudentAnalyticsScalarFieldEnum)[keyof typeof StudentAnalyticsScalarFieldEnum]
-
-
-export const QuestionPaperScalarFieldEnum = {
-  id: 'id',
-  title: 'title',
-  examName: 'examName',
-  description: 'description',
-  className: 'className',
-  subjectName: 'subjectName',
-  chapterName: 'chapterName',
-  settings: 'settings',
-  status: 'status',
-  isActive: 'isActive',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt',
-  deletedAt: 'deletedAt'
-} as const
-
-export type QuestionPaperScalarFieldEnum = (typeof QuestionPaperScalarFieldEnum)[keyof typeof QuestionPaperScalarFieldEnum]
-
-
-export const QuestionPaperQuestionScalarFieldEnum = {
-  id: 'id',
-  questionPaperId: 'questionPaperId',
-  mcqId: 'mcqId',
-  orderIndex: 'orderIndex',
-  overrides: 'overrides',
-  createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
-} as const
-
-export type QuestionPaperQuestionScalarFieldEnum = (typeof QuestionPaperQuestionScalarFieldEnum)[keyof typeof QuestionPaperQuestionScalarFieldEnum]
 
 
 export const SortOrder = {

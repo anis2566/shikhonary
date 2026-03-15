@@ -165,6 +165,24 @@ export const questionPaperRouter = createTRPCRouter({
       };
     }),
 
+  assignCq: baseMutationProcedure
+    .input(
+      z.object({
+        questionPaperId: z.string().uuid(),
+        cqId: z.string().uuid(),
+        orderIndex: z.number().int().min(0).optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = new QuestionPaperService(ctx.db);
+      const data = await service.assignCq(input);
+      return {
+        success: true,
+        message: "CQ assigned to paper",
+        data,
+      };
+    }),
+
   removeMcq: baseMutationProcedure
     .input(z.object({ questionPaperQuestionId: z.string().uuid() }))
     .mutation(async ({ ctx, input }) => {
@@ -191,6 +209,24 @@ export const questionPaperRouter = createTRPCRouter({
       return {
         success: true,
         message: "MCQs assigned to paper",
+        data,
+      };
+    }),
+
+  bulkAssignCq: baseMutationProcedure
+    .input(
+      z.object({
+        questionPaperId: z.string().uuid(),
+        cqIds: z.array(z.string().uuid()),
+        distributionId: z.string().uuid(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = new QuestionPaperService(ctx.db);
+      const data = await service.bulkAssignCqs(input);
+      return {
+        success: true,
+        message: "CQs assigned to paper",
         data,
       };
     }),

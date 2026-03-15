@@ -193,6 +193,33 @@ export function useAssignMcqToQuestionPaper() {
 }
 
 /**
+ * Assign a CQ from the bank to the paper
+ */
+export function useAssignCqToQuestionPaper() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.questionPaper.assignCq.mutationOptions(),
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to assign question");
+    },
+    onSuccess: async (data: any) => {
+      if (data.success) {
+        const paperId = data.data?.questionPaperId;
+        if (paperId) {
+          await queryClient.invalidateQueries({
+            queryKey: trpc.questionPaper.getById.queryKey({ id: paperId }),
+          });
+        }
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+}
+
+/**
  * Remove an assigned MCQ from the paper
  */
 export function useRemoveMcqFromQuestionPaper() {
@@ -238,6 +265,33 @@ export function useBulkAssignMcqToQuestionPaper() {
 
   return useMutation({
     ...trpc.questionPaper.bulkAssignMcq.mutationOptions(),
+    onError: (error: any) => {
+      toast.error(error.message || "Failed to assign questions");
+    },
+    onSuccess: async (data: any, variables: any) => {
+      if (data.success) {
+        toast.success(data.message);
+        if (variables.questionPaperId) {
+          await queryClient.invalidateQueries({
+            queryKey: trpc.questionPaper.getById.queryKey({
+              id: variables.questionPaperId,
+            }),
+          });
+        }
+      }
+    },
+  });
+}
+
+/**
+ * Bulk assign CQs to a paper
+ */
+export function useBulkAssignCqToQuestionPaper() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.questionPaper.bulkAssignCq.mutationOptions(),
     onError: (error: any) => {
       toast.error(error.message || "Failed to assign questions");
     },

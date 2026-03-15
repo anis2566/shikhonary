@@ -31,7 +31,7 @@ export const mcqFormSchema = z.object({
   questionUrl: z.string().url().optional().or(z.literal("")),
   contextUrl: z.string().url().optional().or(z.literal("")),
   questionTypeId: uuidSchema.optional().or(z.literal("")),
-  isActive: z.boolean().optional().default(true),
+  isActive: z.boolean().optional(),
 });
 
 export type MCQFormValues = z.infer<typeof mcqFormSchema>;

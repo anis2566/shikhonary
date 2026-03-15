@@ -22,6 +22,7 @@ export * from "./services/academic-chapter.service";
 export * from "./services/academic-topic.service";
 export * from "./services/academic-subtopic.service";
 export * from "./services/mcq.service";
+export * from "./services/cq.service";
 export * from "./services/question-paper.service";
 export * from "./services/question-type.service";
 
