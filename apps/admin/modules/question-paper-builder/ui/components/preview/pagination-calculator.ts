@@ -11,7 +11,26 @@ import { PaperQuestion, PaperSettings, PaperSubjectBreakdown } from "../types";
 
 const MM_TO_PX = 3.78;
 
-// ─── Estimation helpers ──────────────────────────────────────────────────────
+// Persistent cache for question heights to avoid heavy recalculation
+const heightCache = new Map<string, { height: number; hash: string }>();
+
+function getQuestionHash(q: PaperQuestion, settings: PaperSettings, availableWidth: number): string {
+  // Hash relevant properties that affect height
+  return [
+    q.question,
+    q.context,
+    q.type,
+    q.optionsColumns,
+    availableWidth,
+    settings.fontSize,
+    settings.lineHeight,
+    settings.columns,
+    (q.options || []).map(o => o.text).join('|'),
+    (q.statements || []).join('|'),
+    (q.subQuestions || []).map(sq => sq.text).join('|'),
+    JSON.stringify(q.questionStyle),
+  ].join('_');
+}
 
 /**
  * Estimate the number of wrapped lines for a text string given a font size
@@ -80,6 +99,23 @@ export function estimateHeaderHeight(settings: PaperSettings): number {
  * options / sub-questions, and surrounding spacing.
  */
 export function estimateQuestionHeight(
+  q: PaperQuestion,
+  settings: PaperSettings,
+  availableWidth: number,
+): number {
+  const hash = getQuestionHash(q, settings, availableWidth);
+  const cached = heightCache.get(q.id);
+
+  if (cached && cached.hash === hash) {
+    return cached.height;
+  }
+
+  const height = estimateQuestionHeightInternal(q, settings, availableWidth);
+  heightCache.set(q.id, { height, hash });
+  return height;
+}
+
+function estimateQuestionHeightInternal(
   q: PaperQuestion,
   settings: PaperSettings,
   availableWidth: number,

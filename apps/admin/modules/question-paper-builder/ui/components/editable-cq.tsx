@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Copy, MoreVertical } from "lucide-react";
@@ -51,6 +51,33 @@ export const EditableCq: React.FC<EditableCqProps> = React.memo(({
   onFocus,
   onBlur,
 }) => {
+  // Local state for instant typing response
+  const [localContext, setLocalContext] = useState(question.context || "");
+  const [localSubQuestions, setLocalSubQuestions] = useState(question.subQuestions || []);
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync from props
+  useEffect(() => {
+    const nextContext = question.context || "";
+    if (nextContext !== localContext) {
+      setLocalContext(nextContext);
+    }
+  }, [question.context, localContext]);
+
+  useEffect(() => {
+    const nextSubQuestions = question.subQuestions || [];
+    if (JSON.stringify(nextSubQuestions) !== JSON.stringify(localSubQuestions)) {
+      setLocalSubQuestions(nextSubQuestions);
+    }
+  }, [question.subQuestions, localSubQuestions]);
+
+  const debouncedUpdate = useCallback((update: Partial<PaperQuestion>) => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      onUpdate({ ...question, ...update });
+    }, 250);
+  }, [onUpdate, question]);
+
   const {
     attributes,
     listeners,
@@ -87,18 +114,18 @@ export const EditableCq: React.FC<EditableCqProps> = React.memo(({
   }, [question.contextStyle, settings.fontFamily]);
 
   const handleContextChange = useCallback((value: string) => {
-    onUpdate({ ...question, context: value });
-  }, [question, onUpdate]);
+    setLocalContext(value);
+    debouncedUpdate({ context: value });
+  }, [debouncedUpdate]);
 
   const handleSubQuestionChange = useCallback((index: number, value: string) => {
-    if (!question.subQuestions) return;
-    const newSubQuestions = [...question.subQuestions];
-    const sq = newSubQuestions[index];
-    if (sq) {
-      newSubQuestions[index] = { ...sq, text: value };
+    const newSubQuestions = [...localSubQuestions];
+    if (newSubQuestions[index]) {
+      newSubQuestions[index] = { ...newSubQuestions[index], text: value };
     }
-    onUpdate({ ...question, subQuestions: newSubQuestions });
-  }, [question, onUpdate]);
+    setLocalSubQuestions(newSubQuestions);
+    debouncedUpdate({ subQuestions: newSubQuestions });
+  }, [localSubQuestions, debouncedUpdate]);
 
   const getBengaliNumber = (num: number): string => {
     const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -175,7 +202,7 @@ export const EditableCq: React.FC<EditableCqProps> = React.memo(({
               <div className="mb-0">
                 {isEditing ? (
                   <textarea
-                    value={question.context || ""}
+                    value={localContext}
                     onChange={(e) => handleContextChange(e.target.value)}
                     onFocus={(e) =>
                       onFocus?.(e, "context", undefined, getContextStyle())
@@ -242,7 +269,7 @@ export const EditableCq: React.FC<EditableCqProps> = React.memo(({
                         </div>
                         {isEditing ? (
                           <textarea
-                            value={sq.text}
+                            value={localSubQuestions[idx]?.text || ""}
                             onChange={(e) =>
                               handleSubQuestionChange(idx, e.target.value)
                             }

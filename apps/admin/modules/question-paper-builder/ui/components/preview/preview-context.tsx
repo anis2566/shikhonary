@@ -8,6 +8,7 @@ import React, {
   useEffect,
   useRef,
   useMemo,
+  useDeferredValue,
 } from "react";
 import {
   PaperQuestion,
@@ -16,6 +17,7 @@ import {
   ElementStyle,
   HeaderStyles,
   PaperSubjectBreakdown,
+  PaperSubjectAction,
 } from "../types";
 import { calculatePagination } from "./pagination-calculator";
 import {
@@ -39,6 +41,8 @@ interface PreviewContextType {
   showToolbar: boolean;
   isToolbarInteracting: boolean;
   firstPageEnd: number;
+  allPendingDistributions: PaperSubjectAction[];
+  firstPendingDistId?: string;
 
   // Refs
   containerRef: React.RefObject<HTMLDivElement | null>;
@@ -134,6 +138,10 @@ export const PreviewProvider: React.FC<{
   const isLandscape = settings.paperOrientation === "landscape";
   const isMultiColumn = settings.columns > 1;
   const shouldRestrictHeaderWidth = isLandscape && isMultiColumn;
+
+  const deferredQuestions = useDeferredValue(questions);
+  const deferredSettings = useDeferredValue(settings);
+  const deferredSubjects = useDeferredValue(subjects);
 
   const effectiveScale = zoom === "auto" ? autoScale : zoom;
 
@@ -369,17 +377,45 @@ export const PreviewProvider: React.FC<{
 
   // ── Calculation-based pagination (replaces old DOM measurement) ─────────
   const paginationResult = useMemo(
-    () => calculatePagination(questions, settings, subjects, getPaperDimensions()),
-    [questions, settings, subjects, getPaperDimensions],
+    () => calculatePagination(deferredQuestions, deferredSettings, deferredSubjects, getPaperDimensions()),
+    [deferredQuestions, deferredSettings, deferredSubjects, getPaperDimensions],
   );
 
   const pages = paginationResult.pages;
   const firstPageEnd = paginationResult.firstPageEnd;
 
   const distributionStats = useMemo(
-    () => calculateDistributionStats(questions, subjects),
-    [questions, subjects],
+    () => calculateDistributionStats(deferredQuestions, deferredSubjects),
+    [deferredQuestions, deferredSubjects],
   );
+
+  const getAddedCount = useCallback(
+    (distId: string) => distributionStats[distId]?.count ?? 0,
+    [distributionStats],
+  );
+  const getAddedMarks = useCallback(
+    (distId: string) => distributionStats[distId]?.marks ?? 0,
+    [distributionStats],
+  );
+
+  const allPendingDistributions = useMemo(() => {
+    return (deferredSubjects || []).flatMap((s) => {
+      return (s.distributions || []).filter((d) => {
+        const addedCount = getAddedCount(d.id);
+        const addedMarks = getAddedMarks(d.id);
+        const countPending = addedCount < d.questionCount;
+        const marksPending =
+          addedMarks < (d.totalMarks || d.questionCount * d.marksPerQuestion);
+        const isCQ =
+          d.questionType?.name?.toLowerCase().includes("creative") ||
+          d.questionType?.name?.toLowerCase().includes("cq") ||
+          d.questionType?.name?.includes("সৃজনশীল");
+        return isCQ ? marksPending && countPending : countPending;
+      });
+    });
+  }, [deferredSubjects, getAddedCount, getAddedMarks]);
+
+  const firstPendingDistId = allPendingDistributions[0]?.id;
 
   const value = {
     questions,
@@ -419,6 +455,8 @@ export const PreviewProvider: React.FC<{
     getHeaderStyle,
     getPaperStyle,
     getPaperDimensions,
+    allPendingDistributions,
+    firstPendingDistId,
   };
 
   return (

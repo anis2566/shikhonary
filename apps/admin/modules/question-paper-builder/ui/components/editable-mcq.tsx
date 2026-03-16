@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback } from "react";
+import React, { useCallback, useState, useEffect, useRef } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Copy, MoreVertical } from "lucide-react";
@@ -48,6 +48,53 @@ export const EditableMcq: React.FC<EditableMcqProps> = React.memo(({
   onFocus,
   onBlur,
 }) => {
+  // Local state for instant typing response
+  const [localQuestion, setLocalQuestion] = useState(question.question);
+  const [localContext, setLocalContext] = useState(question.context || "");
+  const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
+
+  // Sync from props only when not typing
+  useEffect(() => {
+    if (question.question !== localQuestion) {
+      setLocalQuestion(question.question);
+    }
+  }, [question.question, localQuestion]);
+
+  useEffect(() => {
+    const nextContext = question.context || "";
+    if (nextContext !== localContext) {
+      setLocalContext(nextContext);
+    }
+  }, [question.context, localContext]);
+
+  const debouncedUpdate = useCallback((update: Partial<PaperQuestion>) => {
+    if (debounceTimerRef.current) clearTimeout(debounceTimerRef.current);
+    debounceTimerRef.current = setTimeout(() => {
+      onUpdate({ ...question, ...update });
+    }, 250);
+  }, [onUpdate, question]);
+
+  const handleQuestionChange = useCallback((value: string) => {
+    setLocalQuestion(value);
+    debouncedUpdate({ question: value });
+  }, [debouncedUpdate]);
+
+  const handleContextChange = useCallback((value: string) => {
+    setLocalContext(value);
+    debouncedUpdate({ context: value });
+  }, [debouncedUpdate]);
+
+  const handleOptionChange = useCallback((index: number, value: string) => {
+    const newOptions = [...question.options];
+    if (!newOptions[index]) {
+      newOptions[index] = { label: "", text: value };
+    } else {
+      newOptions[index] = { ...newOptions[index], text: value };
+    }
+    // Options usually don't need debounce if they are short, but for consistency:
+    onUpdate({ ...question, options: newOptions });
+  }, [question, onUpdate]);
+
   const {
     attributes,
     listeners,
@@ -95,23 +142,7 @@ export const EditableMcq: React.FC<EditableMcqProps> = React.memo(({
     };
   }, [question.contextStyle, settings.fontFamily]);
 
-  const handleQuestionChange = useCallback((value: string) => {
-    onUpdate({ ...question, question: value });
-  }, [question, onUpdate]);
 
-  const handleOptionChange = useCallback((index: number, value: string) => {
-    const newOptions = [...question.options];
-    if (!newOptions[index]) {
-      newOptions[index] = { label: "", text: value };
-    } else {
-      newOptions[index] = { ...newOptions[index], text: value };
-    }
-    onUpdate({ ...question, options: newOptions });
-  }, [question, onUpdate]);
-
-  const handleContextChange = useCallback((value: string) => {
-    onUpdate({ ...question, context: value });
-  }, [question, onUpdate]);
 
   const renderOptionLabel = (label: string) => {
     switch (settings.optionStyle) {
@@ -169,7 +200,7 @@ export const EditableMcq: React.FC<EditableMcqProps> = React.memo(({
                 <div className="mb-0">
                   {isEditing ? (
                       <textarea
-                        value={question.context || ""}
+                        value={localContext}
                         onChange={(e) => handleContextChange(e.target.value)}
                         onFocus={(e) => onFocus?.(e, "context", undefined, getContextStyle())}
                         onBlur={onBlur}
@@ -192,7 +223,7 @@ export const EditableMcq: React.FC<EditableMcqProps> = React.memo(({
 
               {isEditing ? (
                 <textarea
-                  value={question.question}
+                  value={localQuestion}
                   onChange={(e) => handleQuestionChange(e.target.value)}
                   onFocus={(e) => onFocus?.(e, "question", undefined, questionStyle)}
                   onBlur={onBlur}

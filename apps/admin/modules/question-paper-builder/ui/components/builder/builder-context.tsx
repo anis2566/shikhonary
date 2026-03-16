@@ -59,7 +59,7 @@ export interface Paper {
   examName?: string;
   total?: number;
   timeInMinutes?: number | null;
-  settings?: any;
+  settings?: PaperSettings;
   questions?: PQ[];
   subjects?: PaperSubjectBreakdown[];
   academicClass?: { displayName: string };
@@ -506,7 +506,7 @@ export const BuilderProvider: React.FC<{
             overrides: overrides as Record<string, unknown>,
           });
         })
-        .filter((p): p is Promise<any> => p !== null);
+        .filter((p) => p !== null);
 
       const orderItems = questions.map((q, idx) => ({
         id: q.id,

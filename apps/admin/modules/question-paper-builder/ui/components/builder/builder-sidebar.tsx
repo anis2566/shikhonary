@@ -24,7 +24,7 @@ export const BuilderSidebar: React.FC = () => {
   return (
     <div className="w-[380px] border-l bg-background hidden xl:flex flex-col shadow-xl z-10 relative h-full overflow-hidden">
       <div className="flex items-center gap-1 p-2 border-b bg-muted/30">
-        <Tabs value={sidebarTab} onValueChange={(v) => setSidebarTab(v as any)} className="w-full">
+        <Tabs value={sidebarTab} onValueChange={(v) => setSidebarTab(v as "settings" | "picker" | "reorder")} className="w-full">
           <TabsList className="grid w-full grid-cols-3 h-10 bg-muted/50 rounded-xl p-1">
             <TabsTrigger value="settings" className="rounded-lg font-bold text-xs gap-2">
               <Settings className="h-3.5 w-3.5" />

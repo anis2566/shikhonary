@@ -37,6 +37,7 @@ export const PaperContent: React.FC<PaperContentProps> = ({
     shouldRestrictHeaderWidth,
     pages,
     distributionStats,
+    firstPendingDistId,
   } = usePreview();
 
   const { paperId } = useBuilderData();
@@ -45,23 +46,6 @@ export const PaperContent: React.FC<PaperContentProps> = ({
     distributionStats[distId]?.count ?? 0;
   const getAddedMarks = (distId: string) =>
     distributionStats[distId]?.marks ?? 0;
-
-  const allPendingDistributions = (subjects || []).flatMap((s) => {
-    return (s.distributions || []).filter((d) => {
-      const addedCount = getAddedCount(d.id);
-      const addedMarks = getAddedMarks(d.id);
-      const countPending = addedCount < d.questionCount;
-      const marksPending =
-        addedMarks < (d.totalMarks || d.questionCount * d.marksPerQuestion);
-      const isCQ =
-        d.questionType?.name?.toLowerCase().includes("creative") ||
-        d.questionType?.name?.toLowerCase().includes("cq") ||
-        d.questionType?.name?.includes("সৃজনশীল");
-      return isCQ ? marksPending && countPending : countPending;
-    });
-  });
-
-  const firstPendingDistId = allPendingDistributions[0]?.id;
 
   return (
     <div
