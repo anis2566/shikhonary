@@ -7,7 +7,7 @@ import React, {
   useCallback,
   useEffect,
   useRef,
-  useLayoutEffect,
+  useMemo,
 } from "react";
 import {
   PaperQuestion,
@@ -17,6 +17,11 @@ import {
   HeaderStyles,
   PaperSubjectBreakdown,
 } from "../types";
+import { calculatePagination } from "./pagination-calculator";
+import {
+  calculateDistributionStats,
+  DistributionStats,
+} from "./distribution-utils";
 
 interface PreviewContextType {
   // Props
@@ -37,14 +42,12 @@ interface PreviewContextType {
 
   // Refs
   containerRef: React.RefObject<HTMLDivElement | null>;
-  measureHeaderRef: React.RefObject<HTMLDivElement | null>;
-  measureFirstQuestionsRef: React.RefObject<HTMLDivElement | null>;
-  measureRestQuestionsRef: React.RefObject<HTMLDivElement | null>;
   toolbarRef: React.RefObject<HTMLDivElement | null>;
 
   // Derived
   effectiveScale: number;
   shouldRestrictHeaderWidth: boolean;
+  distributionStats: DistributionStats;
 
   // Actions
   onUpdateQuestion: (q: PaperQuestion) => void;
@@ -122,14 +125,9 @@ export const PreviewProvider: React.FC<{
     useState<ActiveElementContext | null>(null);
   const [autoScale, setAutoScale] = useState(1);
   const [isToolbarInteracting, setIsToolbarInteracting] = useState(false);
-  const [pages, setPages] = useState<PaperQuestion[][]>([[]]);
   const [activeElement, setActiveElement] = useState<HTMLElement | null>(null);
-  const [firstPageEnd, setFirstPageEnd] = useState(questions.length);
 
   const containerRef = useRef<HTMLDivElement>(null);
-  const measureHeaderRef = useRef<HTMLDivElement>(null);
-  const measureFirstQuestionsRef = useRef<HTMLDivElement>(null);
-  const measureRestQuestionsRef = useRef<HTMLDivElement>(null);
   const toolbarRef = useRef<HTMLDivElement>(null);
   const blurTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -152,8 +150,6 @@ export const PreviewProvider: React.FC<{
       dimensions.A4;
     return isL ? { width: size.height, height: size.width } : size;
   }, [settings.paperSize, settings.paperOrientation]);
-
-  const mmToPx = (mm: number) => mm * 3.78;
 
   const getPaperStyle = useCallback((): React.CSSProperties => {
     const paper = getPaperDimensions();
@@ -371,109 +367,19 @@ export const PreviewProvider: React.FC<{
     return () => observer.disconnect();
   }, [settings.paperSize, settings.paperOrientation, zoom, getPaperDimensions]);
 
-  // Pagination Logic
-  const computePageForLeft = useCallback((left: number, containerRect: DOMRect, container: HTMLDivElement) => {
-      const cols = settings.columns;
-      const gapElement = container.querySelector(".pagination-column-container") || container;
-      const gap = parseFloat(getComputedStyle(gapElement).columnGap) || 24;
-      const stride = (containerRect.width - gap * (cols - 1)) / cols + gap;
-      return Math.floor(Math.floor((left - containerRect.left + 1) / stride) / cols);
-  }, [settings.columns]);
-
-  const computePageIndices = useCallback(
-    (container: HTMLDivElement) => {
-      const items = Array.from(
-        container.querySelectorAll<HTMLElement>("[data-question-index]"),
-      );
-      if (items.length === 0) return [];
-      const rect = container.getBoundingClientRect();
-      return items.map((el) => computePageForLeft(el.getBoundingClientRect().left, rect, container));
-    },
-    [computePageForLeft],
+  // ── Calculation-based pagination (replaces old DOM measurement) ─────────
+  const paginationResult = useMemo(
+    () => calculatePagination(questions, settings, subjects, getPaperDimensions()),
+    [questions, settings, subjects, getPaperDimensions],
   );
 
-  useLayoutEffect(() => {
-    if (!measureFirstQuestionsRef.current || !measureRestQuestionsRef.current)
-      return;
-    const paper = getPaperDimensions();
-    const h =
-      mmToPx(paper.height) -
-      mmToPx(settings.margins.top) -
-      mmToPx(settings.margins.bottom) -
-      12;
-    const headerH = shouldRestrictHeaderWidth
-      ? 0
-      : (measureHeaderRef.current?.offsetHeight ?? 180) + 8;
+  const pages = paginationResult.pages;
+  const firstPageEnd = paginationResult.firstPageEnd;
 
-    measureFirstQuestionsRef.current.style.height = `${Math.max(80, h - headerH)}px`;
-    measureRestQuestionsRef.current.style.height = `${Math.max(80, h)}px`;
-
-    const firstIndices = computePageIndices(measureFirstQuestionsRef.current);
-    const overflowAt = firstIndices.findIndex((p) => p >= 1);
-    const end = overflowAt === -1 ? questions.length : overflowAt;
-
-    const fPage = questions.slice(0, end);
-    const remaining = questions.slice(end);
-
-    const restIndices = computePageIndices(measureRestQuestionsRef.current);
-    const rPages: PaperQuestion[][] = [];
-    remaining.forEach((q, i) => {
-      const pIdx = restIndices[i] ?? 0;
-      if (!rPages[pIdx]) rPages[pIdx] = [];
-      rPages[pIdx].push(q);
-    });
-
-    const maxRPage = restIndices.length > 0 ? Math.max(...restIndices) : -1;
-    for (let i = 0; i <= maxRPage; i++) {
-        if (!rPages[i]) rPages[i] = [];
-    }
-
-    const finalPages = [fPage, ...rPages];
-
-    const checkSentinel = (container: HTMLDivElement | null) => {
-      if (!container) return 0;
-      const sentinel = container.querySelector<HTMLElement>("[data-end-sentinel='true']");
-      if (!sentinel) return 0;
-      return computePageForLeft(sentinel.getBoundingClientRect().left, container.getBoundingClientRect(), container);
-    };
-
-    let requiredPages = finalPages.length;
-    if (end === questions.length) {
-      const sPage = checkSentinel(measureFirstQuestionsRef.current);
-      if (sPage > 0) {
-        requiredPages = 1 + sPage;
-      }
-    } else {
-      const sPage = checkSentinel(measureRestQuestionsRef.current);
-      if (sPage + 2 > requiredPages) {
-        requiredPages = sPage + 2;
-      }
-    }
-
-    while (finalPages.length < requiredPages) {
-      finalPages.push([]);
-    }
-
-    requestAnimationFrame(() => {
-      if (firstPageEnd !== end) setFirstPageEnd(end);
-      setPages((prev) => {
-        if (
-          prev.length === finalPages.length &&
-          prev.every((p, i) => p.length === finalPages[i]?.length)
-        )
-          return prev;
-        return finalPages;
-      });
-    });
-  }, [
-    questions,
-    settings,
-    getPaperDimensions,
-    computePageIndices,
-    computePageForLeft,
-    firstPageEnd,
-    shouldRestrictHeaderWidth,
-  ]);
+  const distributionStats = useMemo(
+    () => calculateDistributionStats(questions, subjects),
+    [questions, subjects],
+  );
 
   const value = {
     questions,
@@ -494,12 +400,10 @@ export const PreviewProvider: React.FC<{
     isToolbarInteracting,
     firstPageEnd,
     containerRef,
-    measureHeaderRef,
-    measureFirstQuestionsRef,
-    measureRestQuestionsRef,
     toolbarRef,
     effectiveScale,
     shouldRestrictHeaderWidth,
+    distributionStats,
     setActiveContext,
     setActiveElement,
     setShowToolbar,

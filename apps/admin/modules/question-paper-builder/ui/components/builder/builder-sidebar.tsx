@@ -6,21 +6,16 @@ import { Tabs, TabsList, TabsTrigger } from "@workspace/ui/components/tabs";
 import { SettingsSidebar } from "../settings-sidebar";
 import { McqPicker } from "../mcq-picker";
 import { QuestionReorderList } from "../question-reorder-list";
-import { useBuilder, PQ } from "./builder-context";
+import { useBuilderData, useBuilderUI, useBuilderActions, PQ } from "./builder-context";
 
 export const BuilderSidebar: React.FC = () => {
-  const { 
-    paperId,
-    paper,
-    sidebarTab, 
-    setSidebarTab, 
-    settings, 
-    handleSettingsChange, 
-    processedQuestions, 
+  const { paperId, paper, settings, processedQuestions } = useBuilderData();
+  const { sidebarTab, setSidebarTab, isExporting } = useBuilderUI();
+  const {
+    handleSettingsChange,
     handleReorderQuestions,
     handleExportPdf,
-    isExporting
-  } = useBuilder();
+  } = useBuilderActions();
 
   const assignedMcqIds = (paper?.questions ?? [])
     .map((pq: PQ) => pq.mcqId)

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Copy, MoreVertical } from "lucide-react";
@@ -37,7 +37,7 @@ const editableBaseClass = "transition-all duration-200 rounded px-1 -mx-1";
 const editableHoverClass = "hover:bg-primary/10 hover:ring-1 hover:ring-primary/30";
 const editableFocusClass = "focus:bg-primary/5 focus:ring-2 focus:ring-primary focus:outline-none";
 
-export const EditableMcq: React.FC<EditableMcqProps> = ({
+export const EditableMcq: React.FC<EditableMcqProps> = React.memo(({
   question,
   settings,
   onUpdate,
@@ -48,8 +48,6 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
   onFocus,
   onBlur,
 }) => {
-  const [localQuestion, setLocalQuestion] = useState(question);
-
   const {
     attributes,
     listeners,
@@ -65,65 +63,55 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  React.useEffect(() => {
-    setLocalQuestion(question);
-  }, [question]);
-
-  const getQuestionStyle = (): ElementStyle => {
-    return localQuestion.questionStyle || {
+  const getQuestionStyle = useCallback((): ElementStyle => {
+    return question.questionStyle || {
       fontSize: settings.fontSize,
       fontFamily: settings.fontFamily,
       textAlign: "left",
     };
-  };
+  }, [question.questionStyle, settings.fontSize, settings.fontFamily]);
 
-  const getOptionStyle = (index: number): ElementStyle => {
-    return localQuestion.options[index]?.style || {
+  const getOptionStyle = useCallback((index: number): ElementStyle => {
+    return question.options[index]?.style || {
       fontSize: settings.fontSize,
       fontFamily: settings.fontFamily,
       textAlign: "left",
     };
-  };
+  }, [question.options, settings.fontSize, settings.fontFamily]);
 
-  const getStatementStyle = (index: number): ElementStyle => {
-    return localQuestion.statementStyles?.[index] || {
+  const getStatementStyle = useCallback((index: number): ElementStyle => {
+    return question.statementStyles?.[index] || {
       fontSize: 12,
       fontFamily: settings.fontFamily,
       textAlign: "left",
     };
-  };
+  }, [question.statementStyles, settings.fontFamily]);
 
-  const getContextStyle = (): ElementStyle => {
-    return localQuestion.contextStyle || {
+  const getContextStyle = useCallback((): ElementStyle => {
+    return question.contextStyle || {
       fontSize: 12,
       fontFamily: settings.fontFamily,
       textAlign: "left",
     };
-  };
+  }, [question.contextStyle, settings.fontFamily]);
 
-  const handleQuestionChange = (value: string) => {
-    const updated = { ...localQuestion, question: value };
-    setLocalQuestion(updated);
-    onUpdate(updated);
-  };
+  const handleQuestionChange = useCallback((value: string) => {
+    onUpdate({ ...question, question: value });
+  }, [question, onUpdate]);
 
-  const handleOptionChange = (index: number, value: string) => {
-    const newOptions = [...localQuestion.options];
+  const handleOptionChange = useCallback((index: number, value: string) => {
+    const newOptions = [...question.options];
     if (!newOptions[index]) {
       newOptions[index] = { label: "", text: value };
     } else {
       newOptions[index] = { ...newOptions[index], text: value };
     }
-    const updated = { ...localQuestion, options: newOptions };
-    setLocalQuestion(updated);
-    onUpdate(updated);
-  };
+    onUpdate({ ...question, options: newOptions });
+  }, [question, onUpdate]);
 
-  const handleContextChange = (value: string) => {
-    const updated = { ...localQuestion, context: value };
-    setLocalQuestion(updated);
-    onUpdate(updated);
-  };
+  const handleContextChange = useCallback((value: string) => {
+    onUpdate({ ...question, context: value });
+  }, [question, onUpdate]);
 
   const renderOptionLabel = (label: string) => {
     switch (settings.optionStyle) {
@@ -177,11 +165,11 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
               {getBengaliNumber(question.number)}।
             </span>
             <div className="flex-1">
-              {(localQuestion.context?.trim() || localQuestion.type === "contextual") && (
+              {(question.context?.trim() || question.type === "contextual") && (
                 <div className="mb-0">
                   {isEditing ? (
                       <textarea
-                        value={localQuestion.context || ""}
+                        value={question.context || ""}
                         onChange={(e) => handleContextChange(e.target.value)}
                         onFocus={(e) => onFocus?.(e, "context", undefined, getContextStyle())}
                         onBlur={onBlur}
@@ -192,10 +180,10 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
                         placeholder="উদ্দীপক/অনুচ্ছেদ লিখুন..."
                       />
                   ) : (
-                    localQuestion.context && (
+                    question.context && (
                       <p className="m-0 font-medium italic text-foreground leading-relaxed"
                          style={{ fontSize: getContextStyle().fontSize, fontFamily: getContextStyle().fontFamily, lineHeight: settings.lineHeight, textAlign: getContextStyle().textAlign as React.CSSProperties["textAlign"] }}>
-                        {localQuestion.context}
+                        {question.context}
                       </p>
                     )
                   )}
@@ -204,7 +192,7 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
 
               {isEditing ? (
                 <textarea
-                  value={localQuestion.question}
+                  value={question.question}
                   onChange={(e) => handleQuestionChange(e.target.value)}
                   onFocus={(e) => onFocus?.(e, "question", undefined, questionStyle)}
                   onBlur={onBlur}
@@ -216,7 +204,7 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
                 />
               ) : (
                 <p className="m-0 font-bold" style={{ fontSize: questionStyle.fontSize, fontFamily: questionStyle.fontFamily, lineHeight: settings.lineHeight, textAlign: questionStyle.textAlign as React.CSSProperties["textAlign"] }}>
-                  {localQuestion.question}
+                  {question.question}
                 </p>
               )}
 
@@ -230,11 +218,9 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
                         {isEditing ? (
                           <input type="text" value={statement}
                                  onChange={(e) => {
-                                   const newStatements = [...(localQuestion.statements || [])];
+                                   const newStatements = [...(question.statements || [])];
                                    newStatements[idx] = e.target.value;
-                                   const updated = { ...localQuestion, statements: newStatements };
-                                   setLocalQuestion(updated);
-                                   onUpdate(updated);
+                                   onUpdate({ ...question, statements: newStatements });
                                  }}
                                  onFocus={(e) => onFocus?.(e, "statement", idx, statementStyle)}
                                  onBlur={onBlur}
@@ -252,14 +238,14 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
               )}
 
               <div className={cn("mt-0 gap-x-4 gap-y-0", (() => {
-                if (localQuestion.optionsColumns === 1) return "flex flex-col";
-                if (localQuestion.optionsColumns === 2) return "grid grid-cols-2";
-                const maxLen = Math.max(...localQuestion.options.map(o => o.text.length), 0);
+                if (question.optionsColumns === 1) return "flex flex-col";
+                if (question.optionsColumns === 2) return "grid grid-cols-2";
+                const maxLen = Math.max(...question.options.map(o => o.text.length), 0);
                 const baseThreshold = settings.columns === 1 ? 50 : 24;
                 const threshold = Math.floor(baseThreshold * (14 / settings.fontSize));
                 return (maxLen > threshold || settings.columns >= 3) ? "flex flex-col" : "grid grid-cols-2";
               })())} style={{ lineHeight: settings.lineHeight }}>
-                {localQuestion.options.map((option, idx) => {
+                {question.options.map((option, idx) => {
                   const optionStyle = getOptionStyle(idx);
                   return (
                     <div key={idx} className={cn("flex items-center gap-2", settings.optionStyle === "round" && "gap-2")}
@@ -296,4 +282,6 @@ export const EditableMcq: React.FC<EditableMcqProps> = ({
         )}
     </div>
   );
-};
+});
+
+EditableMcq.displayName = "EditableMcq";

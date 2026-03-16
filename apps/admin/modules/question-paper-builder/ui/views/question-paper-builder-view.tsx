@@ -3,7 +3,12 @@
 import React from "react";
 import { Loader2 } from "lucide-react";
 import { PaperPreview } from "../components/paper-preview";
-import { BuilderProvider, useBuilder } from "../components/builder/builder-context";
+import {
+  BuilderProvider,
+  useBuilderData,
+  useBuilderUI,
+  useBuilderActions,
+} from "../components/builder/builder-context";
 import { BuilderHeader } from "../components/builder/builder-header";
 import { BuilderSidebar } from "../components/builder/builder-sidebar";
 import { BuilderCanvasToolbar } from "../components/builder/builder-canvas-toolbar";
@@ -15,18 +20,15 @@ interface QuestionPaperBuilderViewProps {
 }
 
 const BuilderInner: React.FC = () => {
+  const { paper, isLoading, settings, processedQuestions } = useBuilderData();
+
+  const { isEditing, zoom } = useBuilderUI();
   const {
-    paper,
-    isLoading,
-    settings,
     handleSettingsChange,
-    processedQuestions,
     handleUpdateQuestion,
     handleDeleteQuestion,
     handleReorderQuestions,
-    isEditing,
-    zoom,
-  } = useBuilder();
+  } = useBuilderActions();
 
   // Initialize keyboard shortcuts
   useBuilderShortcuts();
@@ -77,7 +79,9 @@ const BuilderInner: React.FC = () => {
   );
 };
 
-export const QuestionPaperBuilderView: React.FC<QuestionPaperBuilderViewProps> = ({ paperId }) => {
+export const QuestionPaperBuilderView: React.FC<
+  QuestionPaperBuilderViewProps
+> = ({ paperId }) => {
   return (
     <BuilderProvider paperId={paperId}>
       <BuilderInner />

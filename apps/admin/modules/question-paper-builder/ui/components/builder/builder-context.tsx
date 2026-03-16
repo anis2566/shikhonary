@@ -12,7 +12,12 @@ import React, {
 import { toast } from "@workspace/ui/components/sonner";
 import jsPDF from "jspdf";
 import { toJpeg } from "html-to-image";
-import { PaperQuestion, PaperSettings, ElementStyle, PaperSubjectBreakdown } from "../types";
+import {
+  PaperQuestion,
+  PaperSettings,
+  ElementStyle,
+  PaperSubjectBreakdown,
+} from "../types";
 import { defaultPaperSettings } from "../mock-data";
 import {
   useQuestionPaperById,
@@ -62,13 +67,18 @@ export interface Paper {
   subjectName?: string;
 }
 
-interface BuilderContextType {
+// ─── Context Types (Split for performance) ────────────────────────────────
+
+interface BuilderDataContextType {
   paperId: string;
   paper: Paper | null;
   isLoading: boolean;
   settings: PaperSettings;
   questions: PaperQuestion[];
   processedQuestions: PaperQuestion[];
+}
+
+interface BuilderUIContextType {
   isEditing: boolean;
   isExporting: boolean;
   zoom: number | "auto";
@@ -78,8 +88,6 @@ interface BuilderContextType {
   sheetOpen: boolean;
   deleteTarget: { id: string; question: string } | null;
   showShortcuts: boolean;
-
-  // Actions
   setIsEditing: (v: boolean | ((p: boolean) => boolean)) => void;
   setZoom: (
     v: number | "auto" | ((p: number | "auto") => number | "auto"),
@@ -88,6 +96,9 @@ interface BuilderContextType {
   setSheetOpen: (v: boolean) => void;
   setDeleteTarget: (v: { id: string; question: string } | null) => void;
   setShowShortcuts: (v: boolean | ((p: boolean) => boolean)) => void;
+}
+
+interface BuilderActionsContextType {
   handleSettingsChange: (newSettings: PaperSettings) => void;
   handleUpdateQuestion: (updated: PaperQuestion) => void;
   handleDeleteQuestion: (id: string) => void;
@@ -99,14 +110,53 @@ interface BuilderContextType {
   handleExportPdf: () => Promise<void>;
 }
 
-const BuilderContext = createContext<BuilderContextType | null>(null);
+// Backward-compatible combined type
+interface BuilderContextType
+  extends
+    BuilderDataContextType,
+    BuilderUIContextType,
+    BuilderActionsContextType {}
 
-export const useBuilder = () => {
-  const context = useContext(BuilderContext);
-  if (!context) {
-    throw new Error("useBuilder must be used within a BuilderProvider");
-  }
+// ─── Context Instances ─────────────────────────────────────────────────────
+
+const BuilderDataContext = createContext<BuilderDataContextType | null>(null);
+const BuilderUIContext = createContext<BuilderUIContextType | null>(null);
+const BuilderActionsContext = createContext<BuilderActionsContextType | null>(
+  null,
+);
+
+// ─── Focused Hooks (subscribe to only what you need) ───────────────────────
+
+/** Data-only: paper, questions, settings. Won't re-render on UI state changes. */
+export const useBuilderData = () => {
+  const context = useContext(BuilderDataContext);
+  if (!context)
+    throw new Error("useBuilderData must be used within a BuilderProvider");
   return context;
+};
+
+/** UI-only: editing, zoom, sidebar tab, dialogs. Won't re-render on data changes. */
+export const useBuilderUI = () => {
+  const context = useContext(BuilderUIContext);
+  if (!context)
+    throw new Error("useBuilderUI must be used within a BuilderProvider");
+  return context;
+};
+
+/** Actions-only: handlers (stable refs). Rarely triggers re-renders. */
+export const useBuilderActions = () => {
+  const context = useContext(BuilderActionsContext);
+  if (!context)
+    throw new Error("useBuilderActions must be used within a BuilderProvider");
+  return context;
+};
+
+/** Backward-compatible: combines all three. Use focused hooks when possible. */
+export const useBuilder = (): BuilderContextType => {
+  const data = useBuilderData();
+  const ui = useBuilderUI();
+  const actions = useBuilderActions();
+  return { ...data, ...ui, ...actions };
 };
 
 const mapToPaperQuestion = (pq: PQ, index: number): PaperQuestion => {
@@ -153,7 +203,7 @@ const mapToPaperQuestion = (pq: PQ, index: number): PaperQuestion => {
     return {
       id: pq.id,
       number: index + 1,
-      question: overrides.question || "", 
+      question: overrides.question || "",
       questionStyle: overrides.questionStyle,
       options: [],
       context: overrides.context || cq.context,
@@ -413,7 +463,7 @@ export const BuilderProvider: React.FC<{
             overrides.questionStyle = q.questionStyle;
             hasChanges = true;
           }
-          if (q.options?.some(opt => opt.style)) {
+          if (q.options?.some((opt) => opt.style)) {
             overrides.options = q.options.map((opt) => ({ style: opt.style }));
             hasChanges = true;
           }
@@ -426,11 +476,13 @@ export const BuilderProvider: React.FC<{
             hasChanges = true;
           }
           if (q.subQuestions) {
-            if (q.subQuestions.some(sq => sq.style)) {
-              overrides.subQuestionStyles = q.subQuestions.map((sq) => sq.style);
+            if (q.subQuestions.some((sq) => sq.style)) {
+              overrides.subQuestionStyles = q.subQuestions.map(
+                (sq) => sq.style,
+              );
               hasChanges = true;
             }
-            if (q.subQuestions.some(sq => sq.text)) {
+            if (q.subQuestions.some((sq) => sq.text)) {
               overrides.subQuestions = q.subQuestions.map((sq) => ({
                 text: sq.text,
                 marks: sq.marks,
@@ -630,38 +682,77 @@ export const BuilderProvider: React.FC<{
     }
   }, [paper, settings, zoom, isEditing, isExporting]);
 
-  const value = {
-    paperId,
-    paper: paper as unknown as Paper,
-    isLoading,
-    settings,
-    questions,
-    processedQuestions,
-    isEditing,
-    isExporting,
-    zoom,
-    sidebarTab,
-    saveStatus,
-    hasUnsavedChanges,
-    sheetOpen,
-    deleteTarget,
-    showShortcuts,
-    setIsEditing,
-    setZoom,
-    setSidebarTab,
-    setSheetOpen,
-    setDeleteTarget,
-    setShowShortcuts,
-    handleSettingsChange,
-    handleUpdateQuestion,
-    handleDeleteQuestion,
-    confirmDeleteQuestion,
-    handleReorderQuestions,
-    handleGlobalSave,
-    handleExportPdf,
-  };
+  const dataValue = useMemo(
+    () => ({
+      paperId,
+      paper: paper as unknown as Paper,
+      isLoading,
+      settings,
+      questions,
+      processedQuestions,
+    }),
+    [paperId, paper, isLoading, settings, questions, processedQuestions],
+  );
+
+  const uiValue = useMemo(
+    () => ({
+      isEditing,
+      isExporting,
+      zoom,
+      sidebarTab,
+      saveStatus,
+      hasUnsavedChanges,
+      sheetOpen,
+      deleteTarget,
+      showShortcuts,
+      setIsEditing,
+      setZoom,
+      setSidebarTab,
+      setSheetOpen,
+      setDeleteTarget,
+      setShowShortcuts,
+    }),
+    [
+      isEditing,
+      isExporting,
+      zoom,
+      sidebarTab,
+      saveStatus,
+      hasUnsavedChanges,
+      sheetOpen,
+      deleteTarget,
+      showShortcuts,
+    ],
+  );
+
+  const actionsValue = useMemo(
+    () => ({
+      handleSettingsChange,
+      handleUpdateQuestion,
+      handleDeleteQuestion,
+      confirmDeleteQuestion,
+      handleReorderQuestions,
+      handleGlobalSave,
+      handleExportPdf,
+    }),
+    [
+      handleSettingsChange,
+      handleUpdateQuestion,
+      handleDeleteQuestion,
+      confirmDeleteQuestion,
+      handleReorderQuestions,
+      handleGlobalSave,
+      handleExportPdf,
+    ],
+  );
 
   return (
-    <BuilderContext.Provider value={value}>{children}</BuilderContext.Provider>
+    <BuilderDataContext.Provider value={dataValue}>
+      <BuilderUIContext.Provider value={uiValue}>
+        <BuilderActionsContext.Provider value={actionsValue}>
+          {children}
+        </BuilderActionsContext.Provider>
+      </BuilderUIContext.Provider>
+    </BuilderDataContext.Provider>
   );
 };

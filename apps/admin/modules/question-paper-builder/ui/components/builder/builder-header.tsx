@@ -23,7 +23,7 @@ import {
   DropdownMenuTrigger,
 } from "@workspace/ui/components/dropdown-menu";
 import { cn } from "@workspace/ui/lib/utils";
-import { useBuilder } from "./builder-context";
+import { useBuilderData, useBuilderUI, useBuilderActions } from "./builder-context";
 import { useUpdateQuestionPaper } from "@workspace/api-client";
 
 export const BuilderHeader: React.FC = () => {
@@ -34,15 +34,19 @@ export const BuilderHeader: React.FC = () => {
     settings, 
     questions, 
     processedQuestions,
+  } = useBuilderData();
+
+  const { 
     isEditing, 
     setIsEditing, 
     sidebarTab, 
     setSidebarTab,
     saveStatus,
     hasUnsavedChanges,
-    handleGlobalSave,
     setSheetOpen
-  } = useBuilder();
+  } = useBuilderUI();
+
+  const { handleGlobalSave } = useBuilderActions();
 
   const { mutate: updateQuestionPaper } = useUpdateQuestionPaper();
 

@@ -7,9 +7,9 @@ import { Button } from "@workspace/ui/components/button";
 import { EditableQuestion } from "../editable-question";
 import { usePreview } from "./preview-context";
 import { toBengaliDigits } from "./preview-utils";
-import { PaperQuestion, PaperSubjectAction } from "../types";
+import { PaperQuestion } from "../types";
 import { PaperHeader } from "./paper-header";
-import { useBuilder } from "../builder/builder-context";
+import { useBuilderData } from "../builder/builder-context";
 import { cn } from "@workspace/ui/lib/utils";
 
 interface PaperContentProps {
@@ -36,141 +36,20 @@ export const PaperContent: React.FC<PaperContentProps> = ({
     handleBlur,
     shouldRestrictHeaderWidth,
     pages,
+    distributionStats,
   } = usePreview();
 
-  const { paperId } = useBuilder();
+  const { paperId } = useBuilderData();
 
-  const getAddedCount = (
-    subjectId: string,
-    distribution: PaperSubjectAction,
-  ) => {
-    const targetTypeId = distribution.questionTypeId;
-    const targetTypeName = (
-      distribution.questionType?.name || ""
-    ).toLowerCase();
-
-    return questions.filter((q) => {
-      if (q.distributionId && q.distributionId === distribution.id) return true;
-
-      // 1. Subject Match Strategy
-      // If there's only one subject in the whole paper, we accept all questions for it
-      const hasSingleSubject = subjects?.length === 1;
-
-      if (!hasSingleSubject) {
-        const qSubjectId = q.subjectId;
-        // Try ID match
-        const idMatch = qSubjectId && qSubjectId === subjectId;
-        // Try simple name or type check if ID is missing or mismatched
-        if (!idMatch && qSubjectId) return false;
-      }
-
-      // 2. Type Match Strategy
-      // Exact ID Match
-      if (q.questionTypeId && targetTypeId && q.questionTypeId === targetTypeId)
-        return true;
-
-      // Robust Name Mapping
-      const qType = q.type || "single";
-
-      // MCQ Group
-      if (
-        targetTypeName.includes("mcq") ||
-        targetTypeName.includes("single") ||
-        targetTypeName.includes("multi") ||
-        targetTypeName.includes("objective")
-      ) {
-        return (
-          qType === "single" || qType === "multiple" || qType === "contextual"
-        );
-      }
-
-      // Statement Group
-      if (
-        targetTypeName.includes("statement") ||
-        targetTypeName.includes("বিবৃতি")
-      ) {
-        return qType === "statement";
-      }
-
-      // CQ Group
-      if (
-        targetTypeName === "cq" ||
-        targetTypeName.includes("creative") ||
-        targetTypeName.includes("সৃজনশীল")
-      ) {
-        return qType === "creative";
-      }
-
-      // Final loose name match
-      const qLabels = [qType.toLowerCase()];
-      if (qType === "single" || qType === "multiple") qLabels.push("mcq");
-
-      if (targetTypeName === "cq" && qLabels.includes("mcq")) return false;
-
-      return qLabels.some(
-        (label) =>
-          targetTypeName === label ||
-          (targetTypeName.includes(label) && label !== "mcq") ||
-          (label.includes(targetTypeName) && targetTypeName !== "cq"),
-      );
-    }).length;
-  };
-
-  const getAddedMarks = (
-    subjectId: string,
-    distribution: PaperSubjectAction,
-  ) => {
-    const targetTypeId = distribution.questionTypeId;
-    const targetTypeName = (
-      distribution.questionType?.name || ""
-    ).toLowerCase();
-
-    return questions
-      .filter((q) => {
-        if (q.distributionId && q.distributionId === distribution.id)
-          return true;
-        const hasSingleSubject = subjects?.length === 1;
-        if (!hasSingleSubject) {
-          if (q.subjectId && q.subjectId !== subjectId) return false;
-        }
-        if (
-          q.questionTypeId &&
-          targetTypeId &&
-          q.questionTypeId === targetTypeId
-        )
-          return true;
-        const qType = q.type || "single";
-        if (
-          targetTypeName.includes("mcq") ||
-          targetTypeName.includes("single") ||
-          targetTypeName.includes("multi") ||
-          targetTypeName.includes("objective")
-        ) {
-          return (
-            qType === "single" || qType === "multiple" || qType === "contextual"
-          );
-        }
-        if (
-          targetTypeName === "cq" ||
-          targetTypeName.includes("creative") ||
-          targetTypeName.includes("সৃজনশীল")
-        ) {
-          return qType === "creative";
-        }
-        return false;
-      })
-      .reduce((sum, q) => {
-        if (q.subQuestions && q.subQuestions.length > 0) {
-          return sum + q.subQuestions.reduce((s, sq) => s + sq.marks, 0);
-        }
-        return sum + distribution.marksPerQuestion;
-      }, 0);
-  };
+  const getAddedCount = (distId: string) =>
+    distributionStats[distId]?.count ?? 0;
+  const getAddedMarks = (distId: string) =>
+    distributionStats[distId]?.marks ?? 0;
 
   const allPendingDistributions = (subjects || []).flatMap((s) => {
     return (s.distributions || []).filter((d) => {
-      const addedCount = getAddedCount(s.subjectId, d);
-      const addedMarks = getAddedMarks(s.subjectId, d);
+      const addedCount = getAddedCount(d.id);
+      const addedMarks = getAddedMarks(d.id);
       const countPending = addedCount < d.questionCount;
       const marksPending =
         addedMarks < (d.totalMarks || d.questionCount * d.marksPerQuestion);
@@ -212,8 +91,8 @@ export const PaperContent: React.FC<PaperContentProps> = ({
             (q) => q.subjectId === s.subjectId,
           );
           const pendingDistributions = (s.distributions || []).filter((d) => {
-            const addedCount = getAddedCount(s.subjectId, d);
-            const addedMarks = getAddedMarks(s.subjectId, d);
+            const addedCount = getAddedCount(d.id);
+            const addedMarks = getAddedMarks(d.id);
 
             // Question count not met
             const countPending = addedCount < d.questionCount;
@@ -533,7 +412,7 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                   </h5>
                   <div className="grid grid-cols-1 gap-2">
                     {pendingDistributions.map((d) => {
-                      const addedCount = getAddedCount(s.subjectId, d);
+                      const addedCount = getAddedCount(d.id);
                       const isFirstPending = d.id === firstPendingDistId;
                       return (
                         <div
@@ -552,10 +431,12 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                           )}
                           <div className="space-y-0.5">
                             <div className="flex items-center gap-2">
-                              <span className={cn(
-                                "font-bold text-sm",
-                                !isFirstPending && "text-black/40"
-                              )}>
+                              <span
+                                className={cn(
+                                  "font-bold text-sm",
+                                  !isFirstPending && "text-black/40",
+                                )}
+                              >
                                 {d.questionType?.name || "প্রশ্নের ধরণ"}
                               </span>
                               <span
@@ -573,10 +454,14 @@ export const PaperContent: React.FC<PaperContentProps> = ({
                                     : "প্রয়োজনীয়"}
                               </span>
                             </div>
-                            <p className={cn(
-                              "text-[10px] font-medium",
-                              isFirstPending ? "text-black/60" : "text-black/30"
-                            )}>
+                            <p
+                              className={cn(
+                                "text-[10px] font-medium",
+                                isFirstPending
+                                  ? "text-black/60"
+                                  : "text-black/30",
+                              )}
+                            >
                               {toBengaliDigits(d.questionCount)}টি প্রশ্ন —
                               প্রতিটির মান {toBengaliDigits(d.marksPerQuestion)}{" "}
                               — মোট {toBengaliDigits(d.totalMarks)} নম্বর

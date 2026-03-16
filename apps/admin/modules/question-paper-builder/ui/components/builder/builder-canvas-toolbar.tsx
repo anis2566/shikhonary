@@ -3,10 +3,10 @@
 import React from "react";
 import { ZoomIn, ZoomOut, Maximize2 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
-import { useBuilder } from "./builder-context";
+import { useBuilderUI } from "./builder-context";
 
 export const BuilderCanvasToolbar: React.FC = () => {
-  const { zoom, setZoom } = useBuilder();
+  const { zoom, setZoom } = useBuilderUI();
 
   return (
     <div className="flex items-center justify-center gap-2 p-2 bg-background/50 border-b absolute top-0 inset-x-0 z-10 backdrop-blur-sm">

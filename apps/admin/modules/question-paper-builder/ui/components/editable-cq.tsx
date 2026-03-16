@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useCallback } from "react";
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { GripVertical, Trash2, Copy, MoreVertical } from "lucide-react";
@@ -40,7 +40,7 @@ const editableHoverClass =
 const editableFocusClass =
   "focus:bg-primary/5 focus:ring-2 focus:ring-primary focus:outline-none";
 
-export const EditableCq: React.FC<EditableCqProps> = ({
+export const EditableCq: React.FC<EditableCqProps> = React.memo(({
   question,
   settings,
   onUpdate,
@@ -51,8 +51,6 @@ export const EditableCq: React.FC<EditableCqProps> = ({
   onFocus,
   onBlur,
 }) => {
-  const [localQuestion, setLocalQuestion] = useState(question);
-
   const {
     attributes,
     listeners,
@@ -68,47 +66,39 @@ export const EditableCq: React.FC<EditableCqProps> = ({
     opacity: isDragging ? 0.5 : 1,
   };
 
-  React.useEffect(() => {
-    setLocalQuestion(question);
-  }, [question]);
-
-  const getQuestionStyle = (): ElementStyle => {
+  const getQuestionStyle = useCallback((): ElementStyle => {
     return (
-      localQuestion.questionStyle || {
+      question.questionStyle || {
         fontSize: settings.fontSize,
         fontFamily: settings.fontFamily,
         textAlign: "left",
       }
     );
-  };
+  }, [question.questionStyle, settings.fontSize, settings.fontFamily]);
 
-  const getContextStyle = (): ElementStyle => {
+  const getContextStyle = useCallback((): ElementStyle => {
     return (
-      localQuestion.contextStyle || {
+      question.contextStyle || {
         fontSize: 12,
         fontFamily: settings.fontFamily,
         textAlign: "left",
       }
     );
-  };
+  }, [question.contextStyle, settings.fontFamily]);
 
-  const handleContextChange = (value: string) => {
-    const updated = { ...localQuestion, context: value };
-    setLocalQuestion(updated);
-    onUpdate(updated);
-  };
+  const handleContextChange = useCallback((value: string) => {
+    onUpdate({ ...question, context: value });
+  }, [question, onUpdate]);
 
-  const handleSubQuestionChange = (index: number, value: string) => {
-    if (!localQuestion.subQuestions) return;
-    const newSubQuestions = [...localQuestion.subQuestions];
+  const handleSubQuestionChange = useCallback((index: number, value: string) => {
+    if (!question.subQuestions) return;
+    const newSubQuestions = [...question.subQuestions];
     const sq = newSubQuestions[index];
     if (sq) {
       newSubQuestions[index] = { ...sq, text: value };
     }
-    const updated = { ...localQuestion, subQuestions: newSubQuestions };
-    setLocalQuestion(updated);
-    onUpdate(updated);
-  };
+    onUpdate({ ...question, subQuestions: newSubQuestions });
+  }, [question, onUpdate]);
 
   const getBengaliNumber = (num: number): string => {
     const bengaliDigits = ["০", "১", "২", "৩", "৪", "৫", "৬", "৭", "৮", "৯"];
@@ -185,7 +175,7 @@ export const EditableCq: React.FC<EditableCqProps> = ({
               <div className="mb-0">
                 {isEditing ? (
                   <textarea
-                    value={localQuestion.context || ""}
+                    value={question.context || ""}
                     onChange={(e) => handleContextChange(e.target.value)}
                     onFocus={(e) =>
                       onFocus?.(e, "context", undefined, getContextStyle())
@@ -213,7 +203,7 @@ export const EditableCq: React.FC<EditableCqProps> = ({
                     rows={1}
                     placeholder="সৃজনশীল প্রশ্নের উদ্দীপক লিখুন..."
                   />
-                ) : localQuestion.context ? (
+                ) : question.context ? (
                   <p
                     className="m-0 font-medium text-foreground leading-relaxed"
                     style={{
@@ -224,15 +214,15 @@ export const EditableCq: React.FC<EditableCqProps> = ({
                         .textAlign as React.CSSProperties["textAlign"],
                     }}
                   >
-                    {localQuestion.context}
+                    {question.context}
                   </p>
                 ) : null}
               </div>
 
               {/* Sub-questions Area */}
-              {localQuestion.subQuestions && (
+              {question.subQuestions && (
                 <div className="">
-                  {localQuestion.subQuestions.map((sq, idx) => {
+                  {question.subQuestions.map((sq, idx) => {
                     const sqStyle = sq.style || questionStyle;
                     return (
                       <div
@@ -317,4 +307,6 @@ export const EditableCq: React.FC<EditableCqProps> = ({
         )}
     </div>
   );
-};
+});
+
+EditableCq.displayName = "EditableCq";

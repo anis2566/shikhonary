@@ -31,30 +31,31 @@ import {
 import { McqPicker } from "../mcq-picker";
 import { SettingsSidebar } from "../settings-sidebar";
 import { QuestionReorderList } from "../question-reorder-list";
-import { useBuilder } from "./builder-context";
+import { useBuilderData, useBuilderUI, useBuilderActions, PQ } from "./builder-context";
 
 export const BuilderDialogs: React.FC = () => {
+  const { paperId, paper, settings, processedQuestions } = useBuilderData();
   const {
-    paperId,
-    paper,
     sheetOpen,
     setSheetOpen,
     deleteTarget,
     setDeleteTarget,
-    confirmDeleteQuestion,
     showShortcuts,
     setShowShortcuts,
     sidebarTab,
     setSidebarTab,
-    settings,
+    isExporting,
+  } = useBuilderUI();
+  const {
+    confirmDeleteQuestion,
     handleSettingsChange,
     handleExportPdf,
-    isExporting,
-    processedQuestions,
     handleReorderQuestions,
-  } = useBuilder();
+  } = useBuilderActions();
 
-  const assignedMcqIds = (paper?.questions ?? []).map((pq: any) => pq.mcqId);
+  const assignedMcqIds = (paper?.questions ?? [])
+    .map((pq: PQ) => pq.mcqId)
+    .filter((id): id is string => !!id);
 
   return (
     <>

@@ -1,17 +1,20 @@
 "use client";
 
 import { useEffect } from "react";
-import { useBuilder } from "./builder-context";
+import { useBuilderUI, useBuilderActions } from "./builder-context";
 
 export const useBuilderShortcuts = () => {
   const {
     setIsEditing,
-    handleExportPdf,
     setZoom,
     setSidebarTab,
     setShowShortcuts,
-    handleGlobalSave
-  } = useBuilder();
+  } = useBuilderUI();
+
+  const {
+    handleExportPdf,
+    handleGlobalSave,
+  } = useBuilderActions();
 
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {

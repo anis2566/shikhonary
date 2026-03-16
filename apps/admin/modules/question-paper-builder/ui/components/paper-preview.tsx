@@ -20,7 +20,6 @@ import {
 import { PaperPreviewProps } from "./types";
 import { FloatingToolbar } from "./floating-toolbar";
 import { PreviewProvider, usePreview } from "./preview/preview-context";
-import { PaperMeasurer } from "./preview/paper-measurer";
 import { PaperPage } from "./preview/paper-page";
 
 const PaperPreviewInner: React.FC = () => {
@@ -78,8 +77,6 @@ const PaperPreviewInner: React.FC = () => {
         onInteractionStart={handleToolbarInteractionStart}
         onInteractionEnd={handleToolbarInteractionEnd}
       />
-
-      <PaperMeasurer />
 
       <div
         className="flex flex-col items-center gap-3"
