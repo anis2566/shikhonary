@@ -25,6 +25,8 @@ export type TenantContext = {
     name: string;
     slug: string;
     connectionString: string | null;
+    isActive: boolean;
+    isSuspended: boolean;
   } | null;
   tenantClient: TenantTypes.PrismaClient | null;
   isSuperAdmin: boolean;

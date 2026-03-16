@@ -55,12 +55,17 @@ export async function getTenantContext(
         name: true,
         slug: true,
         connectionString: true,
+        isActive: true,
+        isSuspended: true,
       },
     });
   } else {
     // Get primary tenant (first one for now)
     const membership = await masterPrisma.tenantMember.findFirst({
-      where: { userId: user.id },
+      where: { 
+        userId: user.id,
+        isActive: true, 
+      },
       include: {
         tenant: {
           select: {
@@ -68,6 +73,8 @@ export async function getTenantContext(
             name: true,
             slug: true,
             connectionString: true,
+            isActive: true,
+            isSuspended: true,
           },
         },
       },
@@ -75,9 +82,9 @@ export async function getTenantContext(
     tenant = membership?.tenant || null;
   }
 
-  // 3. Resolve tenant client if tenant exists
+  // 3. Resolve tenant client if tenant exists and is active/not suspended
   let tenantClient = null;
-  if (tenant) {
+  if (tenant && tenant.isActive && !tenant.isSuspended) {
     tenantClient = await getTenantClientByTenantId(tenant.id);
   }
 
