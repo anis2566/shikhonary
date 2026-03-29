@@ -1,11 +1,9 @@
 import { PrismaPg } from "@prisma/adapter-pg";
 import { config } from "dotenv";
 import { resolve } from "node:path";
-
 import { PrismaClient } from "../master-client-types/client";
 import { auditExtension } from "./extensions/audit";
 
-// Load environment variables
 config({ path: resolve(process.cwd(), "../../.env") });
 
 const getBasePrisma = () => {
@@ -26,24 +24,32 @@ const getBasePrisma = () => {
   });
 };
 
-const basePrisma = getBasePrisma();
+/**
+ * Raw base master PrismaClient.
+ *
+ * IMPORTANT: This is intentionally kept as the non-extended base client.
+ * - It is passed into auditExtension() so the parameter type stays as
+ *   PrismaClient (not DynamicClientExtensionThis), avoiding TS type errors.
+ * - It is also exported for use in tenant-client.ts for the same reason.
+ * - Use `prisma` (the extended version) everywhere else in the app.
+ */
+export const basePrisma = getBasePrisma();
 
-const getExtendedPrisma = () => {
-  return basePrisma.$extends(auditExtension(basePrisma));
+/**
+ * Extended master Prisma client with audit extension.
+ * Use this throughout the app for all master DB queries.
+ */
+const getExtendedPrisma = () => basePrisma.$extends(auditExtension(basePrisma));
+
+const globalForPrisma = global as unknown as {
+  prisma: ReturnType<typeof getExtendedPrisma>;
 };
 
-const globalForUserDBPrismaClient = global as unknown as {
-  userDBPrismaClient: ReturnType<typeof getExtendedPrisma>;
-};
-
-export const userDBPrismaClient =
-  globalForUserDBPrismaClient.userDBPrismaClient || getExtendedPrisma();
+export const prisma = globalForPrisma.prisma || getExtendedPrisma();
 
 if (process.env.NODE_ENV !== "production") {
-  globalForUserDBPrismaClient.userDBPrismaClient = userDBPrismaClient;
+  globalForPrisma.prisma = prisma;
 }
-
-export const prisma = userDBPrismaClient;
 
 /**
  * Health check for the master database

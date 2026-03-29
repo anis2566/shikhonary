@@ -61,7 +61,8 @@ export const ModelName = {
   Announcement: 'Announcement',
   Notification: 'Notification',
   ExamAnalytics: 'ExamAnalytics',
-  StudentAnalytics: 'StudentAnalytics'
+  StudentAnalytics: 'StudentAnalytics',
+  AcademicYear: 'AcademicYear'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -119,12 +120,12 @@ export const BatchScalarFieldEnum = {
   name: 'name',
   academicClassId: 'academicClassId',
   className: 'className',
-  academicYear: 'academicYear',
   capacity: 'capacity',
   currentSize: 'currentSize',
   isActive: 'isActive',
   createdAt: 'createdAt',
-  updatedAt: 'updatedAt'
+  updatedAt: 'updatedAt',
+  academicYearId: 'academicYearId'
 } as const
 
 export type BatchScalarFieldEnum = (typeof BatchScalarFieldEnum)[keyof typeof BatchScalarFieldEnum]
@@ -357,6 +358,20 @@ export const StudentAnalyticsScalarFieldEnum = {
 } as const
 
 export type StudentAnalyticsScalarFieldEnum = (typeof StudentAnalyticsScalarFieldEnum)[keyof typeof StudentAnalyticsScalarFieldEnum]
+
+
+export const AcademicYearScalarFieldEnum = {
+  id: 'id',
+  name: 'name',
+  startDate: 'startDate',
+  endDate: 'endDate',
+  isCurrent: 'isCurrent',
+  isActive: 'isActive',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AcademicYearScalarFieldEnum = (typeof AcademicYearScalarFieldEnum)[keyof typeof AcademicYearScalarFieldEnum]
 
 
 export const SortOrder = {

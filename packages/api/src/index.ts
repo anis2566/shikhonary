@@ -25,6 +25,7 @@ export * from "./services/mcq.service";
 export * from "./services/cq.service";
 export * from "./services/question-paper.service";
 export * from "./services/question-type.service";
+export * from "./services/academic-year.service";
 
 export * from "./services/student.service";
 export * from "./services/batch.service";

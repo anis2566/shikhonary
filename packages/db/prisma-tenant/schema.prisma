@@ -58,19 +58,19 @@ model Batch {
     name            String
     academicClassId String
     className       String?
-    academicYear    String
     capacity        Int?     @default(50)
     currentSize     Int      @default(0)
     isActive        Boolean  @default(true)
     createdAt       DateTime @default(now())
     updatedAt       DateTime @updatedAt
 
+    academicYearId String
+    academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
     students Student[]
     exams    Exam[]
 
-    @@unique([academicClassId, name, academicYear])
     @@index([academicClassId])
-    @@index([academicYear])
     @@index([isActive])
     @@map("batch")
 }
@@ -359,4 +359,19 @@ model StudentAnalytics {
 
     @@index([studentId])
     @@map("student_analytics")
+}
+
+model AcademicYear {
+    id        String   @id @default(uuid())
+    name      String   @unique
+    startDate DateTime
+    endDate   DateTime
+    isCurrent Boolean  @default(false)
+    isActive  Boolean  @default(true)
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    batches Batch[]
+
+    @@map("academic_year")
 }

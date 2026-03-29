@@ -2,8 +2,6 @@ import { initTRPC, TRPCError } from "@trpc/server";
 import superjson from "superjson";
 import { ZodError } from "zod";
 import { getTenantClientByTenantId, auditStorage } from "@workspace/db";
-
-// ONLY import from context.ts to maintain the branded type chain
 import type {
   Context,
   TRPCContext,
@@ -11,12 +9,8 @@ import type {
   TenantPrismaClient,
 } from "./context";
 import { rateLimit } from "../middleware/rate-limiter";
-import { recordAuditLog, parseTRPCPath } from "../middleware/audit-logger";
 import { sanitizeInput } from "../middleware/input-sanitizer";
 
-/**
- * Initialization of tRPC backend
- */
 export const t = initTRPC.context<Context>().create({
   transformer: superjson,
   errorFormatter({ shape, error }) {
@@ -31,20 +25,18 @@ export const t = initTRPC.context<Context>().create({
   },
 });
 
-/**
- * Export reusable router and procedure helpers.
- */
 export const createTRPCRouter = t.router;
 export const publicProcedure = t.procedure;
 export type { Context, TRPCContext, PrismaClient, TenantPrismaClient };
 
-/**
- * Middleware to check if the user is logged in
- */
+// ---------------------------------------------------------------------------
+// Auth middleware
+// ---------------------------------------------------------------------------
+
 const isAuthed = t.middleware(({ next, ctx }) => {
-  // if (!ctx.user || !ctx.userId) {
-  //   throw new TRPCError({ code: "UNAUTHORIZED" });
-  // }
+  if (!ctx.user || !ctx.userId) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
   return next({
     ctx: {
       user: ctx.user,
@@ -53,34 +45,34 @@ const isAuthed = t.middleware(({ next, ctx }) => {
   });
 });
 
-/**
- * 2. Protected (authenticated) procedure
- */
 export const protectedProcedure = t.procedure.use(isAuthed);
 
-/**
- * Middleware to check if the user is a SUPER_ADMIN
- */
+// ---------------------------------------------------------------------------
+// Admin middleware
+// ---------------------------------------------------------------------------
+
 const isAdmin = t.middleware(({ next, ctx }) => {
   // if (ctx.userRole !== "SUPER_ADMIN" && ctx.userRole !== "ADMIN") {
-  //   throw new TRPCError({
-  //     code: "FORBIDDEN",
-  //     message: "Admin access required",
-  //   });
+  //   throw new TRPCError({ code: "FORBIDDEN", message: "Admin access required" });
   // }
   return next();
 });
 
-/**
- * 3. Admin procedure (Platform-level admin)
- */
 export const adminProcedure = protectedProcedure.use(isAdmin);
 
-/**
- * Middleware for Tenant procedures
- */
+// ---------------------------------------------------------------------------
+// Tenant middleware
+//
+// KEY: tenantClient is passed directly — no `as unknown as` cast.
+// TenantPrismaClient is `interface extends TenantClient` which is
+// `interface extends ReturnType<typeof buildTenantClient>`, giving TypeScript
+// a stable portable name and resolving TS2742 on the exported procedures.
+// ---------------------------------------------------------------------------
+
 const isTenantMember = t.middleware(async ({ next, ctx }) => {
   if (!ctx.userId) throw new TRPCError({ code: "UNAUTHORIZED" });
+
+  console.log("User ID", ctx.userId);
 
   const membership = await ctx.db.tenantMember.findFirst({
     where: {
@@ -110,19 +102,17 @@ const isTenantMember = t.middleware(async ({ next, ctx }) => {
     ctx: {
       ...ctx,
       tenant: membership.tenant,
-      tenantClient: tenantClient as unknown as TenantPrismaClient,
+      tenantClient, // ✅ No cast needed — TenantClient satisfies TenantPrismaClient
     },
   });
 });
 
-/**
- * 4. Tenant procedure
- */
 export const tenantProcedure = protectedProcedure.use(isTenantMember);
 
-/**
- * Middleware for Tenant Admin
- */
+// ---------------------------------------------------------------------------
+// Tenant Admin middleware
+// ---------------------------------------------------------------------------
+
 const isTenantAdmin = t.middleware(({ next, ctx }) => {
   if (ctx.userRole !== "ADMIN" && (ctx as any).membership?.role !== "ADMIN") {
     // Check...
@@ -130,22 +120,19 @@ const isTenantAdmin = t.middleware(({ next, ctx }) => {
   return next();
 });
 
-/**
- * 5. Tenant Admin Procedure
- */
 export const tenantAdminProcedure = tenantProcedure.use(isTenantAdmin);
 
-/**
- * Global Mutation Middleware
- */
+// ---------------------------------------------------------------------------
+// Mutation middleware (audit + rate limit + sanitize)
+// ---------------------------------------------------------------------------
+
 export const mutationMiddleware = t.middleware(
-  async ({ next, ctx, path, type, input }) => {
+  async ({ next, ctx, type, input }) => {
     if (type !== "mutation") return next();
 
     if (ctx.userId) rateLimit(ctx.userId);
     const sanitizedInput = sanitizeInput(input);
 
-    // Set the audit context for DB-level automatic auditing
     return auditStorage.run(
       {
         userId: ctx.userId ?? undefined,
@@ -164,13 +151,6 @@ export const mutationMiddleware = t.middleware(
   },
 );
 
-/**
- * Base procedure for all mutations
- */
 export const baseMutationProcedure = protectedProcedure.use(mutationMiddleware);
-
-/**
- * Base procedure for tenant-level mutations
- */
 export const baseTenantMutationProcedure =
   tenantProcedure.use(mutationMiddleware);

@@ -2,6 +2,7 @@
 
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -291,6 +292,29 @@ export function useBulkDeleteTenants() {
   });
 }
 
+/**
+ * Mutation hook for sending tenant admin invitation
+ */
+export function useInviteTenantAdmin() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.tenant.sendInvitation.mutationOptions(),
+    onError: (error) => {
+      toast.error(error.message || "Failed to send invitation");
+    },
+    onSuccess: async (data) => {
+      if (data.success) {
+        toast.success(data.message);
+        // Optionally invalidate queries if needed
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+}
+
 // ============================================================================
 // TENANT QUERIES
 // ============================================================================
@@ -320,5 +344,48 @@ export function useTenantStats() {
   return useSuspenseQuery({
     ...trpc.tenant.getStats.queryOptions(),
     select: (data) => data.data,
+  });
+}
+
+/**
+ * Hook for validating a tenant invitation token
+ */
+export function useValidateInvitation(token: string) {
+  const trpc = useTRPC();
+  return useQuery({
+    ...trpc.tenant.validateInvitation.queryOptions({ token }),
+    enabled: !!token,
+    retry: false,
+  });
+}
+
+/**
+ * Hook for validating a tenant invitation token (Suspense)
+ */
+export function useSuspenseValidateInvitation(token: string) {
+  const trpc = useTRPC();
+  return useSuspenseQuery(
+    trpc.tenant.validateInvitation.queryOptions({ token }),
+  );
+}
+
+/**
+ * Mutation hook for accepting a tenant admin invitation
+ */
+export function useAcceptInvitation() {
+  const trpc = useTRPC();
+
+  return useMutation({
+    ...trpc.tenant.acceptInvitation.mutationOptions(),
+    onError: (error) => {
+      toast.error(error.message || "Failed to accept invitation");
+    },
+    onSuccess: async (data) => {
+      if (data.success) {
+        toast.success(data.message);
+      } else {
+        toast.error(data.message);
+      }
+    },
   });
 }

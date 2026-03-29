@@ -22,7 +22,7 @@ interface BaseLayoutProps {
 export const BaseLayout = ({
   previewText,
   children,
-  logoUrl = "https://placeholder-logo.com/logo.png", // Replace with actual logo URL
+  logoUrl = "https://nvewxsj7lc.ufs.sh/f/KBFRuJIDuGZHBb0cKJ5ySXvwoEAmTk8Z1yU5K7HGFsIRjcQf", // Replace with actual logo URL
   footerText = "© 2026 Your Company. All rights reserved.",
 }: BaseLayoutProps) => {
   return (

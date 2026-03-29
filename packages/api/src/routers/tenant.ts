@@ -4,6 +4,7 @@ import {
   createTRPCRouter,
   adminProcedure,
   baseMutationProcedure,
+  publicProcedure,
 } from "../trpc/index";
 import { TenantService } from "../services/tenant.service";
 import { baseListInputSchema } from "../shared/filters";
@@ -116,4 +117,65 @@ export const tenantRouter = createTRPCRouter({
       data,
     };
   }),
+
+  sendInvitation: adminProcedure
+    .input(
+      z.object({
+        tenantId: z.string(),
+        email: z.string().email(),
+        name: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = new TenantService(ctx.db);
+
+      const data = await service.sendInvitation({
+        tenantId: input.tenantId,
+        email: input.email,
+        name: input.name,
+        // Using userId as invitedBy
+        invitedBy: "Admin",
+      });
+
+      return {
+        success: true,
+        message: "Invitation sent successfully",
+        data,
+      };
+    }),
+
+  validateInvitation: publicProcedure
+    .input(z.object({ token: z.string() }))
+    .query(async ({ ctx, input }) => {
+      const service = new TenantService(ctx.db);
+      const data = await service.validateInvitation(input.token);
+      return {
+        success: true,
+        data,
+      };
+    }),
+
+  acceptInvitation: publicProcedure
+    .input(
+      z.object({
+        token: z.string(),
+        password: z.string().optional(),
+        name: z.string().optional(),
+      }),
+    )
+    .mutation(async ({ ctx, input }) => {
+      const service = new TenantService(ctx.db);
+      const data = await service.acceptInvitation({
+        token: input.token,
+        userId: ctx.userId ?? undefined,
+        password: input.password,
+        name: input.name,
+      });
+
+      return {
+        success: true,
+        message: "Invitation accepted successfully",
+        data,
+      };
+    }),
 } satisfies TRPCRouterRecord);

@@ -17,6 +17,7 @@ export const auth = betterAuth({
   emailVerification: {
     ...config.emailVerification,
   },
+  trustedOrigins: ["http://localhost:3000", "http://localhost:3001"],
 });
 
 export type Session = typeof auth.$Infer.Session.session;

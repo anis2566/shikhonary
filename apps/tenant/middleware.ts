@@ -12,7 +12,8 @@ import { getSessionCookie } from "better-auth/cookies";
  * so we only check cookie presence here.
  */
 
-const PUBLIC_ROUTES = ["/auth/sign-in", "/auth/sign-up"];
+const PUBLIC_ROUTES = ["/auth/sign-in", "/auth/sign-up", "/accept-invitation"];
+const AUTH_ROUTES = ["/auth/sign-in", "/auth/sign-up"];
 const API_PREFIXES = ["/api/auth", "/api/trpc"];
 
 export function middleware(req: NextRequest) {
@@ -28,7 +29,7 @@ export function middleware(req: NextRequest) {
 
   // 3. If user is authenticated and trying to visit auth pages, redirect to dashboard
   if (
-    PUBLIC_ROUTES.some((route) => pathname.startsWith(route)) &&
+    AUTH_ROUTES.some((route) => pathname.startsWith(route)) &&
     sessionCookie
   ) {
     const homeUrl = req.nextUrl.clone();

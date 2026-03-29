@@ -94,3 +94,8 @@ export type ExamAnalytics = Prisma.ExamAnalyticsModel
  * 
  */
 export type StudentAnalytics = Prisma.StudentAnalyticsModel
+/**
+ * Model AcademicYear
+ * 
+ */
+export type AcademicYear = Prisma.AcademicYearModel

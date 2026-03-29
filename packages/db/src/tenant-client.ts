@@ -1,73 +1,78 @@
 import { PrismaClient } from "../tenant-client-types/client";
 import { PrismaPg } from "@prisma/adapter-pg";
-import pg from "pg";
 import { LRUCache } from "lru-cache";
-import { prisma as masterPrisma } from "./client";
+import { basePrisma } from "./client";
 import { auditExtension } from "./extensions/audit";
 
-/**
- * Tenant Prisma Client Pool Configuration
- */
 const MAX_CLIENTS = 50;
-const CLIENT_TTL = 1000 * 60 * 30; // 30 minutes idle time
-
-type TenantClientInstance = {
-  client: any; // Using any for extended client type compatibility
-  pool: pg.Pool;
-};
+const CLIENT_TTL = 1000 * 60 * 30; // 30 minutes
 
 /**
- * LRU Cache for Tenant Prisma Clients
+ * Builds a tenant Prisma client for Prisma 7 + @prisma/adapter-pg 7.
+ *
+ * BREAKING CHANGE in adapter-pg v6+/v7:
+ * PrismaPg no longer accepts a `pg.Pool` instance.
+ * It only accepts a connection string config object — same as how the
+ * master client.ts is already configured. Passing a Pool caused the
+ * "Invalid invocation" runtime error silently.
  */
-const tenantCache = new LRUCache<string, TenantClientInstance>({
-  max: MAX_CLIENTS,
-  dispose: (value) => {
-    // Gracefully disconnect when evicted from cache
-    value.client.$disconnect();
-    value.pool.end();
-  },
-  ttl: CLIENT_TTL,
-});
-
-/**
- * Get or create a Prisma client for a specific tenant connection string
- */
-export const getTenantClient = (connectionString: string) => {
-  const cached = tenantCache.get(connectionString);
-  if (cached) return cached.client;
-
-  const pool = new pg.Pool({
+const buildTenantClient = (connectionString: string) => {
+  const adapter = new PrismaPg({
     connectionString,
-    max: 10, // Limit connections per tenant
     ssl: { rejectUnauthorized: false },
   });
-  const adapter = new PrismaPg(pool);
 
-  const baseClient = new PrismaClient({
+  const base = new PrismaClient({
     adapter,
     log: process.env.NODE_ENV === "development" ? ["error", "warn"] : ["error"],
   });
 
-  const client = baseClient.$extends(auditExtension(masterPrisma));
+  return base.$extends(auditExtension(basePrisma));
+};
 
-  tenantCache.set(connectionString, { client, pool });
+/**
+ * Opaque interface wrapper for the extended tenant client.
+ * Using `interface extends` instead of `type =` prevents TS2742
+ * ("cannot be named without a reference to internal/prismaNamespace").
+ */
+export interface TenantClient extends ReturnType<typeof buildTenantClient> {}
+
+type TenantClientInstance = {
+  client: TenantClient;
+};
+
+const tenantCache = new LRUCache<string, TenantClientInstance>({
+  max: MAX_CLIENTS,
+  ttl: CLIENT_TTL,
+  dispose: (value) => {
+    value.client.$disconnect();
+  },
+});
+
+/**
+ * Get or create a Prisma client for a specific tenant connection string.
+ */
+export const getTenantClient = (connectionString: string): TenantClient => {
+  const cached = tenantCache.get(connectionString);
+  if (cached) return cached.client;
+
+  const client = buildTenantClient(connectionString) as TenantClient;
+  tenantCache.set(connectionString, { client });
   return client;
 };
 
 /**
- * Get a Prisma client by Tenant ID (looks up connection string in master DB)
+ * Get a Prisma client by Tenant ID.
  */
 export const getTenantClientByTenantId = async (
   tenantId: string,
-): Promise<any | null> => {
-  const tenant = await masterPrisma.tenant.findUnique({
+): Promise<TenantClient | null> => {
+  const tenant = await basePrisma.tenant.findUnique({
     where: { id: tenantId },
     select: { connectionString: true },
   });
 
-  if (!tenant || !tenant.connectionString) {
-    return null;
-  }
+  if (!tenant?.connectionString) return null;
 
   return getTenantClient(tenant.connectionString);
 };
@@ -87,25 +92,21 @@ export const pingTenantDb = async (connectionString: string) => {
 };
 
 /**
- * Gracefully disconnect all tenant clients
+ * Gracefully disconnect all tenant clients from the pool
  */
 export const disconnectAllTenants = async () => {
   const values = Array.from(tenantCache.values());
   await Promise.all(values.map((v) => v.client.$disconnect()));
-  await Promise.all(values.map((v) => v.pool.end()));
   tenantCache.clear();
 };
 
 /**
  * Get current pool stats
  */
-export const getPoolStats = () => {
-  return {
-    activeClients: tenantCache.size,
-    maxClients: MAX_CLIENTS,
-  };
-};
+export const getPoolStats = () => ({
+  activeClients: tenantCache.size,
+  maxClients: MAX_CLIENTS,
+});
 
-// Handle cleanup on process exit
 process.on("SIGINT", disconnectAllTenants);
 process.on("SIGTERM", disconnectAllTenants);

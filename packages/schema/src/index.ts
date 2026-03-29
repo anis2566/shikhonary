@@ -9,6 +9,7 @@ export * from "./academic-subject";
 export * from "./academic-chapter";
 export * from "./academic-topic";
 export * from "./academic-subtopic";
+export * from "./academic-year";
 
 // Question Schemas
 export * from "./mcq";

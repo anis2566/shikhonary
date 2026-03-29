@@ -11,8 +11,30 @@ import { TenantWelcomeEmail } from "./components/tenant-welcome-email";
 import { ExamNotificationEmail } from "./components/exam-notification-email";
 import { addEmailToQueue } from "./queue";
 
+import { config } from "dotenv";
+import { resolve } from "node:path";
+
+// Load environment variables
+config({ path: resolve(process.cwd(), "../../.env") });
+
 const resend = new Resend(process.env.RESEND_API_KEY);
 const from = process.env.EMAIL_FROM || "onboarding@resend.dev";
+
+// Helper to queue if Redis is configured, otherwise send directly
+const queueOrSend = async (data: {
+  to: string | string[];
+  subject: string;
+  html: string;
+  from: string;
+  text?: string;
+}) => {
+  const job = await addEmailToQueue(data);
+  if (!job) {
+    console.log(`[EmailService] Sending email directly to ${data.to}: ${data.subject}`);
+    return await resend.emails.send(data);
+  }
+  return job;
+};
 
 export const emailService = {
   welcome: {
@@ -21,7 +43,7 @@ export const emailService = {
       props: React.ComponentProps<typeof WelcomeEmail>,
     ) => {
       const html = await render(React.createElement(WelcomeEmail, props));
-      return addEmailToQueue({
+      return queueOrSend({
         to,
         subject: "Welcome to our platform!",
         html,
@@ -35,7 +57,7 @@ export const emailService = {
       props: React.ComponentProps<typeof InvitationEmail>,
     ) => {
       const html = await render(React.createElement(InvitationEmail, props));
-      return addEmailToQueue({
+      return queueOrSend({
         to,
         subject: `You've been invited to join ${props.tenantName}`,
         html,
@@ -49,7 +71,7 @@ export const emailService = {
       props: React.ComponentProps<typeof VerificationEmail>,
     ) => {
       const html = await render(React.createElement(VerificationEmail, props));
-      return addEmailToQueue({
+      return queueOrSend({
         to,
         subject: "Verify your email address",
         html,
@@ -63,7 +85,7 @@ export const emailService = {
       props: React.ComponentProps<typeof PasswordResetEmail>,
     ) => {
       const html = await render(React.createElement(PasswordResetEmail, props));
-      return addEmailToQueue({
+      return queueOrSend({
         to,
         subject: "Reset your password",
         html,
@@ -77,7 +99,7 @@ export const emailService = {
       props: React.ComponentProps<typeof SubscriptionEmail>,
     ) => {
       const html = await render(React.createElement(SubscriptionEmail, props));
-      return addEmailToQueue({
+      return queueOrSend({
         to,
         subject: "Subscription Update",
         html,
@@ -93,7 +115,7 @@ export const emailService = {
       const html = await render(
         React.createElement(PaymentReceiptEmail, props),
       );
-      return addEmailToQueue({
+      return queueOrSend({
         to,
         subject: `Payment Receipt: ${props.receiptNumber}`,
         html,
@@ -107,7 +129,7 @@ export const emailService = {
       props: React.ComponentProps<typeof TenantWelcomeEmail>,
     ) => {
       const html = await render(React.createElement(TenantWelcomeEmail, props));
-      return addEmailToQueue({
+      return queueOrSend({
         to,
         subject: `Welcome to ${props.tenantName}!`,
         html,
@@ -127,7 +149,7 @@ export const emailService = {
         props.type === "scheduled"
           ? "New Exam Scheduled"
           : "Exam Results Released";
-      return addEmailToQueue({
+      return queueOrSend({
         to,
         subject,
         html,

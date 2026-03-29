@@ -15,6 +15,8 @@ import {
   createPaginatedResponse,
   PaginatedResponse,
 } from "../shared/pagination";
+import { auth } from "@workspace/auth";
+import { emailService } from "@workspace/email";
 
 /**
  * Service for managing Tenants (Platform Level)
@@ -439,6 +441,237 @@ export class TenantService {
           }),
           {} as Record<string, number>,
         ),
+      };
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  /**
+   * Send an invitation to a prospective tenant admin
+   */
+  async sendInvitation(input: {
+    tenantId: string;
+    email: string;
+    name?: string;
+    invitedBy: string;
+  }) {
+    try {
+      const validatedId = uuidSchema.parse(input.tenantId);
+      const email = input.email.toLowerCase();
+
+      const tenant = await this.db.tenant.findUnique({
+        where: { id: validatedId },
+      });
+
+      if (!tenant) throw new Error("Tenant not found");
+
+      // We dynamically import crypto and emailService to avoid issues
+      const crypto = await import("crypto");
+      //@ts-ignore
+
+      const token = crypto.randomBytes(32).toString("hex");
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7); // 7 days from now
+
+      const invitation = await this.db.tenantInvitation.create({
+        data: {
+          tenantId: validatedId,
+          email,
+          name: input.name,
+          token,
+          expiresAt,
+          invitedBy: input.invitedBy,
+          status: "PENDING",
+        },
+      });
+
+      const tenantBaseUrl =
+        process.env.NEXT_PUBLIC_TENANT_URL || "http://localhost:3001";
+      const invitationUrl = `${tenantBaseUrl}/accept-invitation?token=${token}`;
+
+      await emailService.invitation.send(email, {
+        tenantName: tenant.name,
+        inviterName: input.invitedBy,
+        invitationLink: invitationUrl,
+      });
+
+      return {
+        success: true,
+        message: "Invitation sent successfully",
+        data: invitation,
+      };
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  /**
+   * Validate an invitation token
+   */
+  async validateInvitation(token: string) {
+    try {
+      const { TRPCError } = await import("@trpc/server");
+      if (!token)
+        throw new TRPCError({
+          code: "BAD_REQUEST",
+          message: "Token is required",
+        });
+
+      const invitation = await this.db.tenantInvitation.findUnique({
+        where: { token },
+        include: {
+          tenant: true,
+        },
+      });
+
+      if (!invitation)
+        throw new TRPCError({
+          code: "NOT_FOUND",
+          message: "Invalid invitation token",
+        });
+
+      // Calculate expiration safely using Prisma date
+      const isExpired = new Date() > new Date(invitation.expiresAt);
+
+      // Check if user already exists
+      const userExists = await this.db.user.findFirst({
+        where: {
+          email: {
+            equals: invitation.email.toLowerCase(),
+            mode: "insensitive",
+          },
+        },
+      });
+
+      return {
+        id: invitation.id,
+        email: invitation.email,
+        name: invitation.name,
+        tenantId: invitation.tenantId,
+        tenantName: invitation.tenant.name,
+        status: invitation.status,
+        expiresAt: invitation.expiresAt,
+        isExpired,
+        invitedBy: invitation.invitedBy,
+        userExists: !!userExists,
+      };
+    } catch (error) {
+      const { TRPCError } = await import("@trpc/server");
+      if (error instanceof TRPCError) throw error;
+      throw new TRPCError({
+        code: "INTERNAL_SERVER_ERROR",
+        message: "Error validating invitation",
+        cause: error,
+      });
+    }
+  }
+
+  /**
+   * Accept an invitation
+   */
+  async acceptInvitation(input: {
+    token: string;
+    userId?: string;
+    password?: string;
+    name?: string;
+  }) {
+    try {
+      const invitation = await this.db.tenantInvitation.findUnique({
+        where: { token: input.token },
+      });
+
+      if (!invitation) throw new Error("Invalid invitation token");
+      if (invitation.status !== "PENDING")
+        throw new Error("Invitation is no longer valid");
+      if (new Date() > new Date(invitation.expiresAt))
+        throw new Error("Invitation has expired");
+
+      let processUserId = input.userId;
+
+      // If no userId is provided (user is not logged in), check if they need an account
+      if (!processUserId) {
+        // Check if user already exists
+        const existingUser = await this.db.user.findFirst({
+          where: {
+            email: {
+              equals: invitation.email.toLowerCase(),
+              mode: "insensitive",
+            },
+          },
+        });
+
+        if (existingUser) {
+          // User was created in a previous attempt but membership was never finalized.
+          // Reuse the existing user ID so we can complete the membership creation.
+          processUserId = existingUser.id;
+        } else {
+          if (!input.password) {
+            throw new Error("Password is required to create a new account");
+          }
+
+          // Create the user in Better Auth
+          const newUser = await auth.api.signUpEmail({
+            body: {
+              email: invitation.email,
+              password: input.password,
+              name: input.name || invitation.name || "Tenant Admin",
+            },
+            headers: new Headers(),
+          });
+
+          processUserId = newUser.user.id;
+        }
+
+        // We already verified email matches (it's from the invitation)
+        // Skip the redundant DB lookup — go straight to membership creation
+      } else {
+        // Existing user path: verify user exists and email matches
+        const user = await this.db.user.findUnique({
+          where: { id: processUserId },
+        });
+
+        if (!user) throw new Error("User not found");
+        if (user.email.toLowerCase() !== invitation.email.toLowerCase()) {
+          throw new Error("User email does not match invitation email");
+        }
+      }
+
+      // Create membership and update invitation in a transaction
+      const membership = await this.db.$transaction(async (tx) => {
+        // Mark invitation as accepted
+        await tx.tenantInvitation.update({
+          where: { id: invitation.id },
+          data: { status: "ACCEPTED", acceptedAt: new Date() },
+        });
+
+        // Check if user is already a member
+        const existingMember = await tx.tenantMember.findFirst({
+          where: {
+            tenantId: invitation.tenantId,
+            userId: processUserId as string,
+          },
+        });
+
+        if (existingMember) {
+          return existingMember;
+        }
+
+        // Create new member
+        return await tx.tenantMember.create({
+          data: {
+            tenantId: invitation.tenantId,
+            userId: processUserId as string,
+            role: "ADMIN", // Currently invitations are for admins
+            isActive: true,
+          },
+        });
+      });
+
+      return {
+        success: true,
+        message: "Invitation accepted successfully",
+        data: membership,
       };
     } catch (error) {
       handlePrismaError(error);

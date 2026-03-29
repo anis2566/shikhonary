@@ -201,3 +201,12 @@ export const subscriptionFilterSchema = {
   status: parseAsString.withOptions({ clearOnDefault: true }),
   tier: parseAsString.withOptions({ clearOnDefault: true }),
 };
+
+/**
+ * Academic Year Filters
+ */
+export const academicYearFilterSchema = {
+  ...baseFilterSchema,
+  isActive: parseAsBoolean.withOptions({ clearOnDefault: true }),
+  isCurrent: parseAsBoolean.withOptions({ clearOnDefault: true }),
+};

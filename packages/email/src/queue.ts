@@ -1,10 +1,7 @@
 import { Queue, Worker, Job } from "bullmq";
 import { Redis } from "ioredis";
 
-const REDIS_URL = process.env.REDIS_URL || "redis://localhost:6379";
-const connection = new Redis(REDIS_URL, {
-  maxRetriesPerRequest: null,
-});
+const REDIS_URL = process.env.REDIS_URL;
 
 export const EMAIL_QUEUE_NAME = "email-queue";
 
@@ -16,19 +13,34 @@ export interface EmailJobData {
   from?: string;
 }
 
-export const emailQueue = new Queue<EmailJobData>(EMAIL_QUEUE_NAME, {
-  connection,
-  defaultJobOptions: {
-    attempts: 3,
-    backoff: {
-      type: "exponential",
-      delay: 1000,
+let connection: Redis | null = null;
+export let emailQueue: any = null;
+
+if (REDIS_URL) {
+  connection = new Redis(REDIS_URL, {
+    maxRetriesPerRequest: null,
+  });
+
+  emailQueue = new Queue(EMAIL_QUEUE_NAME, {
+    // @ts-expect-error type mismatch with ioredis versions
+    connection,
+    defaultJobOptions: {
+      attempts: 3,
+      backoff: {
+        type: "exponential",
+        delay: 1000,
+      },
+      removeOnComplete: true,
+      removeOnFail: false,
     },
-    removeOnComplete: true,
-    removeOnFail: false,
-  },
-});
+  });
+}
 
 export const addEmailToQueue = async (data: EmailJobData) => {
-  return await emailQueue.add(`send-email-${Date.now()}`, data);
+  if (emailQueue) {
+    return await emailQueue.add(`send-email-${Date.now()}`, data);
+  } else {
+    console.warn("Redis is not configured. Email NOT queued:", data.subject);
+    return null;
+  }
 };

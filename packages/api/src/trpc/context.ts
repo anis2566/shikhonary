@@ -1,38 +1,40 @@
 import { auth, User } from "@workspace/auth";
 import {
   prisma,
+  type TenantClient,
   type Tenant,
   type PrismaClient as BasePrismaClient,
-  type TenantPrismaClient as BaseTenantPrismaClient,
 } from "@workspace/db";
 
 /**
- * Portability Fix: Define branded types that wrap the complex Prisma types.
- * To prevent internal Prisma runtime symbols from leaking into tRPC declarations (TS2742),
- * we use interfaces that extend the base types.
- *
- * IF the error persists, we can switch to a mapped type that picks only the methods we need,
- * but for now, interfaces with the same name are the first line of defense.
+ * Portability fix for master Prisma client type.
+ * Interface wrapper prevents TS2742 by giving TypeScript a stable name.
  */
 export interface PrismaClient extends BasePrismaClient {}
-export interface TenantPrismaClient extends BaseTenantPrismaClient {}
 
 /**
- * Define the context type explicitly.
+ * Re-export TenantClient as TenantPrismaClient for tRPC context naming consistency.
+ *
+ * TenantClient is declared as `interface extends ReturnType<typeof buildTenantClient>`
+ * in tenant-client.ts — giving TypeScript a portable name for .d.ts emission (fixes TS2742).
+ *
+ * RULE: Every file that needs the tenant client type imports TenantClient from
+ * @workspace/db — NOT PrismaClient or TenantPrismaClient from tenant-client-types.
+ * The base PrismaClient type is missing $on (stripped by $extends) and causes
+ * "not assignable" errors when used as a service constructor parameter type.
  */
+export type TenantPrismaClient = TenantClient;
+
 export interface TRPCContext {
   user: User | null;
   userId: string | null;
   userRole: string | null;
   db: PrismaClient;
   tenant: Tenant | null;
-  tenantClient: TenantPrismaClient | null;
+  tenantClient: TenantClient | null; // ✅ TenantClient directly — single source of truth
   headers: Headers;
 }
 
-/**
- * The context for every tRPC request.
- */
 export async function createTRPCContext(opts: {
   headers: Headers;
 }): Promise<TRPCContext> {

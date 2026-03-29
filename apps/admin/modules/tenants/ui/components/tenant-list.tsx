@@ -154,6 +154,7 @@ interface TenantListProps {
   onDeactivate: (id: string) => Promise<void>;
   isLoading: boolean;
   handleDelete: (id: string, name: string) => void;
+  onInviteAdmin?: (id: string, name: string) => void;
 }
 
 function DatabaseStatusBadge({ status }: { status: string }) {
@@ -289,6 +290,7 @@ export function TenantList({
   onDeactivate,
   isLoading,
   handleDelete,
+  onInviteAdmin,
 }: TenantListProps) {
   const { data: tenantsData } = useTenants();
 
@@ -439,6 +441,16 @@ export function TenantList({
                         <Edit className="h-4 w-4" />
                         <span>Configure</span>
                       </Link>
+                    </DropdownMenuItem>
+
+                    <DropdownMenuItem
+                      className="cursor-pointer rounded-xl font-bold text-sm gap-2.5 p-2.5 transition-colors focus:bg-primary/10 focus:text-primary"
+                      onClick={() =>
+                        onInviteAdmin && onInviteAdmin(item.id, item.name)
+                      }
+                    >
+                      <UsersRound className="h-4 w-4" />
+                      <span>Invite Admin</span>
                     </DropdownMenuItem>
                     <DropdownMenuSeparator className="bg-border/50 my-1.5" />
                     <DropdownMenuItem

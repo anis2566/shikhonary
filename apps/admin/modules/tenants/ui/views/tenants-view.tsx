@@ -21,6 +21,8 @@ import { Pagination } from "../components/pagination";
 import { Filter } from "../components/filter";
 import { TenantListStat } from "../components/tenant-list-stat";
 import { TenantList } from "../components/tenant-list";
+import { InviteTenantAdminDialog } from "../modal/tenant-invitation-modal";
+import { useInvitationModal } from "@workspace/ui/hooks/use-invitation-modal";
 
 const containerVariants = {
   hidden: { opacity: 0 },
@@ -40,6 +42,7 @@ const itemVariants = {
 export const TenantsView = () => {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const { openDeleteModal } = useDeleteModal();
+  const { onOpen: openInvitationModal } = useInvitationModal();
 
   const { data: tenantsData } = useTenants();
   const { mutateAsync: bulkActivateTenants, isPending: isBulkActivating } =
@@ -103,6 +106,10 @@ export const TenantsView = () => {
     });
   };
 
+  const handleInviteAdmin = (tenantId: string, tenantName: string) => {
+    openInvitationModal(tenantId, tenantName);
+  };
+
   return (
     <motion.div
       variants={containerVariants}
@@ -110,6 +117,7 @@ export const TenantsView = () => {
       animate="visible"
       className="min-h-screen p-4 lg:p-6 space-y-8"
     >
+      <InviteTenantAdminDialog />
       {/* Stats Section */}
       <motion.div variants={itemVariants}>
         <TenantListStat />
@@ -139,6 +147,7 @@ export const TenantsView = () => {
             onDeactivate={onDeactivate}
             isLoading={isLoading}
             handleDelete={handleDeleteTenant}
+            onInviteAdmin={handleInviteAdmin}
           />
         </div>
 

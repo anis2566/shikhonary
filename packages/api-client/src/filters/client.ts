@@ -14,6 +14,7 @@ import {
   subscriptionPlanFilterSchema,
   subscriptionFilterSchema,
   questionTypeFilterSchema,
+  academicYearFilterSchema,
 } from "./schema";
 
 export const useAcademicClassFilters = () =>
@@ -36,3 +37,5 @@ export const useSubscriptionFilters = () =>
   useQueryStates(subscriptionFilterSchema);
 export const useQuestionTypeFilters = () =>
   useQueryStates(questionTypeFilterSchema);
+export const useAcademicYearFilters = () =>
+  useQueryStates(academicYearFilterSchema);

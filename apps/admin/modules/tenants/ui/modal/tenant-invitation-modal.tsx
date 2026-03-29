@@ -24,8 +24,7 @@ import {
   zodResolver,
 } from "@workspace/ui/components/form";
 import { useInvitationModal } from "@workspace/ui/hooks/use-invitation-modal";
-// TODO: Create this hook for sending invitations
-// import { useInviteTenantAdmin } from "@workspace/api-client";
+import { useInviteTenantAdmin } from "@workspace/api-client";
 
 const inviteFormSchema = z.object({
   email: z
@@ -44,9 +43,7 @@ type InviteFormValues = z.infer<typeof inviteFormSchema>;
 
 export const InviteTenantAdminDialog = () => {
   const { isOpen, onClose, tenantId, tenantName } = useInvitationModal();
-  // TODO: Uncomment when API hook is available
-  // const { mutateAsync: inviteTenantAdmin, isPending } = useInviteTenantAdmin();
-  const isPending = false; // Temporary until hook is available
+  const { mutateAsync: inviteTenantAdmin, isPending } = useInviteTenantAdmin();
 
   const form = useForm<InviteFormValues>({
     resolver: zodResolver(inviteFormSchema),
@@ -57,25 +54,16 @@ export const InviteTenantAdminDialog = () => {
   });
 
   const onSubmit = async (data: InviteFormValues) => {
-    // TODO: Uncomment when API hook is available
-    // await inviteTenantAdmin({
-    //   email: data.email,
-    //   name: data.name,
-    //   tenantId,
-    // }).then(() => {
-    //   handleClose();
-    //   form.reset();
-    // });
+    if (!tenantId) return;
 
-    // Temporary: Just close the modal for now
-    console.log(
-      "Invitation would be sent to:",
-      data.email,
-      "for tenant:",
+    await inviteTenantAdmin({
+      email: data.email,
+      name: data.name,
       tenantId,
-    );
-    handleClose();
-    form.reset();
+    }).then(() => {
+      handleClose();
+      form.reset();
+    });
   };
 
   const handleClose = () => {

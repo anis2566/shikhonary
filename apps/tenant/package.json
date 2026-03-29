@@ -4,7 +4,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "dev": "next dev --turbopack",
+    "dev": "next dev --turbopack --port 3001",
     "inngest:dev": "npx inngest-cli@latest dev --no-discovery -u http://localhost:3000/api/inngest",
     "build": "next build",
     "start": "next start",
