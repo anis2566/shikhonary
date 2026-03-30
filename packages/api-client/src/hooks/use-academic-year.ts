@@ -8,7 +8,8 @@ import {
 } from "@tanstack/react-query";
 import { toast } from "@workspace/ui/components/sonner";
 import { useTRPC } from "../client";
-
+import { useAcademicYearFilters } from "../filters/client";
+import { forSelectionInputType } from "node_modules/@workspace/api/src/shared/input/academic-year";
 // ============================================================================
 // ACADEMIC YEAR MUTATIONS
 // ============================================================================
@@ -115,24 +116,61 @@ export function useDeleteAcademicYear() {
   });
 }
 
+/**
+ * Mutation hook for toggling academic year active status
+ */
+export function useToggleAcademicYearActive() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.academicYear.toggleActive.mutationOptions(),
+    onError: (error) => {
+      toast.error(
+        error.message || "Failed to toggle academic year active status",
+      );
+    },
+    onSuccess: async (data: any) => {
+      if (data.success) {
+        toast.success(data.message);
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: trpc.academicYear.list.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.academicYear.getById.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.academicYear.getStats.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.academicYear.getCurrent.queryKey(),
+          }),
+        ]);
+      } else {
+        toast.error(
+          data.message || "Failed to toggle academic year active status",
+        );
+      }
+    },
+  });
+}
+
 // ============================================================================
 // ACADEMIC YEAR QUERIES
 // ============================================================================
 
 /**
- * Hook for listing academic years
+ * Hook for listing academic years with filters
  */
-export function useAcademicYears(
-  filters: {
-    page: number;
-    limit: number;
-    search?: string;
-    isActive: boolean | null;
-    isCurrent: boolean | null;
-  } = { page: 1, limit: 100 },
-) {
+export function useAcademicYears() {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.academicYear.list.queryOptions(filters));
+  const [filters] = useAcademicYearFilters();
+
+  return useQuery({
+    ...trpc.academicYear.list.queryOptions(filters),
+    select: (data) => data.data,
+  });
 }
 
 /**
@@ -140,7 +178,10 @@ export function useAcademicYears(
  */
 export function useAcademicYearById(id: string) {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.academicYear.getById.queryOptions({ id }));
+  return useSuspenseQuery({
+    ...trpc.academicYear.getById.queryOptions(id),
+    select: (data) => data.data,
+  });
 }
 
 /**
@@ -148,7 +189,10 @@ export function useAcademicYearById(id: string) {
  */
 export function useAcademicYearStats() {
   const trpc = useTRPC();
-  return useQuery(trpc.academicYear.getStats.queryOptions());
+  return useQuery({
+    ...trpc.academicYear.getStats.queryOptions(),
+    select: (data) => data.data,
+  });
 }
 
 /**
@@ -156,5 +200,16 @@ export function useAcademicYearStats() {
  */
 export function useCurrentAcademicYear() {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.academicYear.getCurrent.queryOptions());
+  return useSuspenseQuery({
+    ...trpc.academicYear.getCurrent.queryOptions(),
+    select: (data) => data.data,
+  });
+}
+
+export function useAcademicYearsForSelection(input: forSelectionInputType) {
+  const trpc = useTRPC();
+  return useQuery({
+    ...trpc.academicYear.forSelection.queryOptions(input),
+    select: (data) => data.data,
+  });
 }

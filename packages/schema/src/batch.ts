@@ -6,6 +6,7 @@ import { nameSchema, uuidSchema } from "./shared/fields";
  */
 
 export const batchFormSchema = z.object({
+  academicYearId: uuidSchema,
   academicClassId: uuidSchema.or(z.string().min(1, "Please select a class")),
   name: nameSchema,
   displayName: nameSchema.optional().or(z.literal("")),
@@ -19,14 +20,3 @@ export const batchFormSchema = z.object({
 });
 
 export type BatchFormValues = z.infer<typeof batchFormSchema>;
-
-export const defaultBatchValues: BatchFormValues = {
-  academicClassId: "",
-  name: "",
-  displayName: "",
-  academicYear: new Date().getFullYear().toString(),
-  capacity: 50,
-  isActive: true,
-};
-
-export const updateBatchSchema = batchFormSchema.partial();

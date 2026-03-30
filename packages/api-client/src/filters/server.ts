@@ -12,6 +12,7 @@ import {
   subscriptionPlanFilterSchema,
   subscriptionFilterSchema,
   questionTypeFilterSchema,
+  academicYearFilterSchema,
 } from "./schema";
 
 export const academicClassLoader = createLoader(academicClassFilterSchema);
@@ -30,3 +31,4 @@ export const subscriptionPlanLoader = createLoader(
 );
 export const subscriptionLoader = createLoader(subscriptionFilterSchema);
 export const questionTypeLoader = createLoader(questionTypeFilterSchema);
+export const academicYearLoader = createLoader(academicYearFilterSchema);

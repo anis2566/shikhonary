@@ -1,8 +1,8 @@
 import { z } from "zod";
+import { type TenantClient } from "@workspace/db";
 import { handlePrismaError } from "../middleware/error-handler";
 import {
   batchFormSchema,
-  updateBatchSchema,
   uuidSchema,
   BatchFormValues,
 } from "@workspace/schema";
@@ -12,9 +12,10 @@ import {
   buildWhere,
 } from "../shared/query-builder";
 import {
-  createPaginatedResponse,
-  type PaginatedResponse,
-} from "../shared/pagination";
+  idInputType,
+  listInputType,
+  updateBatchInputType,
+} from "../shared/input/batch";
 
 /**
  * Service for managing Batches (Tenant Level)
@@ -23,21 +24,13 @@ export class BatchService {
   /**
    * Note: This service expects a Tenant-specific Prisma Client
    */
-  constructor(private db: any) {}
+  constructor(private db: TenantClient) {}
 
-  async list(input: {
-    page: number;
-    limit: number;
-    search?: string;
-    sortBy?: string;
-    sortOrder?: "asc" | "desc";
-    classId?: string;
-    academicYear?: string;
-  }): Promise<PaginatedResponse<any> | undefined> {
+  async list(input: listInputType) {
     try {
       const where = buildWhere(input, ["name", "className"]);
-      if (input.classId) where.academicClassId = input.classId;
-      if (input.academicYear) where.academicYear = input.academicYear;
+      if (input.academicClassId) where.academicClassId = input.academicClassId;
+      if (input.academicYearId) where.academicYearId = input.academicYearId;
 
       const orderBy = buildOrderBy(input);
       const pagination = buildPagination(input);
@@ -49,24 +42,38 @@ export class BatchService {
           ...pagination,
           include: {
             _count: { select: { students: true } },
+            academicYear: {
+              select: {
+                name: true,
+              },
+            },
           },
         }),
         this.db.batch.count({ where }),
       ]);
 
-      return createPaginatedResponse(items, total, input.page, input.limit);
+      return {
+        items,
+        total,
+      };
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async getById(id: string): Promise<any | null | undefined> {
+  async getById(input: idInputType) {
     try {
-      const validatedId = uuidSchema.parse(id);
+      const validatedId = uuidSchema.parse(input);
       return await this.db.batch.findUnique({
         where: { id: validatedId },
         include: {
-          students: { take: 10, orderBy: { name: "asc" } },
+          academicYear: true,
+          _count: {
+            select: {
+              students: true,
+              exams: true,
+            },
+          },
         },
       });
     } catch (error) {
@@ -74,21 +81,59 @@ export class BatchService {
     }
   }
 
-  async create(input: BatchFormValues): Promise<any | undefined> {
+  async getDetails(input: idInputType) {
     try {
-      const data = batchFormSchema.parse(input);
-      return await this.db.batch.create({ data });
+      const validatedId = uuidSchema.parse(input);
+
+      const batch = await this.db.batch.findUnique({
+        where: { id: validatedId },
+        include: {
+          academicYear: true,
+        },
+      });
+
+      if (!batch) return null;
+
+      const [
+        totalStudents,
+        activeStudents,
+        totalExams,
+        completedExams,
+        upcomingExams,
+        avgScoreResult,
+      ] = await Promise.all([
+        this.db.student.count({ where: { batchId: input } }),
+        this.db.student.count({ where: { batchId: input, isActive: true } }),
+        this.db.exam.count({ where: { batchId: input } }),
+        this.db.exam.count({ where: { batchId: input, status: "Completed" } }),
+        this.db.exam.count({ where: { batchId: input, status: "Pending" } }),
+        this.db.examAttempt.aggregate({
+          where: { exam: { batchId: input } },
+          _avg: { percentage: true },
+        }),
+      ]);
+
+      return {
+        ...batch,
+        stats: {
+          totalStudents,
+          activeStudents,
+          totalExams,
+          completedExams,
+          upcomingExams,
+          avgScore: Math.round(avgScoreResult._avg.percentage || 0),
+        },
+      };
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async update(id: string, input: BatchFormValues): Promise<any | undefined> {
+  async create(input: BatchFormValues) {
     try {
-      const validatedId = uuidSchema.parse(id);
-      const data = updateBatchSchema.parse(input);
-      return await this.db.batch.update({
-        where: { id: validatedId },
+      const { academicYear, ...data } = batchFormSchema.parse(input);
+      // Prisma expects academicYearId, which is already in 'data'
+      return await this.db.batch.create({
         data,
       });
     } catch (error) {
@@ -96,25 +141,105 @@ export class BatchService {
     }
   }
 
-  async delete(id: string): Promise<any | undefined> {
+  async update(input: updateBatchInputType) {
     try {
-      const validatedId = uuidSchema.parse(id);
+      const { id, academicYear, ...data } = input;
+      return await this.db.batch.update({
+        where: { id },
+        data,
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async delete(input: idInputType) {
+    try {
+      const validatedId = uuidSchema.parse(input);
       return await this.db.batch.delete({ where: { id: validatedId } });
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async getStats(
-    classId?: string,
-  ): Promise<{ total: number; active: number; inactive: number } | undefined> {
+  async getStats() {
     try {
-      const where = classId ? { academicClassId: classId } : {};
-      const total = await this.db.batch.count({ where });
-      const active = await this.db.batch.count({
-        where: { ...where, isActive: true },
+      const [total, active, totalStudentsResult, batches] = await Promise.all([
+        this.db.batch.count(),
+        this.db.batch.count({ where: { isActive: true } }),
+        this.db.student.count({ where: { isActive: true } }),
+        this.db.batch.findMany({
+          select: {
+            capacity: true,
+            students: { where: { isActive: true }, select: { id: true } },
+          },
+        }),
+      ]);
+
+      const nearFull = batches.filter((b) => {
+        const capacity = b.capacity || 50;
+        const currentSize = b.students.length;
+        return currentSize / capacity >= 0.9;
+      }).length;
+
+      const totalCapacity = batches.reduce(
+        (acc, b) => acc + (b.capacity || 50),
+        0,
+      );
+      const capacityPercent =
+        totalCapacity > 0
+          ? Math.round((totalStudentsResult / totalCapacity) * 100)
+          : 0;
+
+      return {
+        total,
+        active,
+        inactive: total - active,
+        totalStudents: totalStudentsResult,
+        nearFull,
+        capacityPercent,
+      };
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async toggleActive(input: string) {
+    try {
+      const validatedId = uuidSchema.parse(input);
+      const batch = await this.db.batch.findUnique({
+        where: { id: validatedId },
       });
-      return { total, active, inactive: total - active };
+
+      if (!batch) throw new Error("Batch not found");
+
+      return await this.db.batch.update({
+        where: { id: validatedId },
+        data: { isActive: !batch.isActive },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async bulkDelete(ids: string[]) {
+    try {
+      const validatedIds = z.array(uuidSchema).parse(ids);
+      return await this.db.batch.deleteMany({
+        where: { id: { in: validatedIds } },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async bulkToggleActive(ids: string[], isActive: boolean) {
+    try {
+      const validatedIds = z.array(uuidSchema).parse(ids);
+      return await this.db.batch.updateMany({
+        where: { id: { in: validatedIds } },
+        data: { isActive },
+      });
     } catch (error) {
       handlePrismaError(error);
     }

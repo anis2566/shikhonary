@@ -6,30 +6,39 @@ import {
   baseTenantMutationProcedure,
 } from "../trpc/index";
 import { BatchService } from "../services/batch.service";
-import { baseListInputSchema, zNullishString } from "../shared/filters";
+import { idSchema, listInput, updateBatchSchema } from "../shared/input/batch";
+import { batchFormSchema } from "@workspace/schema";
 
 export const batchRouter = createTRPCRouter({
-  list: tenantProcedure
-    .input(
-      baseListInputSchema.extend({
-        classId: zNullishString,
-        academicYear: zNullishString,
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const service = new BatchService(ctx.tenantClient);
-      return await service.list(input);
-    }),
+  list: tenantProcedure.input(listInput).query(async ({ ctx, input }) => {
+    const service = new BatchService(ctx.tenantClient);
+    const data = await service.list(input);
+    return {
+      success: true,
+      data,
+    };
+  }),
 
-  getById: tenantProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const service = new BatchService(ctx.tenantClient);
-      return await service.getById(input.id);
-    }),
+  getById: tenantProcedure.input(idSchema).query(async ({ ctx, input }) => {
+    const service = new BatchService(ctx.tenantClient);
+    const data = await service.getById(input);
+    return {
+      success: true,
+      data,
+    };
+  }),
+
+  getDetails: tenantProcedure.input(idSchema).query(async ({ ctx, input }) => {
+    const service = new BatchService(ctx.tenantClient);
+    const data = await service.getDetails(input);
+    return {
+      success: true,
+      data,
+    };
+  }),
 
   create: baseTenantMutationProcedure
-    .input(z.any())
+    .input(batchFormSchema)
     .mutation(async ({ ctx, input }) => {
       const service = new BatchService(ctx.tenantClient);
       const data = await service.create(input);
@@ -41,10 +50,10 @@ export const batchRouter = createTRPCRouter({
     }),
 
   update: baseTenantMutationProcedure
-    .input(z.object({ id: z.string(), data: z.any() }))
+    .input(updateBatchSchema)
     .mutation(async ({ ctx, input }) => {
       const service = new BatchService(ctx.tenantClient);
-      const data = await service.update(input.id, input.data);
+      const data = await service.update(input);
       return {
         success: true,
         message: "Batch updated successfully",
@@ -64,10 +73,48 @@ export const batchRouter = createTRPCRouter({
       };
     }),
 
-  getStats: tenantProcedure
-    .input(z.object({ classId: zNullishString }))
-    .query(async ({ ctx, input }) => {
+  bulkDelete: baseTenantMutationProcedure
+    .input(z.object({ ids: z.array(z.string()) }))
+    .mutation(async ({ ctx, input }) => {
       const service = new BatchService(ctx.tenantClient);
-      return await service.getStats(input.classId);
+      const data = await service.bulkDelete(input.ids);
+      return {
+        success: true,
+        message: "Batches deleted successfully",
+        data,
+      };
+    }),
+
+  getStats: tenantProcedure.query(async ({ ctx }) => {
+    const service = new BatchService(ctx.tenantClient);
+    const data = await service.getStats();
+    return {
+      success: true,
+      data,
+    };
+  }),
+
+  toggleActive: baseTenantMutationProcedure
+    .input(z.object({ id: z.string() }))
+    .mutation(async ({ ctx, input }) => {
+      const service = new BatchService(ctx.tenantClient);
+      const data = await service.toggleActive(input.id);
+      return {
+        success: true,
+        message: "Batch status toggled successfully",
+        data,
+      };
+    }),
+
+  bulkToggleActive: baseTenantMutationProcedure
+    .input(z.object({ ids: z.array(z.string()), isActive: z.boolean() }))
+    .mutation(async ({ ctx, input }) => {
+      const service = new BatchService(ctx.tenantClient);
+      const data = await service.bulkToggleActive(input.ids, input.isActive);
+      return {
+        success: true,
+        message: "Batches status updated successfully",
+        data,
+      };
     }),
 } satisfies TRPCRouterRecord);

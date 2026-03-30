@@ -27,7 +27,7 @@ export const DashboardLayout = ({ children }: DashboardLayoutProps) => {
 
       {/* main is now the scroll container — this makes sticky header work */}
       <main className="flex-1 min-w-0 flex flex-col relative z-10 h-screen overflow-y-auto overflow-x-hidden">
-        <div className="flex-1 flex flex-col animate-fade-in animate-duration-500">
+        <div className="flex-1 flex flex-col">
           {children}
         </div>
       </main>

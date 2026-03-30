@@ -44,6 +44,9 @@ model Student {
     attendance    Attendance[]
     answerHistory AnswerHistory[]
 
+    academicYearId String
+    academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
     @@index([academicClassId])
     @@index([batchId])
     @@index([isActive])
@@ -371,7 +374,8 @@ model AcademicYear {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    batches Batch[]
+    batches  Batch[]
+    students Student[]
 
     @@map("academic_year")
 }

@@ -8,6 +8,11 @@ export enum ACTIVE_STATUS {
   INACTIVE = "INACTIVE",
 }
 
+export enum ACTIVE_BOOLEAN_STATUS {
+  ACTIVE = "true",
+  INACTIVE = "false",
+}
+
 /**
  * Standardized academic levels.
  * FIXED: Removed space in "HIGHER SECONDARY" value.
@@ -23,8 +28,8 @@ export enum ACADEMIC_LEVEL {
  * Simple sort directions
  */
 export enum SORT {
-  ASC = "ASC",
-  DESC = "DESC",
+  ASC = "asc",
+  DESC = "desc",
 }
 
 /**
@@ -61,6 +66,13 @@ export const academicLevelOptions = [
   { value: ACADEMIC_LEVEL.SECONDARY, label: "Secondary" },
   { value: ACADEMIC_LEVEL.HIGHER_SECONDARY, label: "Higher Secondary" },
 ] as const;
+
+export const activeBooleanStatusOptions = Object.values(
+  ACTIVE_BOOLEAN_STATUS,
+).map((value) => ({
+  value,
+  label: value === "true" ? "Active" : "Inactive",
+}));
 
 export const sortOptions = enumToOptions(SORT);
 export const sortWithPositionOptions = enumToOptions(SORT_WITH_POSITION);

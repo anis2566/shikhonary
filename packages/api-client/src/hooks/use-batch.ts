@@ -25,12 +25,17 @@ export function useCreateBatch() {
     onError: (error) => {
       toast.error(error.message || "Failed to create batch");
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data: any) => {
       if (data.success) {
         toast.success(data.message);
-        await queryClient.invalidateQueries({
-          queryKey: trpc.batch.list.queryKey(),
-        });
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.list.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.getStats.queryKey(),
+          }),
+        ]);
       } else {
         toast.error(data.message);
       }
@@ -50,12 +55,17 @@ export function useUpdateBatch() {
     onError: (error) => {
       toast.error(error.message || "Failed to update batch");
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data: any) => {
       if (data.success) {
         toast.success(data.message);
-        await queryClient.invalidateQueries({
-          queryKey: trpc.batch.list.queryKey(),
-        });
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.list.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.getStats.queryKey(),
+          }),
+        ]);
       } else {
         toast.error(data.message);
       }
@@ -75,12 +85,77 @@ export function useDeleteBatch() {
     onError: (error) => {
       toast.error(error.message || "Failed to delete batch");
     },
-    onSuccess: async (data) => {
+    onSuccess: async (data: any) => {
       if (data.success) {
         toast.success(data.message);
-        await queryClient.invalidateQueries({
-          queryKey: trpc.batch.list.queryKey(),
-        });
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.list.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.getStats.queryKey(),
+          }),
+        ]);
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+}
+
+/**
+ * Mutation hook for toggling batch active status
+ */
+export function useToggleBatchActive() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.batch.toggleActive.mutationOptions(),
+    onError: (error) => {
+      toast.error(error.message || "Failed to toggle batch status");
+    },
+    onSuccess: async (data: any) => {
+      if (data.success) {
+        toast.success(data.message);
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.list.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.getStats.queryKey(),
+          }),
+        ]);
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+}
+
+/**
+ * Mutation hook for bulk deleting batches
+ */
+export function useBulkDeleteBatches() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.batch.bulkDelete.mutationOptions(),
+    onError: (error) => {
+      toast.error(error.message || "Failed to delete batches");
+    },
+    onSuccess: async (data: any) => {
+      if (data.success) {
+        toast.success(data.message);
+        await Promise.all([
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.list.queryKey(),
+          }),
+          queryClient.invalidateQueries({
+            queryKey: trpc.batch.getStats.queryKey(),
+          }),
+        ]);
       } else {
         toast.error(data.message);
       }
@@ -97,8 +172,11 @@ export function useDeleteBatch() {
  */
 export function useBatches() {
   const trpc = useTRPC();
-  const [filters, _] = useBatchFilters();
-  return useSuspenseQuery(trpc.batch.list.queryOptions(filters));
+  const [filters] = useBatchFilters();
+  return useSuspenseQuery({
+    ...trpc.batch.list.queryOptions(filters),
+    select: (data) => data.data,
+  });
 }
 
 /**
@@ -106,13 +184,19 @@ export function useBatches() {
  */
 export function useBatchById(id: string) {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.batch.getById.queryOptions({ id }));
+  return useSuspenseQuery({
+    ...trpc.batch.getById.queryOptions(id),
+    select: (data) => data.data,
+  });
 }
 
 /**
  * Hook for getting batch statistics
  */
-export function useBatchStats(filters: { classId?: string } = {}) {
+export function useBatchStats() {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.batch.getStats.queryOptions(filters));
+  return useSuspenseQuery({
+    ...trpc.batch.getStats.queryOptions(),
+    select: (data) => data.data,
+  });
 }

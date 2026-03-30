@@ -56,7 +56,7 @@ export function buildOrderBy(input: {
  * Builds where clause for Prisma with search and filters
  */
 export function buildWhere(
-  input: { search?: string; isActive?: boolean },
+  input: { search?: string; isActive?: boolean | null },
   searchFields: string[] = ["name", "displayName"],
 ) {
   const where: any = {};

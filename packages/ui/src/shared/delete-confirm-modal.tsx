@@ -30,7 +30,8 @@ const entityLabels: Record<
   tenant: { singular: "Tenant", icon: "🏢" },
   subscriptionPlan: { singular: "Subscription Plan", icon: "📦" },
   subscription: { singular: "Subscription", icon: "📦" },
-  questionType: { singular: "Question Type", icon: "❓" },
+  academicYear: { singular: "Academic Year", icon: "📅" },
+  batch: { singular: "Batch", icon: "🎓" },
 };
 
 export function DeleteConfirmModal() {

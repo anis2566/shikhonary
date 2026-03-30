@@ -1,9 +1,4 @@
 import {
-  academicYearFormSchema,
-  updateAcademicYearSchema,
-  uuidSchema,
-} from "@workspace/schema";
-import {
   buildPagination,
   buildOrderBy,
   buildWhere,
@@ -11,20 +6,17 @@ import {
 import { createPaginatedResponse } from "../shared/pagination";
 import { handlePrismaError } from "../middleware/error-handler";
 import { type TenantClient } from "@workspace/db";
+import { AcademicYear, academicYearSchema } from "@workspace/schema";
+import {
+  forSelectionInputType,
+  idInputType,
+  listInputType,
+  updateAcademicYearInputType,
+} from "../shared/input/academic-year";
 
 // ---------------------------------------------------------------------------
 // Input types — only inputs need explicit types, outputs are inferred
 // ---------------------------------------------------------------------------
-
-type ListInput = {
-  page: number;
-  limit: number;
-  search?: string;
-  sortBy?: string;
-  sortOrder?: "asc" | "desc";
-  isActive?: boolean;
-  isCurrent?: boolean;
-};
 
 // ---------------------------------------------------------------------------
 // Service
@@ -36,35 +28,43 @@ export class AcademicYearService {
   // Return type is fully inferred — tRPC will pick it up end-to-end
   // just like writing the logic inline in the router.
 
-  async list(input: ListInput) {
+  async list(input: listInputType) {
     try {
       const where = buildWhere(input, ["name"]);
-      if (input.isActive !== undefined) where.isActive = input.isActive;
-      if (input.isCurrent !== undefined) where.isCurrent = input.isCurrent;
+      if (input.isActive !== null) where.isActive = input.isActive;
+      if (input.isCurrent !== null) where.isCurrent = input.isCurrent;
 
       const [items, total] = await Promise.all([
         this.db.academicYear.findMany({
           where,
+          include: {
+            _count: {
+              select: {
+                batches: true,
+                students: true,
+              },
+            },
+          },
           orderBy: buildOrderBy(input),
           ...buildPagination(input),
         }),
         this.db.academicYear.count({ where }),
       ]);
 
-      const enriched = await Promise.all(
-        items.map((item) => this.#withStats(item)),
-      );
-
-      return createPaginatedResponse(enriched, total, input.page, input.limit);
+      return {
+        success: true,
+        data: items,
+        total,
+      };
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async getById(id: string) {
+  async getById(input: idInputType) {
     try {
       const item = await this.db.academicYear.findUnique({
-        where: { id: uuidSchema.parse(id) },
+        where: { id: input },
       });
       if (!item) return null;
       return this.#withStats(item);
@@ -108,41 +108,77 @@ export class AcademicYearService {
     }
   }
 
-  async create(input: unknown) {
+  async forSelection(input: forSelectionInputType) {
     try {
-      const data = academicYearFormSchema.parse(input);
-      if (data.isCurrent) {
+      const where = buildWhere(input, ["name"]);
+      const items = await this.db.academicYear.findMany({
+        where: { isActive: true, ...where },
+        select: {
+          id: true,
+          name: true,
+        },
+        orderBy: {
+          createdAt: "desc",
+        },
+      });
+      return items;
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async create(input: AcademicYear) {
+    try {
+      if (input.isCurrent) {
         await this.db.academicYear.updateMany({
           where: { isCurrent: true },
           data: { isCurrent: false },
         });
       }
-      return this.db.academicYear.create({ data });
+      return this.db.academicYear.create({ data: input });
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async update(id: string, input: unknown) {
+  async update(input: updateAcademicYearInputType) {
     try {
-      const validatedId = uuidSchema.parse(id);
-      const data = updateAcademicYearSchema.parse(input);
-      if (data.isCurrent) {
+      if (input.isCurrent) {
         await this.db.academicYear.updateMany({
-          where: { isCurrent: true, id: { not: validatedId } },
+          where: { isCurrent: true, id: { not: input.id } },
           data: { isCurrent: false },
         });
       }
-      return this.db.academicYear.update({ where: { id: validatedId }, data });
+      return this.db.academicYear.update({
+        where: { id: input.id },
+        data: input,
+      });
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async delete(id: string) {
+  async delete(input: idInputType) {
     try {
-      return this.db.academicYear.delete({
-        where: { id: uuidSchema.parse(id) },
+      return this.db.academicYear.delete({ where: { id: input } });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async toggleActive(input: idInputType) {
+    try {
+      const academicYear = await this.db.academicYear.findUnique({
+        where: { id: input },
+      });
+
+      if (!academicYear) {
+        throw new Error("Academic year not found");
+      }
+
+      return this.db.academicYear.update({
+        where: { id: input },
+        data: { isActive: !academicYear.isActive },
       });
     } catch (error) {
       handlePrismaError(error);

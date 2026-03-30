@@ -3,6 +3,7 @@ import {
   createTRPCRouter,
   adminProcedure,
   baseMutationProcedure,
+  publicProcedure,
 } from "../trpc/index";
 import { AcademicClassService } from "../services/academic-class.service";
 import { baseListInputSchema, zNullishString } from "../shared/filters";
@@ -161,7 +162,7 @@ export const academicClassRouter = createTRPCRouter({
       };
     }),
 
-  forSelection: adminProcedure.query(async ({ ctx }) => {
+  forSelection: publicProcedure.query(async ({ ctx }) => {
     const service = new AcademicClassService(ctx.db);
     const data = await service.forSelection();
     return {

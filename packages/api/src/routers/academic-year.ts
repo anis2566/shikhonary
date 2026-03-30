@@ -6,30 +6,35 @@ import {
   baseTenantMutationProcedure,
 } from "../trpc/index";
 import { AcademicYearService } from "../services/academic-year.service";
-import { baseListInputSchema, zNullishString } from "../shared/filters";
+import {
+  forSelectionInput,
+  idSchema,
+  listInput,
+  updateAcademicYearSchema,
+} from "../shared/input/academic-year";
+import { academicYearSchema } from "@workspace/schema";
 
 export const academicYearRouter = createTRPCRouter({
-  list: tenantProcedure
-    .input(
-      baseListInputSchema.extend({
-        isActive: z.boolean().optional(),
-        isCurrent: z.boolean().optional(),
-      }),
-    )
-    .query(async ({ ctx, input }) => {
-      const service = new AcademicYearService(ctx.tenantClient);
-      return await service.list(input);
-    }),
+  list: tenantProcedure.input(listInput).query(async ({ ctx, input }) => {
+    const service = new AcademicYearService(ctx.tenantClient);
+    const data = await service.list(input);
+    return {
+      success: true,
+      data,
+    };
+  }),
 
-  getById: tenantProcedure
-    .input(z.object({ id: z.string() }))
-    .query(async ({ ctx, input }) => {
-      const service = new AcademicYearService(ctx.tenantClient);
-      return await service.getById(input.id);
-    }),
+  getById: tenantProcedure.input(idSchema).query(async ({ ctx, input }) => {
+    const service = new AcademicYearService(ctx.tenantClient);
+    const data = await service.getById(input);
+    return {
+      success: true,
+      data,
+    };
+  }),
 
   create: baseTenantMutationProcedure
-    .input(z.any())
+    .input(academicYearSchema)
     .mutation(async ({ ctx, input }) => {
       const service = new AcademicYearService(ctx.tenantClient);
       const data = await service.create(input);
@@ -41,10 +46,10 @@ export const academicYearRouter = createTRPCRouter({
     }),
 
   update: baseTenantMutationProcedure
-    .input(z.object({ id: z.string(), data: z.any() }))
+    .input(updateAcademicYearSchema)
     .mutation(async ({ ctx, input }) => {
       const service = new AcademicYearService(ctx.tenantClient);
-      const data = await service.update(input.id, input.data);
+      const data = await service.update(input);
       return {
         success: true,
         message: "Academic year updated successfully",
@@ -53,23 +58,55 @@ export const academicYearRouter = createTRPCRouter({
     }),
 
   delete: baseTenantMutationProcedure
-    .input(z.object({ id: z.string() }))
+    .input(idSchema)
     .mutation(async ({ ctx, input }) => {
       const service = new AcademicYearService(ctx.tenantClient);
-      const data = await service.delete(input.id);
+      const data = await service.delete(input);
       return {
         success: true,
         message: "Academic year deleted successfully",
         data,
       };
     }),
+
+  toggleActive: baseTenantMutationProcedure
+    .input(idSchema)
+    .mutation(async ({ ctx, input }) => {
+      const service = new AcademicYearService(ctx.tenantClient);
+      const data = await service.toggleActive(input);
+      return {
+        success: true,
+        message: "Academic year toggled successfully",
+        data,
+      };
+    }),
+
   getStats: tenantProcedure.query(async ({ ctx }) => {
     const service = new AcademicYearService(ctx.tenantClient);
-    return await service.getStats();
+    const data = await service.getStats();
+    return {
+      success: true,
+      data,
+    };
   }),
 
   getCurrent: tenantProcedure.query(async ({ ctx }) => {
     const service = new AcademicYearService(ctx.tenantClient);
-    return await service.getCurrent();
+    const data = await service.getCurrent();
+    return {
+      success: true,
+      data,
+    };
   }),
+
+  forSelection: tenantProcedure
+    .input(forSelectionInput)
+    .query(async ({ ctx, input }) => {
+      const service = new AcademicYearService(ctx.tenantClient);
+      const data = await service.forSelection(input);
+      return {
+        success: true,
+        data,
+      };
+    }),
 } satisfies TRPCRouterRecord);

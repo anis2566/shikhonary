@@ -29,12 +29,10 @@ export const baseFilterSchema = {
   limit: parseAsInteger
     .withDefault(DEFAULT_PAGE_SIZE)
     .withOptions({ clearOnDefault: true }),
-  sortBy: parseAsString
-    .withDefault("createdAt")
-    .withOptions({ clearOnDefault: true }),
-  sortOrder: parseAsStringEnum(["asc", "desc"])
-    .withDefault("desc")
-    .withOptions({ clearOnDefault: true }),
+  sortBy: parseAsString.withOptions({ clearOnDefault: true }),
+  sortOrder: parseAsStringEnum(["asc", "desc"]).withOptions({
+    clearOnDefault: true,
+  }),
 };
 
 /**
@@ -159,18 +157,6 @@ export const studentFilterSchema = {
 };
 
 /**
- * Batch Filters
- */
-export const batchFilterSchema = {
-  ...baseFilterSchema,
-  classId: parseAsString.withOptions({ clearOnDefault: true }),
-  academicYear: parseAsString.withOptions({ clearOnDefault: true }),
-  isActive: parseAsStringEnum(ACTIVE_STATUS).withOptions({
-    clearOnDefault: true,
-  }),
-};
-
-/**
  * Tenant Filters
  */
 export const tenantFilterSchema = {
@@ -209,4 +195,14 @@ export const academicYearFilterSchema = {
   ...baseFilterSchema,
   isActive: parseAsBoolean.withOptions({ clearOnDefault: true }),
   isCurrent: parseAsBoolean.withOptions({ clearOnDefault: true }),
+};
+
+/**
+ * Batch Filters
+ */
+export const batchFilterSchema = {
+  ...baseFilterSchema,
+  academicClassId: parseAsString.withOptions({ clearOnDefault: true }),
+  academicYearId: parseAsString.withOptions({ clearOnDefault: true }),
+  isActive: parseAsBoolean.withOptions({ clearOnDefault: true }),
 };
