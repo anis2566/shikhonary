@@ -74,14 +74,14 @@ function BatchPreviewCard({ values }: { values: Partial<FormValues> }) {
     <div className="bg-surface-container-lowest rounded-xl shadow-[0_24px_48px_-12px_rgba(11,28,48,0.08)] overflow-hidden">
       {/* Card Header */}
       <div className="p-5 border-b border-surface-container flex items-center gap-3">
-        <div className="p-2 bg-emerald-50 rounded-lg text-emerald-600">
+        <div className="p-2 bg-primary/5 rounded-lg text-primary">
           <Eye className="size-4" />
         </div>
         <div>
-          <h3 className="font-bold text-sm text-on-background">
+          <h3 className="font-bold text-sm text-on-surface">
             Real-Time Preview
           </h3>
-          <p className="text-[11px] text-on-surface-variant">
+          <p className="text-[11px] text-on-surface-variant/70">
             Updates as you type
           </p>
         </div>
@@ -159,12 +159,12 @@ function SectionHeader({
 }) {
   return (
     <div className="p-6 md:p-8 border-b border-surface-container flex items-center gap-3">
-      <div className="p-2.5 bg-emerald-50 rounded-lg text-emerald-600">
+      <div className="p-2.5 bg-primary/5 rounded-lg text-primary shadow-glow/10">
         <Icon className="size-5" />
       </div>
       <div>
-        <h3 className="font-bold text-on-background">{title}</h3>
-        <p className="text-xs text-on-surface-variant">{subtitle}</p>
+        <h3 className="font-bold text-on-surface">{title}</h3>
+        <p className="text-xs text-on-surface-variant/70">{subtitle}</p>
       </div>
     </div>
   );
@@ -398,10 +398,10 @@ export function BatchCreateForm() {
             </div>
 
             {/* Action Bar */}
-            <div className="p-6 md:p-8 bg-slate-50/70 border-t border-surface-container flex items-center justify-end gap-4">
+            <div className="p-6 md:p-8 bg-surface-container-low/30 border-t border-surface-container flex items-center justify-end gap-4">
               <button
                 type="button"
-                className="px-6 py-2.5 text-sm font-semibold text-slate-500 hover:text-slate-800 transition-all active:scale-95"
+                className="px-6 py-2.5 text-sm font-semibold text-on-surface-variant/60 hover:text-on-surface hover:bg-surface-container-low transition-all active:scale-95 rounded-lg"
                 onClick={() => router.back()}
                 disabled={isPending}
               >
