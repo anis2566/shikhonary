@@ -68,80 +68,85 @@ function BatchPreviewCard({ values }: { values: Partial<FormValues> }) {
     (y) => y.id === values.academicYearId
   );
 
-  const capacity = values.maxCapacity ? parseInt(values.maxCapacity, 10) : null;
+  const capacity = values.maxCapacity ? parseInt(values.maxCapacity, 10) : 0;
 
   return (
-    <div className="bg-surface-container-lowest rounded-xl shadow-[0_24px_48px_-12px_rgba(11,28,48,0.08)] overflow-hidden">
-      {/* Card Header */}
-      <div className="p-5 border-b border-surface-container flex items-center gap-3">
-        <div className="p-2 bg-primary/5 rounded-lg text-primary">
-          <Eye className="size-4" />
-        </div>
-        <div>
-          <h3 className="font-bold text-sm text-on-surface">
-            Real-Time Preview
-          </h3>
-          <p className="text-[11px] text-on-surface-variant/70">
-            Updates as you type
-          </p>
-        </div>
-      </div>
-
-      {/* Preview Content */}
-      <div className="p-5">
-        <div
-          className="rounded-xl p-5 relative overflow-hidden"
-          style={{
-            background:
-              "linear-gradient(135deg, #064e3b 0%, #065f46 50%, #047857 100%)",
-          }}
-        >
-          {/* Decorative background element */}
-          <div className="absolute top-0 right-0 size-24 rounded-full bg-white/5 -translate-y-8 translate-x-8" />
-          <div className="absolute bottom-0 left-0 size-16 rounded-full bg-white/5 translate-y-6 -translate-x-6" />
-
-          <div className="relative z-10">
-            <div className="flex items-start justify-between mb-4">
-              <div className="size-10 rounded-lg bg-white/15 flex items-center justify-center backdrop-blur-sm border border-white/10">
-                <Layers className="size-5 text-white" />
-              </div>
-              {values.isActive && (
-                <Badge 
-                  variant="outline" 
-                  className="bg-emerald-400/20 text-emerald-300 border-emerald-400/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full"
-                >
-                  Active
-                </Badge>
-              )}
-            </div>
-
-            <h4 className="text-white font-bold text-lg leading-tight mb-1">
-              {values.name?.trim() || "New Batch Entity"}
+    <div className="bg-white border border-outline rounded-2xl p-2 shadow-sm animate-fade-in [animation-delay:400ms]">
+      {/* Internal Preview Content */}
+      <div className="bg-slate-50/80 rounded-xl p-6 border border-outline/50">
+        <div className="flex items-start justify-between mb-8">
+          <div>
+            <h4 className="font-extrabold text-on-surface text-xl leading-tight transition-all">
+              {values.name?.trim() || "Morning Batch A"}
             </h4>
+            <p className="text-[10px] font-bold text-on-surface-variant/60 mt-1.5 uppercase tracking-widest">
+              New Batch Entity
+            </p>
+          </div>
+          {values.isActive && (
+            <Badge
+              variant="outline"
+              className="bg-primary/10 text-primary border-primary/20 text-[10px] font-extrabold px-2.5 py-1 rounded-md uppercase tracking-wider"
+            >
+              Active
+            </Badge>
+          )}
+        </div>
 
-            <div className="space-y-2 mt-4">
-              <div className="flex items-center gap-2 text-emerald-200 text-xs">
-                <GraduationCap className="size-3.5 flex-shrink-0" />
-                <span>{selectedClass?.name || "Assigned Class"}</span>
-              </div>
-              <div className="flex items-center gap-2 text-emerald-200 text-xs">
-                <CalendarDays className="size-3.5 flex-shrink-0" />
-                <span>{selectedYear?.name || "Academic Period"}</span>
-              </div>
-              <div className="flex items-center gap-2 text-emerald-200 text-xs">
-                <Users className="size-3.5 flex-shrink-0" />
-                <span>
-                  0 / {capacity ? `${capacity} Students` : "Unlimited"}
-                </span>
+        <div className="space-y-4">
+          {/* Class Row */}
+          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-outline/30 shadow-sm transition-all hover:border-primary/20">
+            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-on-surface-variant group">
+              <GraduationCap className="size-5 transition-transform group-hover:scale-110" />
+            </div>
+            <div>
+              <p className="text-[10px] text-on-surface-variant/70 font-bold uppercase tracking-widest">
+                Assigned Class
+              </p>
+              <p className="text-sm font-bold text-on-surface">
+                {selectedClass?.name || "Grade 9"}
+              </p>
+            </div>
+          </div>
+
+          {/* Academic Period Row */}
+          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-outline/30 shadow-sm transition-all hover:border-primary/20">
+            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-on-surface-variant group">
+              <CalendarDays className="size-5 transition-transform group-hover:scale-110" />
+            </div>
+            <div>
+              <p className="text-[10px] text-on-surface-variant/70 font-bold uppercase tracking-widest">
+                Academic Period
+              </p>
+              <p className="text-sm font-bold text-on-surface">
+                {selectedYear?.name || "2026 Academic Year"}
+              </p>
+            </div>
+          </div>
+
+          {/* Vacancy Row with Progress Bar */}
+          <div className="flex items-center gap-3 p-3.5 rounded-xl bg-white border border-outline/30 shadow-sm transition-all hover:border-primary/20">
+            <div className="w-9 h-9 rounded-lg bg-slate-100 flex items-center justify-center text-on-surface-variant group">
+              <Users className="size-5 transition-transform group-hover:scale-110" />
+            </div>
+            <div className="flex-1">
+              <p className="text-[10px] text-on-surface-variant/70 font-bold uppercase tracking-widest">
+                Initial Vacancy
+              </p>
+              <div className="flex items-center justify-between mt-1">
+                <p className="text-sm font-bold text-on-surface">
+                  0 / {capacity > 0 ? capacity : "∞"} Students
+                </p>
+                <div className="w-20 h-2 bg-slate-100 rounded-full overflow-hidden border border-outline/10">
+                  <div 
+                    className="h-full bg-primary transition-all duration-500 rounded-full shadow-glow" 
+                    style={{ width: "0%" }}
+                  />
+                </div>
               </div>
             </div>
           </div>
         </div>
-
-        <p className="text-[10px] text-on-surface-variant mt-4 leading-relaxed">
-          Changes will be applied instantly to the student registration portal
-          once created.
-        </p>
       </div>
     </div>
   );
@@ -181,10 +186,10 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 
 // ─── Tonal Input ─────────────────────────────────────────────────────────────
 const tonalInputCls =
-  "bg-surface-container-low border-transparent rounded-lg px-4 py-6 focus:bg-surface-container-lowest focus:border-primary/40 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-on-surface-variant/40 text-on-surface text-sm h-auto";
+  "bg-slate-50/50 border border-outline rounded-xl px-4 py-8 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all placeholder:text-slate-400 text-on-surface font-medium text-sm h-auto shadow-sm";
 
 const tonalSelectTriggerCls =
-  "w-full bg-surface-container-low border-transparent rounded-lg px-4 py-6 focus:bg-surface-container-lowest focus:border-primary/40 focus:ring-4 focus:ring-primary/10 transition-all text-on-surface text-sm h-auto flex items-center justify-between";
+  "w-full bg-slate-50/50 border border-outline rounded-xl px-4 py-8 focus:bg-white focus:border-primary focus:ring-4 focus:ring-primary/5 transition-all text-on-surface font-medium text-sm h-auto flex items-center justify-between shadow-sm";
 
 // ─── Main Form Component ─────────────────────────────────────────────────────
 export function BatchCreateForm() {
@@ -225,7 +230,7 @@ export function BatchCreateForm() {
           {/* Basic Information Card */}
           <div className="bg-surface-container-lowest rounded-xl shadow-[0_24px_48px_-12px_rgba(11,28,48,0.08)] overflow-hidden">
             <SectionHeader
-              icon={Hash}
+              icon={GraduationCap}
               title="Basic Information"
               subtitle="Core identity and academic alignment"
             />
@@ -397,39 +402,48 @@ export function BatchCreateForm() {
               />
             </div>
 
-            {/* Action Bar */}
-            <div className="p-6 md:p-8 bg-surface-container-low/30 border-t border-surface-container flex items-center justify-end gap-4">
-              <button
-                type="button"
-                className="px-6 py-2.5 text-sm font-semibold text-on-surface-variant/60 hover:text-on-surface hover:bg-surface-container-low transition-all active:scale-95 rounded-lg"
-                onClick={() => router.back()}
-                disabled={isPending}
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={isPending}
-                style={{
-                  backgroundImage:
-                    "linear-gradient(135deg, #006c49 0%, #10b981 100%)",
-                }}
-                className="px-8 py-2.5 text-white rounded-lg font-bold text-sm shadow-[0_4px_14px_0_rgba(16,185,129,0.39)] hover:shadow-[0_6px_20px_rgba(16,185,129,0.23)] hover:opacity-90 transition-all active:scale-95 flex items-center gap-2 disabled:opacity-60"
-              >
-                {isPending && <Loader2 className="size-4 animate-spin" />}
-                <span>Create Batch</span>
-              </button>
             </div>
           </div>
         </div>
 
         {/* ── Right Column: Live Preview ── */}
-        <div className="xl:sticky xl:top-8 xl:self-start">
-          {/* Mobile Preview label */}
-          <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest mb-3 xl:hidden">
-            Preview
-          </p>
+        <div className="xl:sticky xl:top-24 xl:self-start space-y-6">
+          <div className="flex items-center gap-2 px-1">
+            <Badge variant="ghost" className="bg-surface-container-high/50 text-on-surface-variant text-[10px] uppercase tracking-widest font-bold">
+              Institutional Preview
+            </Badge>
+          </div>
+          
           <BatchPreviewCard values={watchedValues} />
+
+          {/* Action Area in Sidebar as per wires */}
+          <div className="p-4 pt-4 space-y-4 bg-white/50 backdrop-blur-sm rounded-2xl border border-outline/30">
+            <button
+              type="submit"
+              disabled={isPending}
+              className="w-full bg-primary hover:bg-emerald-600 text-white font-bold py-5 rounded-xl flex items-center justify-center gap-2 transition-all shadow-xl shadow-primary/20 active:scale-[0.98] disabled:opacity-60"
+            >
+              {isPending ? (
+                <Loader2 className="size-5 animate-spin" />
+              ) : (
+                <Zap className="size-5" />
+              )}
+              <span>Create Batch</span>
+            </button>
+            <button
+              type="button"
+              className="w-full bg-white border border-outline hover:bg-slate-50 text-on-surface-variant/80 font-bold py-5 rounded-xl transition-all active:scale-[0.98]"
+              onClick={() => router.back()}
+            >
+              Cancel
+            </button>
+          </div>
+
+          <div className="px-4 text-center">
+            <p className="text-[11px] text-on-surface-variant/60 leading-relaxed italic">
+              Changes will be applied instantly to the student registration portal once created.
+            </p>
+          </div>
         </div>
       </form>
     </Form>
