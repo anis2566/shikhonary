@@ -25,6 +25,16 @@ import {
   zodResolver,
 } from "@workspace/ui/components/form";
 import { Switch } from "@workspace/ui/components/switch";
+import { Input } from "@workspace/ui/components/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@workspace/ui/components/select";
+import { Badge } from "@workspace/ui/components/badge";
+import { cn } from "@workspace/ui/lib/utils";
 
 // Dummy data for dropdowns until API integration
 const dummyData = {
@@ -92,13 +102,16 @@ function BatchPreviewCard({ values }: { values: Partial<FormValues> }) {
 
           <div className="relative z-10">
             <div className="flex items-start justify-between mb-4">
-              <div className="size-10 rounded-lg bg-white/15 flex items-center justify-center">
+              <div className="size-10 rounded-lg bg-white/15 flex items-center justify-center backdrop-blur-sm border border-white/10">
                 <Layers className="size-5 text-white" />
               </div>
               {values.isActive && (
-                <span className="text-[10px] font-bold uppercase tracking-wider bg-emerald-400/20 text-emerald-300 px-2.5 py-1 rounded-full border border-emerald-400/20">
+                <Badge 
+                  variant="outline" 
+                  className="bg-emerald-400/20 text-emerald-300 border-emerald-400/20 px-2.5 py-1 text-[10px] font-bold uppercase tracking-wider rounded-full"
+                >
                   Active
-                </span>
+                </Badge>
               )}
             </div>
 
@@ -168,10 +181,10 @@ function FieldLabel({ children }: { children: React.ReactNode }) {
 
 // ─── Tonal Input ─────────────────────────────────────────────────────────────
 const tonalInputCls =
-  "w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 focus:ring-2 focus:ring-primary/40 transition-all placeholder:text-on-surface-variant/40 text-on-surface text-sm";
+  "bg-surface-container-low border-transparent rounded-lg px-4 py-6 focus:bg-surface-container-lowest focus:border-primary/40 focus:ring-4 focus:ring-primary/10 transition-all placeholder:text-on-surface-variant/40 text-on-surface text-sm h-auto";
 
-const tonalSelectCls =
-  "w-full bg-surface-container-low border-none rounded-lg px-4 py-3.5 focus:ring-2 focus:ring-primary/40 transition-all text-on-surface text-sm appearance-none cursor-pointer";
+const tonalSelectTriggerCls =
+  "w-full bg-surface-container-low border-transparent rounded-lg px-4 py-6 focus:bg-surface-container-lowest focus:border-primary/40 focus:ring-4 focus:ring-primary/10 transition-all text-on-surface text-sm h-auto flex items-center justify-between";
 
 // ─── Main Form Component ─────────────────────────────────────────────────────
 export function BatchCreateForm() {
@@ -227,7 +240,7 @@ export function BatchCreateForm() {
                       <FieldLabel>Batch Name</FieldLabel>
                     </FormLabel>
                     <FormControl>
-                      <input
+                      <Input
                         {...field}
                         placeholder="e.g., Morning Batch A"
                         disabled={isPending}
@@ -253,21 +266,25 @@ export function BatchCreateForm() {
                         <FieldLabel>Assigned Class</FieldLabel>
                       </FormLabel>
                       <FormControl>
-                        <div className="relative">
-                          <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
-                          <select
-                            {...field}
-                            disabled={isPending}
-                            className={`${tonalSelectCls} pl-11`}
-                          >
-                            <option value="">Select a class</option>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={isPending}
+                        >
+                          <div className="relative">
+                            <GraduationCap className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] z-10 pointer-events-none" />
+                            <SelectTrigger className={cn(tonalSelectTriggerCls, "pl-11 border-none shadow-none ring-offset-0 focus:ring-0 focus:ring-offset-0 overflow-hidden")}>
+                              <SelectValue placeholder="Select a class" />
+                            </SelectTrigger>
+                          </div>
+                          <SelectContent className="bg-surface-container-lowest border-surface-container shadow-ambient">
                             {dummyData.classes.map((c) => (
-                              <option key={c.id} value={c.id}>
+                              <SelectItem key={c.id} value={c.id} className="focus:bg-surface-container">
                                 {c.name}
-                              </option>
+                              </SelectItem>
                             ))}
-                          </select>
-                        </div>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -283,21 +300,25 @@ export function BatchCreateForm() {
                         <FieldLabel>Academic Period</FieldLabel>
                       </FormLabel>
                       <FormControl>
-                        <div className="relative">
-                          <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
-                          <select
-                            {...field}
-                            disabled={isPending}
-                            className={`${tonalSelectCls} pl-11`}
-                          >
-                            <option value="">Select academic year</option>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={isPending}
+                        >
+                          <div className="relative">
+                            <CalendarDays className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] z-10 pointer-events-none" />
+                            <SelectTrigger className={cn(tonalSelectTriggerCls, "pl-11 border-none shadow-none ring-offset-0 focus:ring-0 focus:ring-offset-0 overflow-hidden")}>
+                              <SelectValue placeholder="Select academic year" />
+                            </SelectTrigger>
+                          </div>
+                          <SelectContent className="bg-surface-container-lowest border-surface-container shadow-ambient">
                             {dummyData.academicYears.map((y) => (
-                              <option key={y.id} value={y.id}>
+                              <SelectItem key={y.id} value={y.id} className="focus:bg-surface-container">
                                 {y.name}
-                              </option>
+                              </SelectItem>
                             ))}
-                          </select>
-                        </div>
+                          </SelectContent>
+                        </Select>
                       </FormControl>
                       <FormMessage />
                     </FormItem>
@@ -326,14 +347,14 @@ export function BatchCreateForm() {
                     </FormLabel>
                     <FormControl>
                       <div className="relative">
-                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none" />
-                        <input
+                        <Users className="absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant size-[18px] pointer-events-none z-10" />
+                        <Input
                           {...field}
                           type="number"
                           min="1"
                           placeholder="Leave blank for unlimited"
                           disabled={isPending}
-                          className={`${tonalInputCls} pl-11`}
+                          className={cn(tonalInputCls, "pl-11")}
                         />
                       </div>
                     </FormControl>
