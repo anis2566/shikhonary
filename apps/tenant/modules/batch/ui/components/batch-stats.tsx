@@ -1,73 +1,47 @@
+"use client";
+
 import React from "react";
-import {
-  Users,
-  Layers,
-  AlertCircle,
-  CheckCircle2,
-  TrendingUp,
-} from "lucide-react";
-import AnimatedStatCard from "./animated-stat-card";
+import { Files, CheckCircle, PauseCircle, GraduationCap } from "lucide-react";
 
-interface BatchStatsProps {
-  stats: {
-    total: number;
-    active: number;
-    inactive: number;
-    totalStudents: number;
-    nearFull: number;
-    capacityPercent: number;
-  };
-}
-
-export default function BatchStats({ stats }: BatchStatsProps) {
+export function BatchStats() {
   return (
-    <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-4">
-      <AnimatedStatCard
-        icon={
-          <div className="p-2 rounded-lg bg-primary/10">
-            <Layers className="w-5 h-5 text-primary" />
-          </div>
-        }
-        label="Total Batches"
-        value={stats.total}
-      />
-      <AnimatedStatCard
-        icon={
-          <div className="p-2 rounded-lg bg-green-500/10">
-            <CheckCircle2 className="w-5 h-5 text-green-500" />
-          </div>
-        }
-        label="Active Batches"
-        value={stats.active}
-      />
-      <AnimatedStatCard
-        icon={
-          <div className="p-2 rounded-lg bg-blue-500/10">
-            <Users className="w-5 h-5 text-blue-500" />
-          </div>
-        }
-        label="Total Students"
-        value={stats.totalStudents}
-      />
-      <AnimatedStatCard
-        icon={
-          <div className="p-2 rounded-lg bg-orange-500/10">
-            <AlertCircle className="w-5 h-5 text-orange-500" />
-          </div>
-        }
-        label="Near Capacity"
-        value={stats.nearFull}
-      />
-      <AnimatedStatCard
-        icon={
-          <div className="p-2 rounded-lg bg-purple-500/10">
-            <TrendingUp className="w-5 h-5 text-purple-500" />
-          </div>
-        }
-        label="Overall Capacity"
-        value={stats.capacityPercent}
-        displayValue={`${stats.capacityPercent}%`}
-      />
-    </div>
+    <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+      <div className="bg-[#f8f9ff]/80 backdrop-blur-md border border-emerald-500/10 p-6 rounded-[12px] shadow-[0_24px_48px_-12px_rgba(11,28,48,0.06)] flex items-center gap-5">
+        <div className="w-12 h-12 rounded-full bg-emerald-500/10 flex items-center justify-center text-emerald-600">
+          <Files className="size-6" />
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Batches</p>
+          <p className="text-2xl font-extrabold text-on-surface">24</p>
+        </div>
+      </div>
+      <div className="bg-[#f8f9ff]/80 backdrop-blur-md border border-emerald-500/10 p-6 rounded-[12px] shadow-[0_24px_48px_-12px_rgba(11,28,48,0.06)] flex items-center gap-5">
+        <div className="w-12 h-12 rounded-full bg-emerald-500/20 flex items-center justify-center text-emerald-700">
+          <CheckCircle className="size-6" />
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Active Batches</p>
+          <p className="text-2xl font-extrabold text-on-surface">18</p>
+        </div>
+      </div>
+      <div className="bg-[#f8f9ff]/80 backdrop-blur-md border border-emerald-500/10 p-6 rounded-[12px] shadow-[0_24px_48px_-12px_rgba(11,28,48,0.06)] flex items-center gap-5">
+        <div className="w-12 h-12 rounded-full bg-slate-200/50 flex items-center justify-center text-slate-600">
+          <PauseCircle className="size-6" />
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Inactive Batches</p>
+          <p className="text-2xl font-extrabold text-on-surface">06</p>
+        </div>
+      </div>
+      <div className="bg-[#f8f9ff]/80 backdrop-blur-md border border-emerald-500/10 p-6 rounded-[12px] shadow-[0_24px_48px_-12px_rgba(11,28,48,0.06)] flex items-center gap-5">
+        <div className="w-12 h-12 rounded-full bg-emerald-600/10 flex items-center justify-center text-emerald-700">
+          <GraduationCap className="size-6" />
+        </div>
+        <div>
+          <p className="text-xs font-bold uppercase tracking-wider text-slate-500">Total Students</p>
+          <p className="text-2xl font-extrabold text-on-surface">1,240</p>
+        </div>
+      </div>
+    </section>
   );
 }
