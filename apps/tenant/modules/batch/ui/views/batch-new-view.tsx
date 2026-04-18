@@ -8,46 +8,53 @@ import Link from "next/link";
 
 export function BatchNewView() {
   return (
-    <div className="w-full max-w-6xl mx-auto py-8 md:py-16 px-4 md:px-8 font-['Inter']">
-      {/* Back Navigation + Page Title */}
-      <div className="mb-8 md:mb-10">
-        <Button
-          className="flex items-center gap-2 text-on-surface-variant hover:text-primary transition-colors group mb-4 w-full max-w-fit hover:bg-transparent"
-          asChild
-          variant="ghost"
-        >
-          <Link href="/batches" prefetch>
-            <ArrowLeft className="text-base group-hover:-translate-x-1 transition-transform size-4" />
-            <span className="text-xs font-medium uppercase tracking-wider">
-              Back to Batches
-            </span>
-          </Link>
-        </Button>
-
-        <div className="flex items-center gap-4">
-          {/* Icon accent */}
-          <div
-            className="hidden md:flex size-12 rounded-xl items-center justify-center shrink-0"
-            style={{
-              backgroundImage:
-                "linear-gradient(135deg, #006c49 0%, #10b981 100%)",
-            }}
+    <div className="w-full min-h-screen bg-gradient-background font-body antialiased">
+      <div className="mx-auto max-w-7xl px-4 py-12 md:px-8 lg:py-20">
+        {/* Back Navigation + Page Title */}
+        <div className="mb-12 animate-fade-in group">
+          <Button
+            className="mb-8 flex h-auto items-center gap-2 p-0 text-on-surface-variant/60 hover:bg-transparent hover:text-primary transition-all group/btn"
+            asChild
+            variant="ghost"
           >
-            <Layers className="size-6 text-white" />
-          </div>
+            <Link href="/batches" prefetch>
+              <div className="flex size-8 items-center justify-center rounded-full bg-surface-container transition-transform group-hover/btn:-translate-x-1">
+                <ArrowLeft className="size-4" />
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-[0.2em] transition-colors group-hover/btn:text-primary">
+                Return to Directory
+              </span>
+            </Link>
+          </Button>
 
-          <div className="flex flex-col gap-1">
-            <h1 className="text-2xl md:text-3xl font-extrabold text-on-background tracking-tight">
-              Create New Batch
-            </h1>
-            <p className="text-on-surface-variant text-sm">
-              Define the parameters for your new student grouping.
-            </p>
+          <div className="flex flex-col gap-6 md:flex-row md:items-end md:justify-between">
+            <div className="flex items-center gap-6">
+              {/* Icon accent - Atmospheric version */}
+              <div className="hidden size-20 items-center justify-center rounded-[2rem] bg-gradient-signature shadow-glow md:flex rotate-3 transition-transform hover:rotate-0 duration-500">
+                <Layers className="size-10 text-white" />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <div className="flex items-center gap-2">
+                  <Badge variant="outline" className="border-primary/20 bg-primary/5 text-primary text-[10px] uppercase tracking-wider font-bold px-3 py-0.5 rounded-full">
+                    Academic Entity
+                  </Badge>
+                </div>
+                <h1 className="text-4xl font-extrabold tracking-tight text-on-surface md:text-5xl lg:text-6xl">
+                  Forge New <span className="text-primary italic">Batch</span>
+                </h1>
+                <p className="max-w-md text-sm leading-relaxed text-on-surface-variant/80 md:text-base">
+                  Architect the parameters for your next high-performance student grouping with precision and clarity.
+                </p>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
 
-      <BatchCreateForm />
+        <div className="animate-fade-in [animation-delay:200ms]">
+          <BatchCreateForm />
+        </div>
+      </div>
     </div>
   );
 }
