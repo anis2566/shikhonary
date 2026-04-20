@@ -1114,6 +1114,14 @@ export type ExamUpdatetopicIdsInput = {
   push?: string | string[]
 }
 
+export type NullableIntFieldUpdateOperationsInput = {
+  set?: number | null
+  increment?: number
+  decrement?: number
+  multiply?: number
+  divide?: number
+}
+
 export type ExamUpdatemcqIdsInput = {
   set?: string[]
   push?: string | string[]

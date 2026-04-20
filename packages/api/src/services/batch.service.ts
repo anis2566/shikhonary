@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { type TenantClient } from "@workspace/db";
+import { type TenantClient, type PrismaClient } from "@workspace/db";
 import { handlePrismaError } from "../middleware/error-handler";
 import {
   batchFormSchema,
@@ -24,7 +24,10 @@ export class BatchService {
   /**
    * Note: This service expects a Tenant-specific Prisma Client
    */
-  constructor(private db: TenantClient) {}
+  constructor(
+    private db: TenantClient,
+    private mainDb: PrismaClient,
+  ) {}
 
   async list(input: listInputType) {
     try {
@@ -132,9 +135,16 @@ export class BatchService {
   async create(input: BatchFormValues) {
     try {
       const { academicYear, ...data } = batchFormSchema.parse(input);
+      const academicClass = await this.mainDb.academicClass.findUnique({
+        where: { id: data.academicClassId },
+      });
+      if (!academicClass) throw new Error("Academic class not found");
       // Prisma expects academicYearId, which is already in 'data'
       return await this.db.batch.create({
-        data,
+        data: {
+          ...data,
+          className: academicClass.name,
+        },
       });
     } catch (error) {
       handlePrismaError(error);

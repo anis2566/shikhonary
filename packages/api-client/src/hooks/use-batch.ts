@@ -2,6 +2,7 @@
 
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -173,7 +174,7 @@ export function useBulkDeleteBatches() {
 export function useBatches() {
   const trpc = useTRPC();
   const [filters] = useBatchFilters();
-  return useSuspenseQuery({
+  return useQuery({
     ...trpc.batch.list.queryOptions(filters),
     select: (data) => data.data,
   });
@@ -195,8 +196,9 @@ export function useBatchById(id: string) {
  */
 export function useBatchStats() {
   const trpc = useTRPC();
-  return useSuspenseQuery({
+  return useQuery({
     ...trpc.batch.getStats.queryOptions(),
     select: (data) => data.data,
   });
 }
+

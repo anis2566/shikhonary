@@ -99,14 +99,21 @@ export const academicYearRouter = createTRPCRouter({
     };
   }),
 
-  forSelection: tenantProcedure
-    .input(forSelectionInput)
-    .query(async ({ ctx, input }) => {
-      const service = new AcademicYearService(ctx.tenantClient);
-      const data = await service.forSelection(input);
-      return {
-        success: true,
-        data,
-      };
-    }),
+  getTimeline: tenantProcedure.query(async ({ ctx }) => {
+    const service = new AcademicYearService(ctx.tenantClient);
+    const data = await service.getTimeline();
+    return {
+      success: true,
+      data,
+    };
+  }),
+
+  forSelection: tenantProcedure.query(async ({ ctx }) => {
+    const service = new AcademicYearService(ctx.tenantClient);
+    const data = await service.forSelection();
+    return {
+      success: true,
+      data,
+    };
+  }),
 } satisfies TRPCRouterRecord);

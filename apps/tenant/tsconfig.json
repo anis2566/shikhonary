@@ -18,7 +18,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "../../packages/ui/src/hooks/use-delete.ts"
+    "../../packages/ui/src/hooks/use-delete.ts",
+    "modules/academic-year/ui/form/academic-year-edit-formtsx"
   ],
   "exclude": ["node_modules"]
 }

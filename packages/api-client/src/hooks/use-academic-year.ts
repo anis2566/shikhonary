@@ -206,10 +206,18 @@ export function useCurrentAcademicYear() {
   });
 }
 
-export function useAcademicYearsForSelection(input: forSelectionInputType) {
+export function useGetTimeline() {
+  const trpc = useTRPC();
+  return useSuspenseQuery({
+    ...trpc.academicYear.getTimeline.queryOptions(),
+    select: (data) => data.data,
+  });
+}
+
+export function useAcademicYearsForSelection() {
   const trpc = useTRPC();
   return useQuery({
-    ...trpc.academicYear.forSelection.queryOptions(input),
+    ...trpc.academicYear.forSelection.queryOptions(),
     select: (data) => data.data,
   });
 }

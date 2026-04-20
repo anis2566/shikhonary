@@ -9,7 +9,6 @@ export const batchFormSchema = z.object({
   academicYearId: uuidSchema,
   academicClassId: uuidSchema.or(z.string().min(1, "Please select a class")),
   name: nameSchema,
-  displayName: nameSchema.optional().or(z.literal("")),
   academicYear: z.string().min(4, "Invalid year").max(20),
   capacity: z.coerce
     .number()

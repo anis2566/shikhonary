@@ -3,13 +3,12 @@ import { SearchParams } from "nuqs";
 
 import { HydrateClient, prefetch, trpc } from "@/trpc/server";
 
-import { AcademicYearsView } from "@/modules/academic-year/ui/views/academic-years-view";
-import DashboardHeader from "@/modules/layout/ui/layout/dashboard-header";
+import { AcademicYearListView } from "@/modules/academic-year/ui/views/academic-year-list-view";
 import { academicYearLoader } from "@workspace/api-client/filters-server";
 
 export const metadata: Metadata = {
-  title: "Academic-Years",
-  description: "Academic-Years",
+  title: "Academic Years",
+  description: "Academic Years",
 };
 
 interface Props {
@@ -19,16 +18,12 @@ interface Props {
 const AcademicYears = async ({ searchParams }: Props) => {
   const params = await academicYearLoader(searchParams);
 
-  prefetch(trpc.academicYear.getStats.queryOptions());
+  prefetch(trpc.academicYear.getTimeline.queryOptions());
   prefetch(trpc.academicYear.list.queryOptions(params));
 
   return (
     <HydrateClient>
-      <DashboardHeader
-        title="Academic-Years"
-        subtitle="Manage academic-years"
-      />
-      <AcademicYearsView />
+      <AcademicYearListView />
     </HydrateClient>
   );
 };

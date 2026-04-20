@@ -32,7 +32,12 @@ export class AcademicYearService {
     try {
       const where = buildWhere(input, ["name"]);
       if (input.isActive !== null) where.isActive = input.isActive;
-      if (input.isCurrent !== null) where.isCurrent = input.isCurrent;
+
+      let orderBy: any = buildOrderBy(input);
+      if (input.sortBy === "newest") orderBy = { startDate: "desc" };
+      if (input.sortBy === "oldest") orderBy = { startDate: "asc" };
+      if (input.sortBy === "name-asc") orderBy = { name: "asc" };
+      if (input.sortBy === "name-desc") orderBy = { name: "desc" };
 
       const [items, total] = await Promise.all([
         this.db.academicYear.findMany({
@@ -45,7 +50,7 @@ export class AcademicYearService {
               },
             },
           },
-          orderBy: buildOrderBy(input),
+          orderBy,
           ...buildPagination(input),
         }),
         this.db.academicYear.count({ where }),
@@ -108,11 +113,27 @@ export class AcademicYearService {
     }
   }
 
-  async forSelection(input: forSelectionInputType) {
+  async getTimeline() {
     try {
-      const where = buildWhere(input, ["name"]);
       const items = await this.db.academicYear.findMany({
-        where: { isActive: true, ...where },
+        orderBy: {
+          startDate: "asc",
+        },
+      });
+      const currentYear = await this.getCurrent();
+      return {
+        data: items,
+        currentId: currentYear?.id,
+      };
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async forSelection() {
+    try {
+      const items = await this.db.academicYear.findMany({
+        where: { isActive: true },
         select: {
           id: true,
           name: true,

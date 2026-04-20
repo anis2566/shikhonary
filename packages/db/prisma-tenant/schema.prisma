@@ -60,8 +60,8 @@ model Batch {
     id              String   @id @default(uuid())
     name            String
     academicClassId String
-    className       String?
-    capacity        Int?     @default(50)
+    className       String
+    capacity        Int      @default(50)
     currentSize     Int      @default(0)
     isActive        Boolean  @default(true)
     createdAt       DateTime @default(now())

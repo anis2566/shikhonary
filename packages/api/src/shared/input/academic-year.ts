@@ -4,7 +4,6 @@ import { academicYearSchema } from "@workspace/schema";
 
 export const listInput = baseListInputSchema.extend({
   isActive: z.boolean().nullable(),
-  isCurrent: z.boolean().nullable(),
 });
 
 export type listInputType = z.infer<typeof listInput>;

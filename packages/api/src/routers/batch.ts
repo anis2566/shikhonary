@@ -11,7 +11,7 @@ import { batchFormSchema } from "@workspace/schema";
 
 export const batchRouter = createTRPCRouter({
   list: tenantProcedure.input(listInput).query(async ({ ctx, input }) => {
-    const service = new BatchService(ctx.tenantClient);
+    const service = new BatchService(ctx.tenantClient, ctx.db);
     const data = await service.list(input);
     return {
       success: true,
@@ -20,7 +20,7 @@ export const batchRouter = createTRPCRouter({
   }),
 
   getById: tenantProcedure.input(idSchema).query(async ({ ctx, input }) => {
-    const service = new BatchService(ctx.tenantClient);
+    const service = new BatchService(ctx.tenantClient, ctx.db);
     const data = await service.getById(input);
     return {
       success: true,
@@ -29,7 +29,7 @@ export const batchRouter = createTRPCRouter({
   }),
 
   getDetails: tenantProcedure.input(idSchema).query(async ({ ctx, input }) => {
-    const service = new BatchService(ctx.tenantClient);
+    const service = new BatchService(ctx.tenantClient, ctx.db);
     const data = await service.getDetails(input);
     return {
       success: true,
@@ -40,7 +40,7 @@ export const batchRouter = createTRPCRouter({
   create: baseTenantMutationProcedure
     .input(batchFormSchema)
     .mutation(async ({ ctx, input }) => {
-      const service = new BatchService(ctx.tenantClient);
+      const service = new BatchService(ctx.tenantClient, ctx.db);
       const data = await service.create(input);
       return {
         success: true,
@@ -52,7 +52,7 @@ export const batchRouter = createTRPCRouter({
   update: baseTenantMutationProcedure
     .input(updateBatchSchema)
     .mutation(async ({ ctx, input }) => {
-      const service = new BatchService(ctx.tenantClient);
+      const service = new BatchService(ctx.tenantClient, ctx.db);
       const data = await service.update(input);
       return {
         success: true,
@@ -64,7 +64,7 @@ export const batchRouter = createTRPCRouter({
   delete: baseTenantMutationProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const service = new BatchService(ctx.tenantClient);
+      const service = new BatchService(ctx.tenantClient, ctx.db);
       const data = await service.delete(input.id);
       return {
         success: true,
@@ -76,7 +76,7 @@ export const batchRouter = createTRPCRouter({
   bulkDelete: baseTenantMutationProcedure
     .input(z.object({ ids: z.array(z.string()) }))
     .mutation(async ({ ctx, input }) => {
-      const service = new BatchService(ctx.tenantClient);
+      const service = new BatchService(ctx.tenantClient, ctx.db);
       const data = await service.bulkDelete(input.ids);
       return {
         success: true,
@@ -86,7 +86,7 @@ export const batchRouter = createTRPCRouter({
     }),
 
   getStats: tenantProcedure.query(async ({ ctx }) => {
-    const service = new BatchService(ctx.tenantClient);
+    const service = new BatchService(ctx.tenantClient, ctx.db);
     const data = await service.getStats();
     return {
       success: true,
@@ -97,7 +97,7 @@ export const batchRouter = createTRPCRouter({
   toggleActive: baseTenantMutationProcedure
     .input(z.object({ id: z.string() }))
     .mutation(async ({ ctx, input }) => {
-      const service = new BatchService(ctx.tenantClient);
+      const service = new BatchService(ctx.tenantClient, ctx.db);
       const data = await service.toggleActive(input.id);
       return {
         success: true,
@@ -109,7 +109,7 @@ export const batchRouter = createTRPCRouter({
   bulkToggleActive: baseTenantMutationProcedure
     .input(z.object({ ids: z.array(z.string()), isActive: z.boolean() }))
     .mutation(async ({ ctx, input }) => {
-      const service = new BatchService(ctx.tenantClient);
+      const service = new BatchService(ctx.tenantClient, ctx.db);
       const data = await service.bulkToggleActive(input.ids, input.isActive);
       return {
         success: true,
