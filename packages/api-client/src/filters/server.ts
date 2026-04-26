@@ -13,6 +13,9 @@ import {
   subscriptionFilterSchema,
   questionTypeFilterSchema,
   academicYearFilterSchema,
+  counterFilterSchema,
+  admissionFeeFilterSchema,
+  monthlyFeeFilterSchema,
 } from "./schema";
 
 export const academicClassLoader = createLoader(academicClassFilterSchema);
@@ -32,3 +35,6 @@ export const subscriptionPlanLoader = createLoader(
 export const subscriptionLoader = createLoader(subscriptionFilterSchema);
 export const questionTypeLoader = createLoader(questionTypeFilterSchema);
 export const academicYearLoader = createLoader(academicYearFilterSchema);
+export const counterLoader = createLoader(counterFilterSchema);
+export const admissionFeeLoader = createLoader(admissionFeeFilterSchema);
+export const monthlyFeeLoader = createLoader(monthlyFeeFilterSchema);

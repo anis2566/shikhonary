@@ -1,33 +1,20 @@
 "use client";
 
 import {
+  BookOpen,
+  Calendar,
   Edit,
   Eye,
-  Loader2,
+  Hash,
+  Layers,
   MoreHorizontal,
-  ToggleLeft,
-  ToggleRight,
   Trash2,
   Users,
 } from "lucide-react";
-import { Badge } from "@workspace/ui/components/badge";
-import { Button } from "@workspace/ui/components/button";
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from "@workspace/ui/components/table";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@workspace/ui/components/avatar";
 import { cn } from "@workspace/ui/lib/utils";
+import { Button } from "@workspace/ui/components/button";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 import { TenantTypes } from "@workspace/db";
-import { motion } from "framer-motion";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -53,212 +40,216 @@ interface BatchTableProps {
   onDelete: (id: string, name: string) => void;
 }
 
-export function BatchTable({
-  batches = [],
+export const BatchTable = ({
+  batches,
   isLoading,
-  onToggleActive,
   onDelete,
-}: BatchTableProps) {
+}: BatchTableProps) => {
+  if (isLoading) {
+    return (
+      <div className="bg-surface-container-lowest overflow-hidden border-t border-surface-container">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left border-collapse">
+            <thead>
+              <tr className="bg-surface-container-low/50">
+                <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant border-b border-surface-container">
+                  Batch Name
+                </th>
+                <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant border-b border-surface-container">
+                  Class & Year
+                </th>
+                <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant border-b border-surface-container">
+                  Capacity
+                </th>
+                <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant border-b border-surface-container">
+                  Status
+                </th>
+                <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant text-right border-b border-surface-container">
+                  Actions
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-surface-container">
+              {[...Array(5)].map((_, i) => (
+                <tr key={i}>
+                  <td className="py-5 px-6">
+                    <div className="flex items-center gap-3">
+                      <Skeleton className="w-10 h-10 rounded-lg bg-slate-100/50" />
+                      <Skeleton className="h-5 w-32 bg-slate-100/50" />
+                    </div>
+                  </td>
+                  <td className="py-5 px-6">
+                    <div className="space-y-2">
+                      <Skeleton className="h-4 w-24 bg-slate-100/50" />
+                      <Skeleton className="h-4 w-28 bg-slate-100/50" />
+                    </div>
+                  </td>
+                  <td className="py-5 px-6">
+                    <Skeleton className="h-5 w-20 bg-slate-100/50" />
+                  </td>
+                  <td className="py-5 px-6">
+                    <Skeleton className="h-6 w-16 bg-slate-100/50 rounded-full" />
+                  </td>
+                  <td className="py-5 px-6">
+                    <div className="flex justify-end">
+                      <Skeleton className="w-10 h-10 rounded-lg bg-slate-100/50" />
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    );
+  }
+
+  if (batches.length === 0) {
+    return (
+      <div className="bg-surface-container-lowest py-20 flex flex-col items-center justify-center text-center space-y-4 border-t border-surface-container">
+        <div className="w-20 h-20 bg-slate-50 rounded-full flex items-center justify-center text-slate-300">
+          <Layers size={40} />
+        </div>
+        <div className="space-y-1">
+          <h3 className="text-xl font-bold text-slate-900 tracking-tight">
+            No batches found
+          </h3>
+          <p className="text-slate-500 max-w-xs mx-auto text-sm leading-relaxed">
+            There are no batches matching your criteria. Try adjusting your
+            filters or add a new one.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-100 overflow-hidden">
-      <Table>
-        <TableHeader>
-          <TableRow className="bg-slate-50/50 hover:bg-slate-50/50">
-            <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-              Batch Name
-            </TableHead>
-            <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-              Class
-            </TableHead>
-            <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-              Academic Year
-            </TableHead>
-            <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-              Capacity
-            </TableHead>
-            <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-              Students
-            </TableHead>
-            <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-slate-500">
-              Status
-            </TableHead>
-            <TableHead className="px-8 py-5 text-xs font-bold uppercase tracking-widest text-slate-500 text-right">
-              Actions
-            </TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {batches &&
-            batches.map((batch, i) => (
-              <motion.tr
+    <div className="bg-surface-container-lowest overflow-hidden animate-in fade-in zoom-in-95 duration-500 border-t border-surface-container">
+      <div className="overflow-x-auto">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="bg-surface-container-low/50">
+              <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant border-b border-surface-container">
+                Batch Name
+              </th>
+              <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant border-b border-surface-container">
+                Class & Year
+              </th>
+              <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant border-b border-surface-container">
+                Capacity
+              </th>
+              <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant border-b border-surface-container">
+                Status
+              </th>
+              <th className="py-3 px-6 font-semibold text-sm text-on-surface-variant text-right border-b border-surface-container">
+                Actions
+              </th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-surface-container">
+            {batches.map((batch, index) => (
+              <tr
                 key={batch.id}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.05 }}
-                className="border-b border-slate-50 transition-colors hover:bg-slate-50/50 group cursor-default"
+                className="hover:bg-surface-container-low/30 transition-colors group"
+                style={{ animationDelay: `${index * 50}ms` }}
               >
-                <TableCell className="px-8 py-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-lg bg-emerald-50 flex items-center justify-center text-emerald-600 transition-colors group-hover:bg-emerald-100">
-                      <Users className="w-5 h-5" />
+                <td className="py-5 px-6">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className={cn(
+                        "w-10 h-10 rounded bg-surface-container flex items-center justify-center transition-colors group-hover:bg-white",
+                        index % 3 === 0
+                          ? "text-primary"
+                          : "text-on-surface-variant",
+                      )}
+                    >
+                      <Layers size={20} strokeWidth={2.5} />
                     </div>
-                    <div>
-                      <div className="font-bold text-slate-900 group-hover:text-emerald-700 transition-colors line-clamp-1">
-                        {batch.name}
-                      </div>
-                      <div className="text-sm text-slate-500">Morning</div>
-                    </div>
-                  </div>
-                </TableCell>
-                <TableCell className="px-8 py-6">
-                  <span className="font-medium text-slate-700">
-                    {batch.className}
-                  </span>
-                </TableCell>
-                <TableCell className="px-8 py-6">
-                  <span className="font-medium text-slate-700">
-                    {batch.academicYear.name}
-                  </span>
-                </TableCell>
-                <TableCell className="px-8 py-6">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-900">
-                      {batch._count.students}/{batch.capacity}
+                    <span className="text-base font-semibold text-on-surface tracking-tight">
+                      {batch.name}
                     </span>
-                    {batch._count.students / batch.capacity > 0.9 && (
-                      <div
-                        className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"
-                        title="Near Capacity"
-                      />
-                    )}
                   </div>
-                </TableCell>
-                <TableCell className="px-8 py-6">
-                  <div className="flex -space-x-2">
-                    {[1, 2].map((i) => (
-                      <Avatar
-                        key={i}
-                        className="w-8 h-8 border-2 border-white ring-1 ring-slate-100"
-                      >
-                        <AvatarImage
-                          src={`https://i.pravatar.cc/150?u=${batch.id}${i}`}
-                        />
-                        <AvatarFallback className="text-[10px]">
-                          ST
-                        </AvatarFallback>
-                      </Avatar>
-                    ))}
-                    {batch._count.students > 2 && (
-                      <div className="w-8 h-8 rounded-full bg-slate-100 border-2 border-white flex items-center justify-center text-[10px] font-bold text-slate-500 ring-1 ring-slate-100">
-                        +{batch._count.students - 2}
-                      </div>
-                    )}
+                </td>
+                <td className="py-5 px-6">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2">
+                      <BookOpen size={16} className="text-emerald-500" />
+                      <span className="text-sm font-bold tracking-tight text-on-surface">
+                        {batch.className}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Calendar size={14} className="text-on-surface-variant/60" />
+                      <span className="text-xs font-medium text-on-surface-variant">
+                        {batch.academicYear.name}
+                      </span>
+                    </div>
                   </div>
-                </TableCell>
-                <TableCell className="px-8 py-6">
-                  <Badge
-                    variant={batch.isActive ? "default" : "outline"}
+                </td>
+                <td className="py-5 px-6">
+                  <div className="flex items-center gap-2">
+                    <Users size={16} className="text-emerald-500" />
+                    <span className="text-sm font-bold tracking-tight text-on-surface">
+                      {batch._count.students} / {batch.capacity}
+                    </span>
+                  </div>
+                </td>
+                <td className="py-5 px-6">
+                  <span
                     className={cn(
-                      "font-bold tracking-wide rounded-full px-3 py-1 border-none shadow-none",
+                      "px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider border",
                       batch.isActive
-                        ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-100"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200",
+                        ? "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-sm"
+                        : "bg-slate-50 text-slate-400 border-slate-100",
                     )}
                   >
                     {batch.isActive ? "Active" : "Inactive"}
-                  </Badge>
-                </TableCell>
-                <TableCell className="px-8 py-7 text-right">
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        className="text-slate-400 hover:text-emerald-600 transition-all cursor-pointer rounded-lg hover:bg-emerald-50 outline-none focus:outline-none focus:ring-0"
-                      >
-                        <MoreHorizontal className="w-5 h-5" />
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end" className="w-40">
-                      <DropdownMenuItem
-                        className="cursor-pointer font-medium text-slate-600"
-                        asChild
-                      >
-                        <Link href={`/batches/${batch.id}`}>
-                          <Eye className="w-4 h-4 mr-2" /> View
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer font-medium text-slate-600"
-                        asChild
-                      >
-                        <Link href={`/batches/edit/${batch.id}`}>
-                          <Edit className="w-4 h-4 mr-2" /> Edit
-                        </Link>
-                      </DropdownMenuItem>
-                      <DropdownMenuItem
-                        className="cursor-pointer font-medium p-2 rounded-lg"
-                        onClick={() => onToggleActive(batch.id)}
-                      >
-                        {batch.isActive ? (
-                          <>
-                            <ToggleLeft className="h-4 w-4 mr-2 text-amber-500 opacity-70" />
-                            Deactivate
-                          </>
-                        ) : (
-                          <>
-                            <ToggleRight className="h-4 w-4 mr-2 text-green-500 opacity-70" />
-                            Activate
-                          </>
-                        )}
-                      </DropdownMenuItem>
-                      <DropdownMenuSeparator />
-                      <DropdownMenuItem
-                        className="text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer font-medium"
-                        onClick={() => onDelete(batch.id, batch.name)}
-                      >
-                        <Trash2 className="w-4 h-4 mr-2" /> Delete
-                      </DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </motion.tr>
+                  </span>
+                </td>
+                <td className="py-5 px-6 text-right">
+                  <div className="flex justify-end gap-2">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      asChild
+                      className="text-slate-400 hover:text-emerald-600 transition-all cursor-pointer rounded-lg hover:bg-emerald-50"
+                    >
+                      <Link href={`/batches/${batch.id}`}>
+                        <Eye className="w-5 h-5" />
+                      </Link>
+                    </Button>
+                    <DropdownMenu>
+                      <DropdownMenuTrigger asChild>
+                        <Button
+                          variant="ghost"
+                          size="icon"
+                          className="text-slate-400 hover:text-emerald-600 transition-all cursor-pointer rounded-lg hover:bg-emerald-50 outline-none focus:outline-none focus:ring-0"
+                        >
+                          <MoreHorizontal className="w-5 h-5" />
+                        </Button>
+                      </DropdownMenuTrigger>
+                      <DropdownMenuContent align="end" className="w-40">
+                        <DropdownMenuItem asChild className="cursor-pointer font-medium text-slate-600">
+                          <Link href={`/batches/edit/${batch.id}`}>
+                            <Edit className="w-4 h-4 mr-2" /> Edit
+                          </Link>
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          className="text-red-600 focus:text-red-700 focus:bg-red-50 cursor-pointer font-medium"
+                          onClick={() => onDelete(batch.id, batch.name)}
+                        >
+                          <Trash2 className="w-4 h-4 mr-2" /> Delete
+                        </DropdownMenuItem>
+                      </DropdownMenuContent>
+                    </DropdownMenu>
+                  </div>
+                </td>
+              </tr>
             ))}
-
-          {isLoading && (
-            <TableRow>
-              <TableCell colSpan={7} className="px-8 py-20 text-center">
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <Loader2 className="w-8 h-8 animate-spin text-emerald-600" />
-                  <p className="text-slate-500 font-medium text-sm">
-                    Loading batches...
-                  </p>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-
-          {!isLoading && batches.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={7} className="px-8 py-20 text-center">
-                <div className="flex flex-col items-center justify-center gap-4">
-                  <div className="w-16 h-16 rounded-full bg-slate-50 flex items-center justify-center">
-                    <Users className="w-8 h-8 text-slate-200" />
-                  </div>
-                  <div>
-                    <p className="text-slate-900 font-bold text-base">
-                      No batches found
-                    </p>
-                    <p className="text-slate-500 text-sm mt-1">
-                      Adjust your filters or add a new batch to get started
-                    </p>
-                  </div>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </tbody>
+        </table>
+      </div>
     </div>
   );
-}
+};

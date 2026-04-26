@@ -14,14 +14,14 @@ export const BatchesView = () => {
   const deleteMutation = useDeleteBatch();
   const toggleActiveMutation = useToggleBatchActive();
 
-  const academicYears = batches?.items || [];
-  const total = batches?.total || academicYears.length;
+  const batchItems = batches?.items || [];
+  const total = batches?.total || batchItems.length;
 
   const toggleActive = async (id: string) => {
     await toggleActiveMutation.mutateAsync({ id });
   };
 
-  const handleDeleteAcademicYear = (id: string, name: string) => {
+  const handleDeleteBatch = (id: string, name: string) => {
     openDeleteModal({
       entityId: id,
       entityType: "batch",
@@ -39,15 +39,25 @@ export const BatchesView = () => {
         <List
           batches={batches?.items ?? []}
           isLoading={isLoading}
+          total={total}
           onToggleActive={toggleActive}
-          onDelete={handleDeleteAcademicYear}
+          onDelete={handleDeleteBatch}
         />
       </div>
 
       {/* Mobile View */}
       <div className="md:hidden">
-        <MobileList />
+        <MobileList
+          isLoading={isLoading}
+          batches={batches?.items ?? []}
+          total={total}
+          onToggleActive={toggleActive}
+          onDelete={handleDeleteBatch}
+        />
       </div>
+      {/* Floating Background Decorative Elements */}
+      <div className="fixed top-[20%] -left-16 w-64 h-64 bg-emerald-200/20 rounded-full blur-3xl -z-10 pointer-events-none" />
+      <div className="fixed bottom-[10%] -right-16 w-80 h-80 bg-emerald-300/10 rounded-full blur-3xl -z-10 pointer-events-none" />
     </>
   );
 };

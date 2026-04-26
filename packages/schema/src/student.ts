@@ -1,5 +1,11 @@
 import { z } from "zod";
-import { GENDER, BLOOD_GROUP, RELIGION } from "@workspace/utils/constants";
+import {
+  GENDER,
+  BLOOD_GROUP,
+  RELIGION,
+  NATIONALITY,
+  SHIFT,
+} from "@workspace/utils/constants";
 import {
   nameSchema,
   emailSchema,
@@ -16,88 +22,72 @@ import {
  */
 
 export const studentFormSchema = z.object({
-  // Personal Info
-  firstName: nameSchema,
-  lastName: nameSchema,
-  email: emailSchema.optional().or(z.literal("")),
-  phone: bdPhoneSchema,
-  dateOfBirth: z.coerce.date({
-    errorMap: () => ({ message: "Please provide a valid date of birth" }),
-  }),
-  gender: z.nativeEnum(GENDER),
-  bloodGroup: z.nativeEnum(BLOOD_GROUP).optional().nullable(),
-  religion: z.nativeEnum(RELIGION).optional().nullable(),
-  nationality: z.string().default("Bangladeshi"),
-
-  // Academic Info
   studentId: z.string().min(1, "Student ID is required"),
-  academicClassId: uuidSchema.or(z.string().min(1, "Please select a class")),
-  batchId: uuidSchema.or(z.string().min(1, "Please select a batch")),
-  rollNo: z.string().optional().or(z.literal("")),
-  session: z.string().min(1, "Session is required"),
-
-  // Guardian Info
-  guardianName: nameSchema,
-  guardianPhone: bdPhoneSchema,
-  guardianEmail: emailSchema.optional().or(z.literal("")),
-  relationToGuardian: z.string().min(1, "Relation to guardian is required"),
-
-  // Address
-  presentAddress: addressSchema,
-  presentCity: citySchema,
-  presentState: stateSchema,
-  presentPostalCode: postalCodeSchema,
-
-  sameAsPresentAddress: z.boolean().default(true),
-
-  permanentAddress: addressSchema.optional().or(z.literal("")),
-  permanentCity: citySchema.optional().or(z.literal("")),
-  permanentState: stateSchema.optional().or(z.literal("")),
-  permanentPostalCode: postalCodeSchema,
-
-  // Status
-  isActive: z.boolean().default(true),
+  name: z.string().min(1, "Name is required"),
+  email: emailSchema.optional().or(z.literal("")),
+  academicClassId: uuidSchema,
+  batchId: uuidSchema.nullable().optional(),
+  institute: z.string().min(1, "Institute is required"),
+  roll: z.string().min(1, "Roll is required"),
+  group: z.string().optional(),
+  shift: z.string().optional(),
+  section: z.string().optional(),
+  fatherName: z.string().min(1, "Father name is required"),
+  motherName: z.string().min(1, "Mother name is required"),
+  dateOfBirth: z.date().optional(),
+  gender: z.string().min(1, "Gender is required"),
+  bloodGroup: z.string().optional(),
+  nationality: z.string().min(1, "Nationality is required"),
+  religion: z.string().min(1, "Religion is required"),
+  imageUrl: z.string().optional(),
+  primaryPhone: z.string().length(11, "Phone number must be 11 digits"),
+  secondaryPhone: z
+    .string()
+    .length(11, "Phone number must be 11 digits")
+    .optional(),
+  presentAddress: z.string().min(1, "Present address is required"),
+  permanentAddress: z.string().min(1, "Permanent address is required"),
+  isActive: z.boolean(),
+  academicYearId: uuidSchema,
+  admissionFee: z.number().int().min(0, "Admission fee must be at least 0"),
+  monthlyFee: z.number().int().min(0, "Monthly fee must be at least 0"),
 });
 
 export type StudentFormValues = z.infer<typeof studentFormSchema>;
 
 export const defaultStudentValues: Partial<StudentFormValues> = {
-  firstName: "",
-  lastName: "",
-  email: "",
-  phone: "",
-  gender: GENDER.MALE,
-  bloodGroup: null,
-  religion: RELIGION.ISLAM,
-  nationality: "Bangladeshi",
   studentId: "",
+  name: "",
+  email: "",
   academicClassId: "",
   batchId: "",
-  rollNo: "",
-  session: new Date().getFullYear().toString(),
-  guardianName: "",
-  guardianPhone: "",
-  guardianEmail: "",
-  relationToGuardian: "",
+  institute: "",
+  roll: "",
+  group: "",
+  shift: SHIFT.DAY,
+  section: "",
+  fatherName: "",
+  motherName: "",
+  dateOfBirth: new Date(),
+  gender: GENDER.MALE,
+  bloodGroup: "",
+  nationality: NATIONALITY.BANGLADESHI,
+  religion: RELIGION.ISLAM,
+  imageUrl: "",
+  primaryPhone: "",
+  secondaryPhone: "",
   presentAddress: "",
-  presentCity: "",
-  presentState: "",
-  presentPostalCode: "",
-  sameAsPresentAddress: true,
   permanentAddress: "",
-  permanentCity: "",
-  permanentState: "",
-  permanentPostalCode: "",
   isActive: true,
+  academicYearId: "",
+  admissionFee: 0,
+  monthlyFee: 0,
 };
 
 export const updateStudentSchema = studentFormSchema.partial();
 
 export const studentSchema = studentFormSchema.extend({
   id: uuidSchema,
-  name: z.string(), // firstName + lastName computed
-  createdAt: z.date(),
-  updatedAt: z.date(),
 });
 
 export type Student = z.infer<typeof studentSchema>;

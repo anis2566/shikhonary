@@ -117,4 +117,28 @@ export const batchRouter = createTRPCRouter({
         data,
       };
     }),
+  forSelection: tenantProcedure.query(async ({ ctx }) => {
+    const service = new BatchService(ctx.tenantClient, ctx.db);
+    const data = await service.forSelection();
+    return {
+      success: true,
+      data,
+    };
+  }),
+
+  getByYearClassId: tenantProcedure
+    .input(
+      z.object({
+        academicYearId: z.string().optional(),
+        academicClassId: z.string().optional(),
+      }),
+    )
+    .query(async ({ ctx, input }) => {
+      const service = new BatchService(ctx.tenantClient, ctx.db);
+      const data = await service.getByYearClassId(input);
+      return {
+        success: true,
+        data,
+      };
+    }),
 } satisfies TRPCRouterRecord);

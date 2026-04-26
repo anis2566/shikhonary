@@ -1,3 +1,4 @@
+import React from "react";
 import { AnimatePresence } from "framer-motion";
 import { Header } from "./header";
 import { TenantTypes } from "@workspace/db";
@@ -5,6 +6,7 @@ import { YearCard } from "./card";
 import { Card } from "@workspace/ui/components/card";
 import { Calendar } from "lucide-react";
 import { Pagination } from "../../desktop/list/pagination";
+import { Skeleton } from "@workspace/ui/components/skeleton";
 
 interface AcademicYearWithRelations extends TenantTypes.AcademicYear {
   _count: {
@@ -33,11 +35,42 @@ export const MobileList = ({
       <main className="flex-grow px-6 py-4 flex flex-col gap-6">
         <AnimatePresence mode="popLayout">
           {isLoading ? (
-            Array.from({ length: 3 }).map((_, i) => (
+            Array.from({ length: 4 }).map((_, i) => (
               <div
                 key={`skeleton-${i}`}
-                className="bg-surface-container-lowest rounded-2xl p-5 shadow-ambient animate-pulse h-52 border border-outline-variant/10"
-              />
+                className="bg-surface-container-lowest rounded-2xl p-5 shadow-ambient relative overflow-hidden border border-outline-variant/10 space-y-4"
+              >
+                <div className="absolute top-0 left-0 w-1.5 h-full bg-slate-100/50"></div>
+                <div className="flex justify-between items-start">
+                  <div className="space-y-2 flex-1">
+                    <div className="flex gap-2">
+                      <Skeleton className="h-7 w-24 bg-slate-100/50" />
+                      <Skeleton className="h-5 w-16 rounded-full bg-slate-100/50" />
+                    </div>
+                    <Skeleton className="h-4 w-1/2 bg-slate-100/50" />
+                  </div>
+                  <div className="text-right space-y-1">
+                    <Skeleton className="h-3 w-12 bg-slate-100/50 ml-auto" />
+                    <Skeleton className="h-6 w-10 bg-slate-100/50 ml-auto" />
+                  </div>
+                </div>
+
+                <Skeleton className="h-1.5 w-full rounded-full bg-slate-100/50" />
+
+                <div className="grid grid-cols-2 gap-4">
+                  <Skeleton className="h-14 rounded-xl bg-slate-100/50" />
+                  <Skeleton className="h-14 rounded-xl bg-slate-100/50" />
+                </div>
+
+                <div className="flex gap-2 bg-slate-50/50 rounded-xl p-1">
+                  <Skeleton className="h-9 flex-1 rounded-lg bg-slate-100/50" />
+                  <div className="flex gap-1">
+                    <Skeleton className="h-9 w-9 rounded-lg bg-slate-100/50" />
+                    <Skeleton className="h-9 w-9 rounded-lg bg-slate-100/50" />
+                    <Skeleton className="h-9 w-9 rounded-lg bg-slate-100/50" />
+                  </div>
+                </div>
+              </div>
             ))
           ) : academicYears.length > 0 ? (
             academicYears.map((ay, i) => (

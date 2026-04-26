@@ -1,13 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import {
-  Search,
-  LayoutGrid,
-  List as ListIcon,
-  X,
-  RotateCcw,
-} from "lucide-react";
+import { Search, RotateCcw, X, LayoutGrid, List as ListIcon } from "lucide-react";
 import { Input } from "@workspace/ui/components/input";
 import { Button } from "@workspace/ui/components/button";
 import {
@@ -23,10 +17,10 @@ import {
   useBatchFilters,
 } from "@workspace/api-client";
 import { useDebounce } from "@workspace/ui/hooks/use-debounce";
-import { cn } from "@workspace/ui/lib/utils";
 import { Badge } from "@workspace/ui/components/badge";
 import { motion, AnimatePresence } from "framer-motion";
 import { DEFAULT_PAGE, DEFAULT_PAGE_SIZE } from "@workspace/utils/constants";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface FiltersProps {
   viewMode: "table" | "grid";
@@ -38,14 +32,8 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
   const debouncedSearch = useDebounce(search, 500);
   const [filters, setFilters] = useBatchFilters();
 
-  const { data: classes } = useAcademicClassesForSelection();
   const { data: years } = useAcademicYearsForSelection();
-
-  const class_options =
-    classes?.map((item) => ({
-      label: item.displayName,
-      value: item.id,
-    })) ?? [];
+  const { data: classes } = useAcademicClassesForSelection();
 
   const year_options =
     years?.map((item) => ({
@@ -53,35 +41,35 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
       value: item.id,
     })) ?? [];
 
+  const class_options =
+    classes?.map((item) => ({
+      label: item.displayName,
+      value: item.id,
+    })) ?? [];
+
   useEffect(() => {
-    setFilters({ search: debouncedSearch || null });
+    setFilters({ ...filters, search: debouncedSearch || null });
   }, [debouncedSearch, setFilters]);
 
-  const handleStatusChange = (status: "all" | "active" | "inactive") => {
+  const handleAcademicYearChange = (id: string) => {
     setFilters({
-      isActive:
-        status === "active" ? true : status === "inactive" ? false : null,
+      ...filters,
+      academicYearId: id === "all" ? null : id,
     });
   };
 
   const handleAcademicClassChange = (id: string) => {
     setFilters({
       ...filters,
-      academicClassId: id,
+      academicClassId: id === "all" ? null : id,
     });
   };
 
-  const handleAcademicYearChagne = (id: string) => {
+  const handleStatusChange = (status: "all" | "active" | "inactive") => {
     setFilters({
       ...filters,
-      academicYearId: id,
-    });
-  };
-
-  const handleSortChange = (value: string) => {
-    setFilters({
-      ...filters,
-      sortBy: value,
+      isActive:
+        status === "active" ? true : status === "inactive" ? false : null,
     });
   };
 
@@ -89,8 +77,8 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
     (filters.isActive !== null && filters.isActive !== undefined) ||
     !!filters.sortBy ||
     !!filters.search ||
-    !!filters.academicClassId ||
     !!filters.academicYearId ||
+    !!filters.academicClassId ||
     filters.limit !== DEFAULT_PAGE_SIZE ||
     filters.page !== DEFAULT_PAGE;
 
@@ -101,35 +89,35 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
       limit: null,
       page: null,
       sortBy: null,
-      academicClassId: null,
       academicYearId: null,
+      academicClassId: null,
       isActive: null,
     });
   };
 
   return (
-    <div className="hidden md:block bg-white border border-slate-100 rounded-2xl shadow-sm shadow-slate-200/50 overflow-hidden">
-      <div className="bg-white border border-[#bbcabf]/10 rounded-[12px] p-4 shadow-[0_24px_48px_-12px_rgba(11,28,48,0.06)] flex flex-wrap items-center gap-4">
-        <div className="relative flex-grow min-w-[240px]">
+    <div className="bg-white overflow-hidden">
+      <div className="bg-white p-4 flex flex-wrap items-center gap-4">
+        <div className="relative flex-grow min-w-[300px]">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#0b1c30]/50" />
           <Input
-            className="w-full bg-[#f8f9ff] py-2.5 pl-10 pr-4 rounded-[12px] border-none focus:ring-2 focus:ring-[#006c49]/20 text-sm text-[#0b1c30] placeholder:text-[#0b1c30]/40"
+            className="w-full bg-[#f8f9ff] py-2.5 pl-10 pr-4 rounded-[12px] border-slate-200 focus:border-none focus:ring-2 focus:ring-primary/60 text-sm text-[#0b1c30] placeholder:text-[#0b1c30]/40 h-10 transition-all"
             placeholder="Search batches..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center bg-[#f1f5f9]/50 p-1 rounded-[12px] border border-slate-100">
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleStatusChange("all")}
             className={cn(
-              "px-4 py-2 rounded-[12px] text-sm font-semibold transition-all",
+              "h-8 px-4 rounded-lg text-xs font-bold transition-all duration-200",
               filters.isActive === null
-                ? "bg-[#006c49] text-white hover:bg-[#006c49]/90"
-                : "bg-[#e5eeff] hover:bg-[#dce9ff] text-[#3c4a42]",
+                ? "bg-white text-emerald-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-white/50",
             )}
           >
             All
@@ -139,77 +127,38 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
             size="sm"
             onClick={() => handleStatusChange("active")}
             className={cn(
-              "px-4 py-2 rounded-[12px] text-sm font-medium flex items-center gap-2 transition-colors",
+              "h-8 px-4 rounded-lg text-xs font-bold transition-all duration-200",
               filters.isActive === true
-                ? "bg-[#006c49] text-white hover:bg-[#006c49]/90"
-                : "bg-[#e5eeff] hover:bg-[#dce9ff] text-[#3c4a42]",
+                ? "bg-white text-emerald-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-white/50",
             )}
           >
             Active
-            <span
-              className={cn(
-                "px-1.5 py-0.5 rounded text-[10px] font-bold",
-                filters.isActive === true
-                  ? "bg-white/20 text-white"
-                  : "bg-[#d3e4fe] text-[#0b1c30]",
-              )}
-            >
-              18
-            </span>
           </Button>
           <Button
             variant="ghost"
             size="sm"
             onClick={() => handleStatusChange("inactive")}
             className={cn(
-              "px-4 py-2 rounded-[12px] text-sm font-medium flex items-center gap-2 transition-colors",
+              "h-8 px-4 rounded-lg text-xs font-bold transition-all duration-200",
               filters.isActive === false
-                ? "bg-[#006c49] text-white hover:bg-[#006c49]/90"
-                : "bg-[#e5eeff] hover:bg-[#dce9ff] text-[#3c4a42]",
+                ? "bg-white text-emerald-700 shadow-sm"
+                : "text-slate-500 hover:text-slate-700 hover:bg-white/50",
             )}
           >
             Inactive
-            <span
-              className={cn(
-                "px-1.5 py-0.5 rounded text-[10px] font-bold",
-                filters.isActive === false
-                  ? "bg-white/20 text-white"
-                  : "bg-[#d3e4fe] text-[#0b1c30]",
-              )}
-            >
-              6
-            </span>
           </Button>
         </div>
 
-        <div className="h-6 w-px bg-[#bbcabf]/20 hidden lg:block"></div>
-
         <div className="flex items-center gap-3">
           <Select
-            value={filters.academicClassId ?? undefined}
-            onValueChange={(value) => handleAcademicClassChange(value)}
+            value={filters.academicYearId ?? "all"}
+            onValueChange={handleAcademicYearChange}
           >
-            <SelectTrigger className="bg-[#eff4ff] border-none rounded-[12px] text-sm font-medium text-[#0b1c30] w-[140px] h-10 px-4 focus:ring-2 focus:ring-[#006c49]/20">
-              <SelectValue placeholder="All Classes" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Classes</SelectItem>
-              {class_options.map((item) => (
-                <SelectItem key={item.value} value={item.value}>
-                  {item.label}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
-
-          <Select
-            value={filters.academicYearId ?? undefined}
-            onValueChange={(value) => handleAcademicYearChagne(value)}
-          >
-            <SelectTrigger className="bg-[#eff4ff] border-none rounded-[12px] text-sm font-medium text-[#0b1c30] w-[140px] h-10 px-4 focus:ring-2 focus:ring-[#006c49]/20">
+            <SelectTrigger className="bg-[#eff4ff] border-none rounded-[12px] text-sm font-semibold text-[#0b1c30] w-[150px] h-10 px-4 focus:ring-2 focus:ring-primary/20 transition-all hover:bg-[#e5eeff]">
               <SelectValue placeholder="All Years" />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="rounded-xl border-slate-100 shadow-ambient bg-white/95 backdrop-blur-md">
               <SelectItem value="all">All Years</SelectItem>
               {year_options.map((item) => (
                 <SelectItem key={item.value} value={item.value}>
@@ -218,49 +167,51 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
               ))}
             </SelectContent>
           </Select>
+
+          <Select
+            value={filters.academicClassId ?? "all"}
+            onValueChange={handleAcademicClassChange}
+          >
+            <SelectTrigger className="bg-[#eff4ff] border-none rounded-[12px] text-sm font-semibold text-[#0b1c30] w-[150px] h-10 px-4 focus:ring-2 focus:ring-primary/20 transition-all hover:bg-[#e5eeff]">
+              <SelectValue placeholder="All Classes" />
+            </SelectTrigger>
+            <SelectContent className="rounded-xl border-slate-100 shadow-ambient bg-white/95 backdrop-blur-md">
+              <SelectItem value="all">All Classes</SelectItem>
+              {class_options.map((item) => (
+                <SelectItem key={item.value} value={item.value}>
+                  {item.label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
         </div>
 
-        <Select
-          value={filters.sortBy ?? undefined}
-          onValueChange={(value) => handleSortChange(value)}
-        >
-          <SelectTrigger className="bg-[#eff4ff] border-none rounded-[12px] text-sm font-medium text-[#0b1c30] w-[140px] h-10 px-4 focus:ring-2 focus:ring-[#006c49]/20">
-            <SelectValue placeholder="Sort By" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="newest">Newest First</SelectItem>
-            <SelectItem value="oldest">Oldest First</SelectItem>
-            <SelectItem value="name-asc">Name A-Z</SelectItem>
-            <SelectItem value="name-desc">Name Z-A</SelectItem>
-          </SelectContent>
-        </Select>
-
-        <div className="ml-auto flex items-center bg-[#eff4ff] p-1 rounded-[12px]">
+        <div className="ml-auto flex items-center bg-[#f1f5f9]/50 p-1 rounded-[12px] border border-slate-100">
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onViewModeChange("grid")}
             className={cn(
-              "p-2 rounded-[10px] transition-colors",
+              "h-8 w-8 rounded-lg transition-all duration-200",
               viewMode === "grid"
-                ? "bg-white shadow-sm text-[#006c49]"
-                : "text-[#3c4a42] hover:bg-[#dce9ff]",
+                ? "bg-white shadow-sm text-emerald-600"
+                : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
             )}
           >
-            <LayoutGrid className="w-5 h-5" />
+            <LayoutGrid className="w-4 h-4" />
           </Button>
           <Button
             variant="ghost"
             size="icon"
             onClick={() => onViewModeChange("table")}
             className={cn(
-              "p-2 rounded-[10px] transition-colors",
+              "h-8 w-8 rounded-lg transition-all duration-200",
               viewMode === "table"
-                ? "bg-white shadow-sm text-[#006c49]"
-                : "text-[#3c4a42] hover:bg-[#dce9ff]",
+                ? "bg-white shadow-sm text-emerald-600"
+                : "text-slate-400 hover:text-slate-600 hover:bg-white/50",
             )}
           >
-            <ListIcon className="w-5 h-5" />
+            <ListIcon className="w-4 h-4" />
           </Button>
         </div>
       </div>
@@ -273,13 +224,16 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
           >
-            <div className="flex flex-wrap items-center gap-2 px-4 pb-4 pt-3 border-t border-slate-50 bg-slate-50/30">
+            <div className="flex flex-wrap items-center gap-2 px-4 pb-4 pt-0">
               {filters.search && (
                 <Badge
                   variant="secondary"
                   className="flex items-center gap-1.5 px-3 py-1 bg-white border border-emerald-100 text-xs text-emerald-700 shadow-sm rounded-lg hover:bg-white"
                 >
-                  <span className="font-medium text-[11px]">
+                  <span className="font-bold text-[10px] uppercase opacity-50 mr-1">
+                    Search:
+                  </span>
+                  <span className="font-bold text-[11px]">
                     {filters.search}
                   </span>
                   <button
@@ -289,7 +243,7 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
                     }}
                     className="hover:text-rose-500 transition-colors ml-1"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3 h-3 stroke-[3]" />
                   </button>
                 </Badge>
               )}
@@ -299,79 +253,69 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
                   variant="secondary"
                   className="flex items-center gap-1.5 px-3 py-1 bg-white border border-emerald-100 text-xs text-emerald-700 shadow-sm rounded-lg hover:bg-white"
                 >
-                  <span className="font-medium text-[11px]">
+                  <span className="font-bold text-[10px] uppercase opacity-50 mr-1">
+                    Status:
+                  </span>
+                  <span className="font-bold text-[11px]">
                     {filters.isActive ? "Active" : "Inactive"}
                   </span>
                   <button
                     onClick={() => setFilters({ ...filters, isActive: null })}
                     className="hover:text-rose-500 transition-colors ml-1"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3 h-3 stroke-[3]" />
                   </button>
                 </Badge>
               )}
 
-              {filters.academicClassId !== null &&
-                filters.academicClassId !== undefined && (
-                  <Badge
-                    variant="secondary"
-                    className="flex items-center gap-1.5 px-3 py-1 bg-white border border-emerald-100 text-xs text-emerald-700 shadow-sm rounded-lg hover:bg-white"
-                  >
-                    <span className="font-medium text-[11px]">
-                      {
-                        class_options.find(
-                          (item) => item.value === filters.academicClassId,
-                        )?.label
-                      }
-                    </span>
-                    <button
-                      onClick={() =>
-                        setFilters({ ...filters, academicClassId: null })
-                      }
-                      className="hover:text-rose-500 transition-colors ml-1"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </Badge>
-                )}
-
-              {filters.academicYearId !== null &&
-                filters.academicYearId !== undefined && (
-                  <Badge
-                    variant="secondary"
-                    className="flex items-center gap-1.5 px-3 py-1 bg-white border border-emerald-100 text-xs text-emerald-700 shadow-sm rounded-lg hover:bg-white"
-                  >
-                    <span className="font-medium text-[11px]">
-                      {
-                        year_options.find(
-                          (item) => item.value === filters.academicYearId,
-                        )?.label
-                      }
-                    </span>
-                    <button
-                      onClick={() =>
-                        setFilters({ ...filters, academicYearId: null })
-                      }
-                      className="hover:text-rose-500 transition-colors ml-1"
-                    >
-                      <X className="w-3 h-3" />
-                    </button>
-                  </Badge>
-                )}
-
-              {filters.sortBy && (
+              {filters.academicYearId && (
                 <Badge
                   variant="secondary"
                   className="flex items-center gap-1.5 px-3 py-1 bg-white border border-emerald-100 text-xs text-emerald-700 shadow-sm rounded-lg hover:bg-white"
                 >
-                  <span className="font-medium text-[11px] capitalize">
-                    {filters.sortBy.replace("-", " ")}
+                  <span className="font-bold text-[10px] uppercase opacity-50 mr-1">
+                    Year:
+                  </span>
+                  <span className="font-bold text-[11px]">
+                    {
+                      year_options.find(
+                        (item) => item.value === filters.academicYearId,
+                      )?.label
+                    }
                   </span>
                   <button
-                    onClick={() => setFilters({ ...filters, sortBy: null })}
+                    onClick={() =>
+                      setFilters({ ...filters, academicYearId: null })
+                    }
                     className="hover:text-rose-500 transition-colors ml-1"
                   >
-                    <X className="w-3 h-3" />
+                    <X className="w-3 h-3 stroke-[3]" />
+                  </button>
+                </Badge>
+              )}
+
+              {filters.academicClassId && (
+                <Badge
+                  variant="secondary"
+                  className="flex items-center gap-1.5 px-3 py-1 bg-white border border-emerald-100 text-xs text-emerald-700 shadow-sm rounded-lg hover:bg-white"
+                >
+                  <span className="font-bold text-[10px] uppercase opacity-50 mr-1">
+                    Class:
+                  </span>
+                  <span className="font-bold text-[11px]">
+                    {
+                      class_options.find(
+                        (item) => item.value === filters.academicClassId,
+                      )?.label
+                    }
+                  </span>
+                  <button
+                    onClick={() =>
+                      setFilters({ ...filters, academicClassId: null })
+                    }
+                    className="hover:text-rose-500 transition-colors ml-1"
+                  >
+                    <X className="w-3 h-3 stroke-[3]" />
                   </button>
                 </Badge>
               )}
@@ -382,7 +326,7 @@ export function Filters({ viewMode, onViewModeChange }: FiltersProps) {
                 onClick={handleResetFilters}
                 className="ml-auto text-[10px] font-bold text-slate-500 hover:text-rose-600 hover:bg-rose-50 transition-all flex items-center gap-1.5 px-3 h-8 rounded-lg text-destructive"
               >
-                <RotateCcw className="w-3 h-3" />
+                <RotateCcw className="w-3 h-3 text-destructive" />
                 Reset All
               </Button>
             </div>

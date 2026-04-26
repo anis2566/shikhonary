@@ -23,48 +23,66 @@ interface BatchWithRelations extends TenantTypes.Batch {
 interface BatchTableProps {
   batches: BatchWithRelations[];
   isLoading: boolean;
+  total: number;
   onToggleActive: (id: string) => Promise<void> | void;
   onDelete: (id: string, name: string) => void;
 }
+
 export const List = ({
   batches,
   isLoading,
+  total,
   onToggleActive,
   onDelete,
 }: BatchTableProps) => {
-  const [viewMode, setViewMode] = useState<ViewMode>("grid");
+  const [viewMode, setViewMode] = useState<ViewMode>("table");
 
   return (
-    <div className="hidden md:block">
-      <main className="flex-grow container mx-auto px-6 py-12 lg:px-12 max-w-7xl space-y-0">
+    <div className="hidden md:block min-h-screen bg-surface relative isolate">
+      {/* Background blobs for depth */}
+      <div
+        aria-hidden
+        className="absolute top-[20%] -left-16 w-64 h-64 rounded-full bg-emerald-200/20 blur-3xl -z-10 pointer-events-none"
+      />
+      <div
+        aria-hidden
+        className="absolute bottom-[10%] -right-16 w-80 h-80 rounded-full bg-emerald-300/10 blur-3xl -z-10 pointer-events-none"
+      />
+
+      <main className="container mx-auto px-6 py-12 lg:px-12 max-w-7xl relative z-10">
         <Header
-          title="Manage Batches"
-          description="View and manage academic groups, student enrollments, and status tracking for the current semester."
+          title="Academic Batches"
+          description="Manage academic groups, student enrollments, and track batch performance across semesters."
         />
 
-        <Stats />
+        <div className="mt-8">
+          <Stats />
+        </div>
 
-        <Filters viewMode={viewMode} onViewModeChange={setViewMode} />
+        <div className="mt-12 bg-surface-container-lowest rounded-2xl shadow-ambient overflow-hidden flex flex-col">
+          <Filters viewMode={viewMode} onViewModeChange={setViewMode} />
 
-        <div className="mt-4">
-          {viewMode === "table" ? (
-            <div className="space-y-6">
+          <div className="relative flex-grow">
+            {viewMode === "table" ? (
               <BatchTable
                 batches={batches}
                 isLoading={isLoading}
                 onToggleActive={onToggleActive}
                 onDelete={onDelete}
               />
-            </div>
-          ) : (
-            <BatchGrid
-              batches={batches}
-              isLoading={isLoading}
-              onToggleActive={onToggleActive}
-              onDelete={onDelete}
-            />
-          )}
-          <Pagination total={24} />
+            ) : (
+              <div className="p-8 bg-surface-container-lowest border-t border-surface-container">
+                <BatchGrid
+                  batches={batches}
+                  isLoading={isLoading}
+                  onToggleActive={onToggleActive}
+                  onDelete={onDelete}
+                />
+              </div>
+            )}
+          </div>
+          
+          <Pagination total={total} />
         </div>
       </main>
     </div>

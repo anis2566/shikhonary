@@ -51,6 +51,15 @@ export function handlePrismaError(error: any): never {
     throw error;
   }
 
+  // Handle generic errors (e.g., from `throw new Error("...")` in services)
+  if (error instanceof Error) {
+    throw new TRPCError({
+      code: "BAD_REQUEST",
+      message: error.message,
+      cause: error,
+    });
+  }
+
   // Generic fallback
   console.error("Unhandle Database Error:", error);
   throw new TRPCError({

@@ -32,6 +32,7 @@ import {
   Bus,
   Activity,
   Lock,
+  Hash,
 } from "lucide-react";
 
 import { Button } from "@workspace/ui/components/button";
@@ -40,10 +41,7 @@ import {
   SheetContent,
   SheetTrigger,
 } from "@workspace/ui/components/sheet";
-import {
-  Avatar,
-  AvatarFallback,
-} from "@workspace/ui/components/avatar";
+import { Avatar, AvatarFallback } from "@workspace/ui/components/avatar";
 import {
   Tooltip,
   TooltipContent,
@@ -68,9 +66,7 @@ interface NavSection {
 const navSections: NavSection[] = [
   {
     label: "Main",
-    items: [
-      { title: "Dashboard", url: "/", icon: LayoutDashboard },
-    ],
+    items: [{ title: "Dashboard", url: "/", icon: LayoutDashboard }],
   },
   {
     label: "People",
@@ -90,12 +86,27 @@ const navSections: NavSection[] = [
     ],
   },
   {
+    label: "Utils",
+    items: [{ title: "Counters", url: "/counters", icon: Hash }],
+  },
+  {
+    label: "Fees",
+    items: [
+      { title: "Admission Fee", url: "/admission-fees", icon: DollarSign },
+      { title: "Monthly Fee", url: "/monthly-fees", icon: DollarSign },
+    ],
+  },
+  {
     label: "Examinations",
     items: [
       { title: "All Exams", url: "/exams", icon: ClipboardList },
       { title: "Create Exam", url: "/exams/new", icon: FileText },
       { title: "Question Bank", url: "/question-bank", icon: BookOpen },
-      { title: "Paper Builder", url: "/question-paper-builder", icon: FileEdit },
+      {
+        title: "Paper Builder",
+        url: "/question-paper-builder",
+        icon: FileEdit,
+      },
       { title: "Results", url: "/results", icon: TrendingUp },
       { title: "Report Cards", url: "/report-cards", icon: FileSpreadsheet },
     ],
@@ -104,8 +115,16 @@ const navSections: NavSection[] = [
     label: "Attendance",
     items: [
       { title: "Student Attendance", url: "/attendance", icon: CalendarDays },
-      { title: "Teacher Attendance", url: "/teacher-attendance", icon: UserCheck },
-      { title: "Mark Attendance", url: "/mark-attendance", icon: ClipboardList },
+      {
+        title: "Teacher Attendance",
+        url: "/teacher-attendance",
+        icon: UserCheck,
+      },
+      {
+        title: "Mark Attendance",
+        url: "/mark-attendance",
+        icon: ClipboardList,
+      },
     ],
   },
   {
@@ -142,9 +161,7 @@ const navSections: NavSection[] = [
   },
   {
     label: "Settings",
-    items: [
-      { title: "Settings", url: "/settings", icon: Settings },
-    ],
+    items: [{ title: "Settings", url: "/settings", icon: Settings }],
   },
 ];
 
@@ -153,7 +170,10 @@ interface SidebarContentProps {
   onToggle?: () => void;
 }
 
-const SidebarContent: React.FC<SidebarContentProps> = ({ collapsed, onToggle }) => {
+const SidebarContent: React.FC<SidebarContentProps> = ({
+  collapsed,
+  onToggle,
+}) => {
   const pathname = usePathname();
   const router = useRouter();
   const user = { email: "admin@tenant.com" }; // Placeholder logic, should be replaced with actual auth session data if available
@@ -222,7 +242,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ collapsed, onToggle }) 
                         isActive(item.url)
                           ? "bg-primary text-primary-foreground"
                           : "text-muted-foreground hover:text-foreground hover:bg-muted",
-                        collapsed && "justify-center"
+                        collapsed && "justify-center",
                       )}
                     >
                       <item.icon className="w-4 h-4 flex-shrink-0" />
@@ -233,9 +253,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ collapsed, onToggle }) 
                   if (collapsed) {
                     return (
                       <Tooltip key={item.title}>
-                        <TooltipTrigger asChild>
-                          {linkContent}
-                        </TooltipTrigger>
+                        <TooltipTrigger asChild>{linkContent}</TooltipTrigger>
                         <TooltipContent side="right" className="font-medium">
                           {item.title}
                         </TooltipContent>
@@ -274,7 +292,7 @@ const SidebarContent: React.FC<SidebarContentProps> = ({ collapsed, onToggle }) 
           onClick={handleLogout}
           className={cn(
             "flex items-center gap-3 w-full px-3 py-2.5 rounded-lg text-sm font-medium text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-colors",
-            collapsed && "justify-center"
+            collapsed && "justify-center",
           )}
         >
           <LogOut className="w-5 h-5 flex-shrink-0" />
@@ -319,7 +337,7 @@ export const DashboardSidebar: React.FC<DashboardSidebarProps> = ({
     <aside
       className={cn(
         "hidden lg:flex flex-col h-screen sticky top-0 transition-all duration-300 z-30",
-        collapsed ? "w-16" : "w-64"
+        collapsed ? "w-16" : "w-64",
       )}
     >
       <SidebarContent collapsed={collapsed} onToggle={onToggle} />

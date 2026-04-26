@@ -13,7 +13,11 @@ export type DeleteEntityType =
   | "subscription"
   | "mcq"
   | "academicYear"
-  | "batch";
+  | "batch"
+  | "counter"
+  | "admissionFee"
+  | "monthlyFee"
+  | "student";
 
 interface DeleteModalState {
   isOpen: boolean;

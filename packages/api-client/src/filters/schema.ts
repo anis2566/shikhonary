@@ -151,6 +151,7 @@ export const studentFilterSchema = {
   ...baseFilterSchema,
   batchId: parseAsString.withOptions({ clearOnDefault: true }),
   classId: parseAsString.withOptions({ clearOnDefault: true }),
+  academicYearId: parseAsString.withOptions({ clearOnDefault: true }),
   isActive: parseAsStringEnum(ACTIVE_STATUS).withOptions({
     clearOnDefault: true,
   }),
@@ -205,4 +206,31 @@ export const batchFilterSchema = {
   academicClassId: parseAsString.withOptions({ clearOnDefault: true }),
   academicYearId: parseAsString.withOptions({ clearOnDefault: true }),
   isActive: parseAsBoolean.withOptions({ clearOnDefault: true }),
+};
+
+/**
+ * Counter Filters
+ */
+export const counterFilterSchema = {
+  ...baseFilterSchema,
+  academicYearId: parseAsString.withOptions({ clearOnDefault: true }),
+  academicClassId: parseAsString.withOptions({ clearOnDefault: true }),
+};
+
+/**
+ * Admission Fee Filters
+ */
+export const admissionFeeFilterSchema = {
+  ...baseFilterSchema,
+  academicYearId: parseAsString.withOptions({ clearOnDefault: true }),
+  academicClassId: parseAsString.withOptions({ clearOnDefault: true }),
+};
+
+/**
+ * Monthly Fee Filters
+ */
+export const monthlyFeeFilterSchema = {
+  ...baseFilterSchema,
+  academicYearId: parseAsString.withOptions({ clearOnDefault: true }),
+  academicClassId: parseAsString.withOptions({ clearOnDefault: true }),
 };

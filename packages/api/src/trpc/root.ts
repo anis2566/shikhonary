@@ -17,6 +17,9 @@ import { bookRouter, chapterRouter, contentBlockRouter } from "../routers/book";
 import { questionPaperRouter } from "../routers/question-paper";
 import { questionTypeRouter } from "../routers/question-type";
 import { academicYearRouter } from "../routers/academic-year";
+import { counterRouter } from "../routers/counter";
+import { admissionFeeRouter } from "../routers/admission-fee";
+import { monthlyFeeRouter } from "../routers/monthly-fee";
 
 // Explicitly import branded types to ensure they are available for inference in this module
 import type { TRPCContext, PrismaClient, TenantPrismaClient } from "./context";
@@ -45,6 +48,9 @@ export const appRouter = t.router({
   questionPaper: questionPaperRouter,
   questionType: questionTypeRouter,
   academicYear: academicYearRouter,
+  counter: counterRouter,
+  admissionFee: admissionFeeRouter,
+  monthlyFee: monthlyFeeRouter,
 });
 
 /**

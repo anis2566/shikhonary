@@ -77,3 +77,18 @@ export type StudentAnalytics = Prisma.StudentAnalyticsModel
  * 
  */
 export type AcademicYear = Prisma.AcademicYearModel
+/**
+ * Model Counter
+ * 
+ */
+export type Counter = Prisma.CounterModel
+/**
+ * Model AdmissionFee
+ * 
+ */
+export type AdmissionFee = Prisma.AdmissionFeeModel
+/**
+ * Model MonthlyFee
+ * 
+ */
+export type MonthlyFee = Prisma.MonthlyFeeModel

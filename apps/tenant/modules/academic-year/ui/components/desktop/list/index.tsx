@@ -36,37 +36,51 @@ export const List = ({
   const [viewMode, setViewMode] = useState<ViewMode>("table");
 
   return (
-    <div className="hidden md:block p-8 max-w-7xl mx-auto space-y-8">
-      <Header
-        title="Academic Years"
-        description="Manage and configure your institution's educational timelines"
+    <div className="hidden md:flex flex-col min-h-screen bg-surface relative isolate">
+      {/* Blob — top left */}
+      <div
+        aria-hidden
+        className="absolute top-[20%] -left-16 w-64 h-64 rounded-full bg-emerald-200/20 blur-3xl -z-10 pointer-events-none"
+      />
+      {/* Blob — bottom right */}
+      <div
+        aria-hidden
+        className="absolute bottom-[10%] -right-16 w-80 h-80 rounded-full bg-emerald-300/10 blur-3xl -z-10 pointer-events-none"
       />
 
-      <Timeline />
+      <main className="flex-grow container mx-auto px-6 py-12 lg:px-12 max-w-7xl space-y-12">
+        <Header
+          title="Academic Years"
+          description="Manage and configure your institution's educational timelines"
+        />
 
-      <Filters viewMode={viewMode} onViewModeChange={setViewMode} />
+        <Timeline />
 
-      <div className="mt-4">
-        {viewMode === "table" ? (
-          <div className="space-y-6">
-            <YearTable
-              academicYears={academicYears}
-              isLoading={isLoadingYears}
-              onToggleActive={toggleActive}
-              onDelete={onDelete}
-            />
+        <div className="bg-surface-container-lowest rounded-xl shadow-ambient overflow-hidden flex flex-col">
+          <Filters viewMode={viewMode} onViewModeChange={setViewMode} />
+
+          <div className="flex-grow flex flex-col">
+            {viewMode === "table" ? (
+              <YearTable
+                academicYears={academicYears}
+                isLoading={isLoadingYears}
+                onToggleActive={toggleActive}
+                onDelete={onDelete}
+              />
+            ) : (
+              <div className="p-6">
+                <YearGrid
+                  academicYears={academicYears}
+                  isLoading={isLoadingYears}
+                  onToggleActive={toggleActive}
+                  onDelete={onDelete}
+                />
+              </div>
+            )}
+            {academicYears.length > 0 && <Pagination total={total} />}
           </div>
-        ) : (
-          <div className="space-y-6">
-            <YearGrid
-              academicYears={academicYears}
-              onToggleActive={toggleActive}
-              onDelete={onDelete}
-            />
-          </div>
-        )}
-        {academicYears.length > 0 && <Pagination total={total} />}
-      </div>
+        </div>
+      </main>
     </div>
   );
 };

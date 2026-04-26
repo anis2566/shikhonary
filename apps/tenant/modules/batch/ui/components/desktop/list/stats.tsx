@@ -16,28 +16,28 @@ export function Stats() {
       <StatCard
         icon={<FolderIcon className="w-6 h-6" />}
         label="Total Batches"
-        value={stats?.total.toString()}
+        value={stats?.total.toString() ?? "0"}
         iconBgClass="bg-emerald-500/10"
         iconTextClass="text-emerald-600"
       />
       <StatCard
         icon={<CheckCircle className="w-6 h-6" />}
         label="Active Batches"
-        value={stats?.active.toString()}
+        value={stats?.active.toString() ?? "0"}
         iconBgClass="bg-emerald-500/20"
         iconTextClass="text-emerald-700"
       />
       <StatCard
         icon={<PauseCircle className="w-6 h-6" />}
         label="Inactive Batches"
-        value={stats?.inactive.toString()}
+        value={stats?.inactive.toString() ?? "0"}
         iconBgClass="bg-slate-200/50"
         iconTextClass="text-slate-600"
       />
       <StatCard
         icon={<GraduationCap className="w-6 h-6" />}
         label="Total Students"
-        value={stats?.totalStudents.toLocaleString()}
+        value={stats?.totalStudents.toLocaleString() ?? "0"}
         iconBgClass="bg-emerald-600/10"
         iconTextClass="text-emerald-700"
       />

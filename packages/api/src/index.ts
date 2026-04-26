@@ -26,6 +26,9 @@ export * from "./services/cq.service";
 export * from "./services/question-paper.service";
 export * from "./services/question-type.service";
 export * from "./services/academic-year.service";
+export * from "./services/counter.service";
+export * from "./services/admission-fee.service";
+export * from "./services/monthly-fee.service";
 
 export * from "./services/student.service";
 export * from "./services/batch.service";

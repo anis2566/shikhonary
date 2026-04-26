@@ -26,6 +26,9 @@ export * from "./teacher";
 export * from "./exam";
 export * from "./attendance";
 export * from "./announcement";
+export * from "./counter";
+export * from "./admission-fee";
+export * from "./monthly-fee";
 
 // Business Schemas
 export * from "./subscription-plan";

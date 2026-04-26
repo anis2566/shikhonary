@@ -2,6 +2,7 @@
 
 import {
   useMutation,
+  useQuery,
   useQueryClient,
   useSuspenseQuery,
 } from "@tanstack/react-query";
@@ -113,6 +114,34 @@ export function useBulkImportStudents() {
   });
 }
 
+/**
+ * Mutation hook for toggling student active status
+ */
+export function useToggleStudentActive() {
+  const trpc = useTRPC();
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    ...trpc.student.toggleActive.mutationOptions(),
+    onError: (error) => {
+      toast.error(error.message || "Failed to toggle student status");
+    },
+    onSuccess: async (data) => {
+      if (data.success) {
+        toast.success(data.message);
+        await queryClient.invalidateQueries({
+          queryKey: trpc.student.list.queryKey(),
+        });
+        await queryClient.invalidateQueries({
+          queryKey: trpc.student.getStats.queryKey(),
+        });
+      } else {
+        toast.error(data.message);
+      }
+    },
+  });
+}
+
 // ============================================================================
 // STUDENT QUERIES
 // ============================================================================
@@ -122,8 +151,22 @@ export function useBulkImportStudents() {
  */
 export function useStudents() {
   const trpc = useTRPC();
-  const [filters, _] = useStudentFilters();
-  return useSuspenseQuery(trpc.student.list.queryOptions(filters));
+  const [filters] = useStudentFilters();
+  return useQuery({
+    ...trpc.student.list.queryOptions(filters),
+    select: (data) => data.data,
+  });
+}
+
+/**
+ * Hook for getting student stats
+ */
+export function useStudentStats() {
+  const trpc = useTRPC();
+  return useQuery({
+    ...trpc.student.getStats.queryOptions(),
+    select: (data) => data.data,
+  });
 }
 
 /**
@@ -131,5 +174,18 @@ export function useStudents() {
  */
 export function useStudentById(id: string) {
   const trpc = useTRPC();
-  return useSuspenseQuery(trpc.student.getById.queryOptions({ id }));
+  return useSuspenseQuery({
+    ...trpc.student.getById.queryOptions(id),
+    select: (data) => data.data,
+  });
+}
+/**
+ * Hook for getting student details by ID
+ */
+export function useStudentDetails(id: string) {
+  const trpc = useTRPC();
+  return useSuspenseQuery({
+    ...trpc.student.getDetails.queryOptions(id),
+    select: (data) => data.data,
+  });
 }

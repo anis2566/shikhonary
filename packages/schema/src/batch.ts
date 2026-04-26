@@ -13,9 +13,8 @@ export const batchFormSchema = z.object({
   capacity: z.coerce
     .number()
     .int()
-    .min(1, "Capacity must be at least 1")
-    .default(50),
-  isActive: z.boolean().default(true),
+    .min(1, "Capacity must be at least 1"),
+  isActive: z.boolean(),
 });
 
 export type BatchFormValues = z.infer<typeof batchFormSchema>;

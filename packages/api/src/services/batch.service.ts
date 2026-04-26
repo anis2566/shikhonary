@@ -31,7 +31,7 @@ export class BatchService {
 
   async list(input: listInputType) {
     try {
-      const where = buildWhere(input, ["name", "className"]);
+      const where = buildWhere(input, ["name"]);
       if (input.academicClassId) where.academicClassId = input.academicClassId;
       if (input.academicYearId) where.academicYearId = input.academicYearId;
 
@@ -92,39 +92,29 @@ export class BatchService {
         where: { id: validatedId },
         include: {
           academicYear: true,
+          _count: {
+            select: {
+              students: true,
+              exams: true,
+            },
+          },
         },
       });
 
       if (!batch) return null;
 
-      const [
-        totalStudents,
-        activeStudents,
-        totalExams,
-        completedExams,
-        upcomingExams,
-        avgScoreResult,
-      ] = await Promise.all([
+      const [totalStudents, inactiveStudents, totalExams] = await Promise.all([
         this.db.student.count({ where: { batchId: input } }),
-        this.db.student.count({ where: { batchId: input, isActive: true } }),
+        this.db.student.count({ where: { batchId: input, isActive: false } }),
         this.db.exam.count({ where: { batchId: input } }),
-        this.db.exam.count({ where: { batchId: input, status: "Completed" } }),
-        this.db.exam.count({ where: { batchId: input, status: "Pending" } }),
-        this.db.examAttempt.aggregate({
-          where: { exam: { batchId: input } },
-          _avg: { percentage: true },
-        }),
       ]);
 
       return {
         ...batch,
         stats: {
           totalStudents,
-          activeStudents,
+          inactiveStudents,
           totalExams,
-          completedExams,
-          upcomingExams,
-          avgScore: Math.round(avgScoreResult._avg.percentage || 0),
         },
       };
     } catch (error) {
@@ -249,6 +239,40 @@ export class BatchService {
       return await this.db.batch.updateMany({
         where: { id: { in: validatedIds } },
         data: { isActive },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async forSelection() {
+    try {
+      return await this.db.batch.findMany({
+        where: { isActive: true },
+        select: {
+          id: true,
+          name: true,
+        },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async getByYearClassId(input: {
+    academicYearId?: string;
+    academicClassId?: string;
+  }) {
+    try {
+      if (!input.academicClassId || !input.academicYearId) {
+        return [];
+      }
+
+      return await this.db.batch.findMany({
+        where: {
+          academicYearId: input.academicYearId,
+          academicClassId: input.academicClassId,
+        },
       });
     } catch (error) {
       handlePrismaError(error);

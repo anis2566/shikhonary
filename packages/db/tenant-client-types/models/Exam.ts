@@ -1132,14 +1132,6 @@ export type ExamUpdatecqIdsInput = {
   push?: string | string[]
 }
 
-export type FloatFieldUpdateOperationsInput = {
-  set?: number
-  increment?: number
-  decrement?: number
-  multiply?: number
-  divide?: number
-}
-
 export type ExamUpdatetargetStudentIdsInput = {
   set?: string[]
   push?: string | string[]

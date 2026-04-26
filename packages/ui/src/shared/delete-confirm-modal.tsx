@@ -32,6 +32,10 @@ const entityLabels: Record<
   subscription: { singular: "Subscription", icon: "📦" },
   academicYear: { singular: "Academic Year", icon: "📅" },
   batch: { singular: "Batch", icon: "🎓" },
+  counter: { singular: "Counter", icon: "🔢" },
+  admissionFee: { singular: "Admission Fee", icon: "💰" },
+  monthlyFee: { singular: "Monthly Fee", icon: "💰" },
+  student: { singular: "Student", icon: "📚" },
 };
 
 export function DeleteConfirmModal() {

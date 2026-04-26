@@ -10,6 +10,7 @@ import {
   ToggleRight,
   Edit,
   Trash2,
+  Eye,
 } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { TenantTypes } from "@workspace/db";
@@ -157,20 +158,10 @@ export const YearCard = ({
       </div>
 
       <div className="flex bg-surface-container-low/30 rounded-xl p-1 gap-1">
-        <Button
-          variant="ghost"
-          size="sm"
-          className="flex-1 h-9 text-on-surface-variant/60 text-[10px] font-bold uppercase tracking-widest hover:bg-surface-container-lowest hover:text-on-surface hover:shadow-sm"
-          asChild
-        >
-          <Link href={`/academic-years/${ay.id}`}>Details</Link>
-        </Button>
-        <div className="w-px h-4 bg-outline-variant/20 mt-2.5 mx-0.5"></div>
         <div className="flex gap-1 px-1">
           <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 text-on-surface-variant/40 hover:text-primary hover:bg-surface-container-lowest hover:shadow-sm transition-all"
+            variant="outline"
+            className="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-xl border bg-slate-100 hover:bg-slate-100 hover:text-slate-700 transition-all shadow-none"
             onClick={() => onToggleActive(ay.id)}
           >
             {ay.isActive ? (
@@ -180,9 +171,8 @@ export const YearCard = ({
             )}
           </Button>
           <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 text-on-surface-variant/40 hover:text-blue-600 hover:bg-surface-container-lowest hover:shadow-sm transition-all"
+            variant="outline"
+            className="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-xl border bg-slate-100 hover:bg-slate-100 hover:text-slate-700 transition-all shadow-none"
             asChild
           >
             <Link href={`/academic-years/edit/${ay.id}`}>
@@ -190,12 +180,11 @@ export const YearCard = ({
             </Link>
           </Button>
           <Button
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 text-on-surface-variant/40 hover:text-destructive hover:bg-surface-container-lowest hover:shadow-sm transition-all"
+            variant="outline"
+            className="h-9 w-9 flex-shrink-0 flex items-center justify-center rounded-xl border bg-slate-100 hover:bg-slate-100 hover:text-slate-700 transition-all shadow-none"
             onClick={() => onDelete(ay.id, ay.name)}
           >
-            <Trash2 className="w-4 h-4" />
+            <Trash2 className="w-4 h-4 text-red-500" />
           </Button>
         </div>
       </div>

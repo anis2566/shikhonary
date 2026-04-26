@@ -192,6 +192,17 @@ export function useBatchById(id: string) {
 }
 
 /**
+ * Hook for getting a batch by ID
+ */
+export function useBatchDetails(id: string) {
+  const trpc = useTRPC();
+  return useSuspenseQuery({
+    ...trpc.batch.getDetails.queryOptions(id),
+    select: (data) => data.data,
+  });
+}
+
+/**
  * Hook for getting batch statistics
  */
 export function useBatchStats() {
@@ -201,4 +212,24 @@ export function useBatchStats() {
     select: (data) => data.data,
   });
 }
+export function useBatchesForSelection() {
+  const trpc = useTRPC();
+  return useQuery({
+    ...trpc.batch.forSelection.queryOptions(),
+    select: (data) => data.data,
+  });
+}
 
+export function useBatchByYearClassId(
+  academicYearId?: string,
+  academicClassId?: string,
+) {
+  const trpc = useTRPC();
+  return useQuery({
+    ...trpc.batch.getByYearClassId.queryOptions({
+      academicYearId,
+      academicClassId,
+    }),
+    select: (data) => data.data,
+  });
+}

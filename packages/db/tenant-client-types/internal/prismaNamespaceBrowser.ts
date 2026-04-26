@@ -62,7 +62,10 @@ export const ModelName = {
   Notification: 'Notification',
   ExamAnalytics: 'ExamAnalytics',
   StudentAnalytics: 'StudentAnalytics',
-  AcademicYear: 'AcademicYear'
+  AcademicYear: 'AcademicYear',
+  Counter: 'Counter',
+  AdmissionFee: 'AdmissionFee',
+  MonthlyFee: 'MonthlyFee'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -83,13 +86,13 @@ export type TransactionIsolationLevel = (typeof TransactionIsolationLevel)[keyof
 
 export const StudentScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
   studentId: 'studentId',
   name: 'name',
   email: 'email',
   academicClassId: 'academicClassId',
   className: 'className',
   batchId: 'batchId',
+  institute: 'institute',
   roll: 'roll',
   group: 'group',
   shift: 'shift',
@@ -107,6 +110,8 @@ export const StudentScalarFieldEnum = {
   presentAddress: 'presentAddress',
   permanentAddress: 'permanentAddress',
   isActive: 'isActive',
+  admissionFee: 'admissionFee',
+  monthlyFee: 'monthlyFee',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt',
   deletedAt: 'deletedAt',
@@ -373,6 +378,45 @@ export const AcademicYearScalarFieldEnum = {
 } as const
 
 export type AcademicYearScalarFieldEnum = (typeof AcademicYearScalarFieldEnum)[keyof typeof AcademicYearScalarFieldEnum]
+
+
+export const CounterScalarFieldEnum = {
+  id: 'id',
+  academicYearId: 'academicYearId',
+  academicClassId: 'academicClassId',
+  className: 'className',
+  value: 'value',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CounterScalarFieldEnum = (typeof CounterScalarFieldEnum)[keyof typeof CounterScalarFieldEnum]
+
+
+export const AdmissionFeeScalarFieldEnum = {
+  id: 'id',
+  academicYearId: 'academicYearId',
+  academicClassId: 'academicClassId',
+  className: 'className',
+  amount: 'amount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdmissionFeeScalarFieldEnum = (typeof AdmissionFeeScalarFieldEnum)[keyof typeof AdmissionFeeScalarFieldEnum]
+
+
+export const MonthlyFeeScalarFieldEnum = {
+  id: 'id',
+  academicYearId: 'academicYearId',
+  academicClassId: 'academicClassId',
+  className: 'className',
+  amount: 'amount',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyFeeScalarFieldEnum = (typeof MonthlyFeeScalarFieldEnum)[keyof typeof MonthlyFeeScalarFieldEnum]
 
 
 export const SortOrder = {

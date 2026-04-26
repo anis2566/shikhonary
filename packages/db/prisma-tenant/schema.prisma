@@ -11,34 +11,37 @@ datasource db {
 
 model Student {
     id               String    @id @default(uuid())
-    userId           String?   @unique
-    studentId        String    @unique
+    studentId        String
     name             String
     email            String?
     academicClassId  String
-    className        String?
+    className        String
     batchId          String?
     batch            Batch?    @relation(fields: [batchId], references: [id])
+    institute        String
     roll             String
     group            String?
     shift            String?
     section          String?
-    fatherName       String?
-    motherName       String?
+    fatherName       String
+    motherName       String
     dateOfBirth      DateTime?
-    gender           String?
+    gender           String
     bloodGroup       String?
-    nationality      String?   @default("Bangladeshi")
-    religion         String?
+    nationality      String
+    religion         String
     imageUrl         String?
-    primaryPhone     String?
+    primaryPhone     String
     secondaryPhone   String?
-    presentAddress   String?
-    permanentAddress String?
+    presentAddress   String
+    permanentAddress String
     isActive         Boolean   @default(true)
-    createdAt        DateTime  @default(now())
-    updatedAt        DateTime  @updatedAt
-    deletedAt        DateTime?
+    admissionFee     Float     @default(0)
+    monthlyFee       Float     @default(0)
+
+    createdAt DateTime  @default(now())
+    updatedAt DateTime  @updatedAt
+    deletedAt DateTime?
 
     attempts      ExamAttempt[]
     attendance    Attendance[]
@@ -52,7 +55,6 @@ model Student {
     @@index([isActive])
     @@index([name])
     @@index([studentId])
-    @@index([userId])
     @@map("student")
 }
 
@@ -374,8 +376,59 @@ model AcademicYear {
     createdAt DateTime @default(now())
     updatedAt DateTime @updatedAt
 
-    batches  Batch[]
-    students Student[]
+    batches       Batch[]
+    students      Student[]
+    counters      Counter[]
+    admissionFees AdmissionFee[]
+    monthlyFees   MonthlyFee[]
 
     @@map("academic_year")
+}
+
+model Counter {
+    id             String       @id @default(uuid())
+    academicYearId String
+    academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+    academicClassId String
+    className       String
+
+    value Int @default(0)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("counter")
+}
+
+model AdmissionFee {
+    id             String       @id @default(uuid())
+    academicYearId String
+    academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+    academicClassId String
+    className       String
+
+    amount Float @default(0)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("admission_fee")
+}
+
+model MonthlyFee {
+    id             String       @id @default(uuid())
+    academicYearId String
+    academicYear   AcademicYear @relation(fields: [academicYearId], references: [id])
+
+    academicClassId String
+    className       String
+
+    amount Float @default(0)
+
+    createdAt DateTime @default(now())
+    updatedAt DateTime @updatedAt
+
+    @@map("monthly_fee")
 }

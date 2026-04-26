@@ -1,10 +1,10 @@
 import { z } from "zod";
+import { type TenantClient, type PrismaClient } from "@workspace/db";
 import { handlePrismaError } from "../middleware/error-handler";
 import {
-  type Student,
   studentFormSchema,
-  updateStudentSchema,
   uuidSchema,
+  StudentFormValues,
 } from "@workspace/schema";
 import {
   buildPagination,
@@ -12,9 +12,10 @@ import {
   buildWhere,
 } from "../shared/query-builder";
 import {
-  createPaginatedResponse,
-  type PaginatedResponse,
-} from "../shared/pagination";
+  idInputType,
+  listInputType,
+  updateStudentInputType,
+} from "../shared/input/student";
 
 /**
  * Service for managing Students (Tenant Level)
@@ -23,21 +24,22 @@ export class StudentService {
   /**
    * Note: This service expects a Tenant-specific Prisma Client
    */
-  constructor(private db: any) {}
+  constructor(
+    private db: TenantClient,
+    private mainDb: PrismaClient,
+  ) {}
 
-  async list(input: {
-    page: number;
-    limit: number;
-    search?: string;
-    sortBy?: string;
-    sortOrder?: "asc" | "desc";
-    batchId?: string;
-    classId?: string;
-  }): Promise<PaginatedResponse<Student & { batch: any }> | undefined> {
+  async list(input: listInputType) {
     try {
-      const where = buildWhere(input, ["name", "studentId", "email"]);
+      const where = buildWhere(input, [
+        "name",
+        "studentId",
+        "email",
+        "primaryPhone",
+      ]);
       if (input.batchId) where.batchId = input.batchId;
-      if (input.classId) where.academicClassId = input.classId;
+      if (input.academicClassId) where.academicClassId = input.academicClassId;
+      if (input.academicYearId) where.academicYearId = input.academicYearId;
 
       const orderBy = buildOrderBy(input);
       const pagination = buildPagination(input);
@@ -47,73 +49,200 @@ export class StudentService {
           where,
           orderBy,
           ...pagination,
-          include: { batch: true },
+          include: {
+            batch: {
+              select: {
+                name: true,
+              },
+            },
+            academicYear: {
+              select: {
+                name: true,
+              },
+            },
+          },
         }),
         this.db.student.count({ where }),
       ]);
 
-      return createPaginatedResponse(
-        items as any,
+      return {
+        items,
         total,
-        input.page,
-        input.limit,
-      );
+      };
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async getById(id: string): Promise<any | null | undefined> {
+  async getById(input: idInputType) {
     try {
-      const validatedId = uuidSchema.parse(id);
+      const validatedId = uuidSchema.parse(input);
       return await this.db.student.findUnique({
         where: { id: validatedId },
-        include: { batch: true },
+        include: {
+          batch: true,
+          academicYear: true,
+        },
       });
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async create(input: Student): Promise<Student | undefined> {
+  async getDetails(input: idInputType) {
+    try {
+      const validatedId = uuidSchema.parse(input);
+
+      const student = await this.db.student.findUnique({
+        where: { id: validatedId },
+        include: {
+          batch: true,
+          academicYear: true,
+          // attendance: {
+          //   take: 10,
+          //   orderBy: { date: "desc" },
+          // },
+        },
+      });
+
+      if (!student) return null;
+
+      // Add some basic stats for student
+      // const [totalAttendance, presentCount] = await Promise.all([
+      //   this.db.attendance.count({ where: { studentId: validatedId } }),
+      //   this.db.attendance.count({ where: { studentId: validatedId, status: "PRESENT" } }),
+      // ]);
+
+      // const attendancePercentage = totalAttendance > 0
+      //   ? Math.round((presentCount / totalAttendance) * 100)
+      //   : 0;
+
+      return {
+        ...student,
+        stats: {
+          // totalAttendance,
+          // presentCount,
+          // attendancePercentage,
+        },
+      };
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async create(input: StudentFormValues) {
     try {
       const data = studentFormSchema.parse(input);
-      const item = await this.db.student.create({ data });
-      return item as unknown as Student;
-    } catch (error) {
-      handlePrismaError(error);
-    }
-  }
-
-  async update(id: string, input: Student): Promise<Student | undefined> {
-    try {
-      const validatedId = uuidSchema.parse(id);
-      const data = updateStudentSchema.parse(input);
-      const item = await this.db.student.update({
-        where: { id: validatedId },
-        data,
+      const className = await this.mainDb.academicClass.findUnique({
+        where: { id: data.academicClassId },
       });
-      return item as unknown as Student;
+
+      return await this.db.student.create({
+        data: {
+          ...data,
+          className: className?.name ?? "",
+        },
+      });
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async delete(id: string): Promise<Student | undefined> {
+  async update(input: updateStudentInputType) {
     try {
-      const validatedId = uuidSchema.parse(id);
-      const item = await this.db.student.delete({ where: { id: validatedId } });
-      return item as unknown as Student;
+      const { id, ...data } = input;
+      const className = await this.mainDb.academicClass.findUnique({
+        where: { id: data.academicClassId },
+      });
+      return await this.db.student.update({
+        where: { id },
+        data: {
+          ...data,
+          className: className?.name ?? "",
+        },
+      });
     } catch (error) {
       handlePrismaError(error);
     }
   }
 
-  async bulkImport(students: unknown[]): Promise<any | undefined> {
+  async delete(input: idInputType) {
     try {
-      const data = z.array(studentFormSchema).parse(students);
+      const validatedId = uuidSchema.parse(input);
+      return await this.db.student.delete({ where: { id: validatedId } });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async getStats() {
+    try {
+      const [total, active, male, female] = await Promise.all([
+        this.db.student.count(),
+        this.db.student.count({ where: { isActive: true } }),
+        this.db.student.count({ where: { gender: "MALE" } }),
+        this.db.student.count({ where: { gender: "FEMALE" } }),
+      ]);
+
+      return {
+        total,
+        active,
+        inactive: total - active,
+        male,
+        female,
+        other: total - (male + female),
+      };
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async toggleActive(input: string) {
+    try {
+      const validatedId = uuidSchema.parse(input);
+      const student = await this.db.student.findUnique({
+        where: { id: validatedId },
+      });
+
+      if (!student) throw new Error("Student not found");
+
+      return await this.db.student.update({
+        where: { id: validatedId },
+        data: { isActive: !student.isActive },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async bulkDelete(ids: string[]) {
+    try {
+      const validatedIds = z.array(uuidSchema).parse(ids);
+      return await this.db.student.deleteMany({
+        where: { id: { in: validatedIds } },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async bulkToggleActive(ids: string[], isActive: boolean) {
+    try {
+      const validatedIds = z.array(uuidSchema).parse(ids);
+      return await this.db.student.updateMany({
+        where: { id: { in: validatedIds } },
+        data: { isActive },
+      });
+    } catch (error) {
+      handlePrismaError(error);
+    }
+  }
+
+  async bulkImport(students: any[]) {
+    try {
+      // In a real scenario, we might want to do more validation here
       return await this.db.student.createMany({
-        data,
+        data: students,
         skipDuplicates: true,
       });
     } catch (error) {

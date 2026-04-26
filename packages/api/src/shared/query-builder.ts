@@ -66,12 +66,35 @@ export function buildWhere(
   }
 
   if (input.search && searchFields.length > 0) {
-    where.OR = searchFields.map((field) => ({
-      [field]: {
-        contains: input.search,
-        mode: "insensitive",
-      },
-    }));
+    where.OR = searchFields.map((field) => {
+      // Handle nested fields (e.g., "academicYear.name")
+      if (field.includes(".")) {
+        const parts = field.split(".");
+        const result: any = {};
+        let current = result;
+
+        for (let i = 0; i < parts.length; i++) {
+          const part = parts[i] as string;
+          if (i === parts.length - 1) {
+            current[part] = {
+              contains: input.search,
+              mode: "insensitive",
+            };
+          } else {
+            current[part] = {};
+            current = current[part];
+          }
+        }
+        return result;
+      }
+
+      return {
+        [field]: {
+          contains: input.search,
+          mode: "insensitive",
+        },
+      };
+    });
   }
 
   return where;

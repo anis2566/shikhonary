@@ -1,77 +1,89 @@
 "use client";
 
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import React from "react";
 import { Button } from "@workspace/ui/components/button";
+import { useBatchFilters } from "@workspace/api-client";
+import { cn } from "@workspace/ui/lib/utils";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 
 interface PaginationProps {
   total: number;
-  current?: number;
-  pageSize?: number;
 }
 
-export function Pagination({ total, current = 1, pageSize = 10 }: PaginationProps) {
-  const start = (current - 1) * pageSize + 1;
-  const end = Math.min(current * pageSize, total);
+export function Pagination({ total }: PaginationProps) {
+  const [filters, setFilters] = useBatchFilters();
+
+  const currentPage = filters.page;
+  const pageSize = filters.limit;
+  const totalPages = Math.ceil(total / pageSize);
+
+  const handlePageChange = (page: number) => {
+    if (page < 1 || page > totalPages) return;
+    setFilters({ ...filters, page });
+  };
+
+  const startRange = total > 0 ? (currentPage - 1) * pageSize + 1 : 0;
+  const endRange = Math.min(currentPage * pageSize, total);
+
+  if (total === 0) return null;
 
   return (
-    <footer className="mt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-      <div className="text-sm text-slate-500">
-        Showing <span className="font-semibold text-slate-900">{start}</span> to{" "}
-        <span className="font-semibold text-slate-900">{end}</span> of{" "}
-        <span className="font-semibold text-slate-900">{total}</span> results
+    <div className="px-8 py-5 flex items-center justify-between border-t border-slate-100 bg-white">
+      <div className="flex items-center gap-3">
+        <div className="px-3 py-1 bg-slate-50 border border-slate-100 rounded-lg">
+          <p className="text-[11px] font-bold text-slate-400 uppercase tracking-wider">
+            Showing <span className="text-emerald-600">{startRange}</span> -{" "}
+            <span className="text-emerald-600">{endRange}</span> of{" "}
+            <span className="text-slate-600">{total}</span>
+          </p>
+        </div>
       </div>
 
-      <nav aria-label="Pagination" className="flex items-center gap-2">
+      <div className="flex items-center gap-2">
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
-          disabled
-          className="h-10 px-4 font-medium text-slate-500 bg-slate-50 border-none hover:bg-slate-100 rounded-xl"
+          disabled={currentPage <= 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+          className="h-9 px-3 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent font-bold text-xs gap-1"
         >
-          <ChevronLeft className="w-4 h-4 mr-1" />
+          <ChevronLeft className="w-4 h-4" />
           Previous
         </Button>
 
-        <div className="flex items-center gap-1">
-          <Button
-            size="icon"
-            className="w-10 h-10 rounded-xl font-bold bg-emerald-600 text-white shadow-lg shadow-emerald-200"
-          >
-            1
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-10 h-10 rounded-xl font-medium text-slate-500 hover:bg-slate-100"
-          >
-            2
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-10 h-10 rounded-xl font-medium text-slate-500 hover:bg-slate-100"
-          >
-            3
-          </Button>
-          <span className="px-2 text-slate-300">...</span>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="w-10 h-10 rounded-xl font-medium text-slate-500 hover:bg-slate-100"
-          >
-            8
-          </Button>
+        <div className="flex items-center gap-1 mx-2">
+          {Array.from({ length: Math.min(totalPages, 5) }).map((_, i) => {
+            const pageNum = i + 1;
+            return (
+              <Button
+                key={pageNum}
+                variant="ghost"
+                size="sm"
+                onClick={() => handlePageChange(pageNum)}
+                className={cn(
+                  "w-9 h-9 rounded-lg font-bold text-xs transition-all",
+                  currentPage === pageNum
+                    ? "bg-emerald-600 text-white shadow-md shadow-emerald-600/20 hover:bg-emerald-700"
+                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-50",
+                )}
+              >
+                {pageNum}
+              </Button>
+            );
+          })}
         </div>
 
         <Button
-          variant="outline"
+          variant="ghost"
           size="sm"
-          className="h-10 px-4 font-medium text-slate-500 bg-slate-50 border-none hover:bg-slate-100 rounded-xl"
+          disabled={currentPage >= totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+          className="h-9 px-3 text-slate-500 hover:text-emerald-600 hover:bg-emerald-50 rounded-lg transition-all disabled:opacity-30 disabled:hover:bg-transparent font-bold text-xs gap-1"
         >
           Next
-          <ChevronRight className="w-4 h-4 ml-1" />
+          <ChevronRight className="w-4 h-4" />
         </Button>
-      </nav>
-    </footer>
+      </div>
+    </div>
   );
 }

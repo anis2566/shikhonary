@@ -1,13 +1,13 @@
 <!doctype html>
 
-<html lang="en">
+<html class="light" lang="en">
   <head>
     <meta charset="utf-8" />
     <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-    <title>AcademiaBatch - Batches Console</title>
+    <title>Coaching Setup - Step 1</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <link
-      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&amp;display=swap"
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap"
       rel="stylesheet"
     />
     <link
@@ -24,64 +24,65 @@
         theme: {
           extend: {
             colors: {
-              "surface-tint": "#006c49",
-              "on-tertiary-container": "#711419",
-              "on-error": "#ffffff",
               surface: "#f8f9ff",
-              "on-secondary": "#ffffff",
-              "secondary-container": "#b7ebce",
-              secondary: "#376850",
-              error: "#ba1a1a",
-              "inverse-surface": "#213145",
-              "on-surface-variant": "#3c4a42",
-              "on-surface": "#0b1c30",
-              "surface-container-low": "#eff4ff",
-              "surface-container": "#e5eeff",
-              "on-secondary-fixed-variant": "#1e4f3a",
-              tertiary: "#a43a3a",
-              "secondary-fixed": "#baeed1",
-              "surface-dim": "#cbdbf5",
-              "secondary-fixed-dim": "#9ed2b5",
-              primary: "#006c49",
-              "primary-fixed": "#6ffbbe",
-              "inverse-primary": "#4edea3",
-              "on-error-container": "#93000a",
-              "surface-bright": "#f8f9ff",
-              "on-tertiary": "#ffffff",
-              "on-background": "#0b1c30",
-              "surface-container-high": "#dce9ff",
-              "on-tertiary-fixed": "#410005",
-              "on-primary-container": "#00422b",
-              "primary-container": "#10b981",
-              "error-container": "#ffdad6",
-              "tertiary-fixed": "#ffdad7",
-              outline: "#6c7a71",
-              "on-primary-fixed-variant": "#005236",
-              "on-primary-fixed": "#002113",
-              "on-primary": "#ffffff",
-              "tertiary-fixed-dim": "#ffb3af",
-              background: "#f8f9ff",
-              "surface-container-lowest": "#ffffff",
-              "outline-variant": "#bbcabf",
               "on-secondary-fixed": "#002113",
-              "on-secondary-container": "#3c6c54",
-              "tertiary-container": "#fc7c78",
-              "primary-fixed-dim": "#4edea3",
-              "on-tertiary-fixed-variant": "#842225",
-              "surface-variant": "#d3e4fe",
-              "surface-container-highest": "#d3e4fe",
               "inverse-on-surface": "#eaf1ff",
+              "surface-tint": "#006c49",
+              "primary-container": "#10b981",
+              "surface-variant": "#d3e4fe",
+              "secondary-fixed-dim": "#9ed2b5",
+              "on-secondary-fixed-variant": "#1e4f3a",
+              "on-primary": "#ffffff",
+              "surface-container-highest": "#d3e4fe",
+              "on-error-container": "#93000a",
+              "surface-dim": "#cbdbf5",
+              "secondary-fixed": "#baeed1",
+              "on-tertiary-fixed": "#410005",
+              "on-tertiary-container": "#711419",
+              "tertiary-fixed-dim": "#ffb3af",
+              "surface-container": "#e5eeff",
+              "on-surface-variant": "#3c4a42",
+              "on-tertiary": "#ffffff",
+              "on-surface": "#0b1c30",
+              "tertiary-container": "#fc7c78",
+              secondary: "#376850",
+              "tertiary-fixed": "#ffdad7",
+              tertiary: "#a43a3a",
+              "outline-variant": "#bbcabf",
+              "on-secondary-container": "#3c6c54",
+              "error-container": "#ffdad6",
+              "inverse-primary": "#4edea3",
+              "on-background": "#0b1c30",
+              "on-primary-fixed": "#002113",
+              "surface-container-low": "#eff4ff",
+              "inverse-surface": "#213145",
+              "secondary-container": "#b7ebce",
+              primary: "#006c49",
+              "surface-bright": "#f8f9ff",
+              "surface-container-high": "#dce9ff",
+              "primary-fixed": "#6ffbbe",
+              "on-secondary": "#ffffff",
+              "on-primary-fixed-variant": "#005236",
+              outline: "#6c7a71",
+              "on-error": "#ffffff",
+              "primary-fixed-dim": "#4edea3",
+              error: "#ba1a1a",
+              "on-tertiary-fixed-variant": "#842225",
+              "surface-container-lowest": "#ffffff",
+              "on-primary-container": "#00422b",
+              background: "#f8f9ff",
             },
             borderRadius: {
-              DEFAULT: "0.5rem",
-              lg: "0.75rem",
-              xl: "1rem",
+              DEFAULT: "0.25rem",
+              lg: "0.5rem",
+              xl: "0.75rem",
               full: "9999px",
             },
             fontFamily: {
-              headline: ["Inter"],
-              body: ["Inter"],
-              label: ["Inter"],
+              headline: ["Inter", "sans-serif"],
+              display: ["Inter", "sans-serif"],
+              body: ["Inter", "sans-serif"],
+              label: ["Inter", "sans-serif"],
             },
           },
         },
@@ -89,854 +90,307 @@
     </script>
     <style>
       .material-symbols-outlined {
-        font-variation-settings:
-          "FILL" 0,
-          "wght" 400,
-          "GRAD" 0,
-          "opsz" 24;
+        font-family: "Material Symbols Outlined";
+        font-weight: normal;
+        font-style: normal;
+        font-size: 24px;
+        line-height: 1;
+        letter-spacing: normal;
+        text-transform: none;
+        display: inline-block;
+        white-space: nowrap;
+        word-wrap: normal;
+        direction: ltr;
+        -webkit-font-feature-settings: "liga";
+        -webkit-font-smoothing: antialiased;
       }
-      body {
-        font-family: "Inter", sans-serif;
+
+      /* Signature Gradient for high-impact elements */
+      .bg-signature-gradient {
+        background: linear-gradient(135deg, #006c49 0%, #10b981 100%);
+      }
+
+      .hover\:bg-signature-gradient:hover {
+        background: linear-gradient(135deg, #006c49 0%, #10b981 100%);
       }
     </style>
   </head>
-  <body class="bg-surface text-on-surface antialiased min-h-screen">
-    <!-- Header Section: Stats & Title -->
-    <header class="pt-8 pb-6 px-8 max-w-[1600px] mx-auto">
-      <div
-        class="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-8"
-      >
-        <div class="space-y-1">
-          <h1 class="text-3xl font-extrabold tracking-tight text-on-surface">
-            Batches Dashboard
-          </h1>
-          <p class="text-on-surface-variant font-medium">
-            Manage institutional groups and student cohorts
-          </p>
-        </div>
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 w-full lg:w-auto">
-          <!-- Stat Card 1 -->
+  <body
+    class="bg-background text-on-background font-body min-h-screen antialiased flex flex-col items-center justify-center p-4 md:p-8"
+  >
+    <div class="w-full max-w-4xl mx-auto flex flex-col gap-12">
+      <!-- Header & Progress -->
+      <header class="flex flex-col gap-8 w-full">
+        <div class="flex items-center gap-4">
           <div
-            class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant/10 min-w-[160px]"
+            class="w-12 h-12 rounded-lg bg-surface-container-high flex items-center justify-center shadow-sm"
           >
-            <p
-              class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1"
+            <span
+              class="material-symbols-outlined text-primary"
+              data-weight="fill"
+              style="font-variation-settings: &quot;FILL&quot; 1"
+              >school</span
             >
-              Total Batches
+          </div>
+          <div>
+            <h1
+              class="text-3xl md:text-4xl font-headline font-bold text-on-background tracking-tight"
+            >
+              Coaching Setup
+            </h1>
+            <p class="text-on-surface-variant mt-1 text-lg">
+              Core institutional enrollment details
             </p>
-            <div class="flex items-center gap-2">
-              <span class="text-2xl font-black text-on-surface">24</span>
+          </div>
+        </div>
+        <!-- Progress Indicator -->
+        <div class="w-full relative py-6">
+          <!-- Connecting Line Base -->
+          <div
+            class="absolute top-1/2 left-0 w-full h-1 bg-surface-variant -translate-y-1/2 rounded-full z-0"
+          ></div>
+          <!-- Active Line Progress -->
+          <div
+            class="absolute top-1/2 left-0 w-[12.5%] h-1 bg-primary -translate-y-1/2 rounded-full z-0 transition-all duration-500"
+          ></div>
+          <div class="flex justify-between relative z-10 w-full">
+            <!-- Step 1 (Active) -->
+            <div class="flex flex-col items-center gap-2 group">
+              <div
+                class="w-10 h-10 rounded-full bg-primary text-on-primary flex items-center justify-center font-bold shadow-lg ring-4 ring-surface"
+              >
+                1
+              </div>
               <span
-                class="text-[10px] px-1.5 py-0.5 bg-primary-container/20 text-primary font-bold rounded"
-                >+2</span
+                class="text-sm font-label font-semibold text-primary absolute -bottom-6 whitespace-nowrap"
+                >Setup</span
+              >
+            </div>
+            <!-- Step 2 -->
+            <div class="flex flex-col items-center gap-2">
+              <div
+                class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-medium ring-4 ring-surface"
+              >
+                2
+              </div>
+              <span
+                class="text-sm font-label text-on-surface-variant absolute -bottom-6 whitespace-nowrap hidden md:block"
+                >Preferences</span
+              >
+            </div>
+            <!-- Step 3 -->
+            <div class="flex flex-col items-center gap-2">
+              <div
+                class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-medium ring-4 ring-surface"
+              >
+                3
+              </div>
+              <span
+                class="text-sm font-label text-on-surface-variant absolute -bottom-6 whitespace-nowrap hidden md:block"
+                >Schedule</span
+              >
+            </div>
+            <!-- Step 4 -->
+            <div class="flex flex-col items-center gap-2">
+              <div
+                class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-medium ring-4 ring-surface"
+              >
+                4
+              </div>
+              <span
+                class="text-sm font-label text-on-surface-variant absolute -bottom-6 whitespace-nowrap hidden md:block"
+                >Goals</span
+              >
+            </div>
+            <!-- Step 5 -->
+            <div class="flex flex-col items-center gap-2">
+              <div
+                class="w-10 h-10 rounded-full bg-surface-container-highest text-on-surface-variant flex items-center justify-center font-medium ring-4 ring-surface"
+              >
+                5
+              </div>
+              <span
+                class="text-sm font-label text-on-surface-variant absolute -bottom-6 whitespace-nowrap hidden md:block"
+                >Review</span
               >
             </div>
           </div>
-          <!-- Stat Card 2 -->
-          <div
-            class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant/10 min-w-[160px]"
-          >
-            <p
-              class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1"
-            >
-              Active
-            </p>
-            <div class="flex items-center gap-2">
-              <span class="text-2xl font-black text-primary">18</span>
-              <span
-                class="w-2 h-2 rounded-full bg-primary animate-pulse"
-              ></span>
-            </div>
-          </div>
-          <!-- Stat Card 3 -->
-          <div
-            class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant/10 min-w-[160px]"
-          >
-            <p
-              class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1"
-            >
-              Inactive
-            </p>
-            <div class="flex items-center gap-2">
-              <span class="text-2xl font-black text-on-surface">06</span>
-            </div>
-          </div>
-          <!-- Stat Card 4 -->
-          <div
-            class="bg-surface-container-lowest p-4 rounded-xl shadow-sm border border-outline-variant/10 min-w-[160px]"
-          >
-            <p
-              class="text-xs font-bold uppercase tracking-widest text-on-surface-variant mb-1"
-            >
-              Total Students
-            </p>
-            <div class="flex items-center gap-2">
-              <span class="text-2xl font-black text-on-surface">1,240</span>
-            </div>
-          </div>
         </div>
-      </div>
-      <!-- Filter Section -->
-      <div
-        class="bg-surface-container-low p-4 rounded-xl flex flex-wrap items-center gap-4 border border-outline-variant/5"
+      </header>
+      <!-- Main Form Canvas -->
+      <main
+        class="w-full bg-surface-container-lowest rounded-[12px] p-8 md:p-12 shadow-[0_8px_30px_rgb(11,28,48,0.04)] relative overflow-hidden"
       >
-        <div class="relative flex-grow min-w-[240px]">
-          <span
-            class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-on-surface-variant"
-            >search</span
-          >
-          <input
-            class="w-full pl-10 pr-4 py-2.5 bg-surface-container-lowest border-none rounded-lg ring-1 ring-outline-variant/20 focus:ring-2 focus:ring-primary/40 text-sm transition-all"
-            placeholder="Search batch or section..."
-            type="text"
-          />
-        </div>
+        <!-- Decorative asymmetrical element -->
         <div
-          class="flex bg-surface-container-lowest rounded-lg p-1 ring-1 ring-outline-variant/20"
-        >
-          <button
-            class="px-4 py-1.5 text-xs font-bold rounded-md bg-primary text-on-primary"
-          >
-            All
-          </button>
-          <button
-            class="px-4 py-1.5 text-xs font-bold rounded-md text-on-surface-variant hover:text-primary transition-colors"
-          >
-            Active
-          </button>
-          <button
-            class="px-4 py-1.5 text-xs font-bold rounded-md text-on-surface-variant hover:text-primary transition-colors"
-          >
-            Inactive
-          </button>
-        </div>
-        <select
-          class="bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 rounded-lg text-sm py-2 px-4 focus:ring-2 focus:ring-primary/40"
-        >
-          <option>Class: Grade 12</option>
-          <option>Class: Grade 11</option>
-          <option>Class: Grade 10</option>
-        </select>
-        <select
-          class="bg-surface-container-lowest border-none ring-1 ring-outline-variant/20 rounded-lg text-sm py-2 px-4 focus:ring-2 focus:ring-primary/40"
-        >
-          <option>Year: 2023 - 2024</option>
-          <option>Year: 2022 - 2023</option>
-        </select>
-        <div class="ml-auto flex items-center gap-3">
-          <button
-            class="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-on-surface-variant hover:text-primary transition-colors"
-          >
-            <span class="material-symbols-outlined text-[20px]"
-              >sort_by_alpha</span
-            >
-            Name A-Z
-          </button>
-          <div
-            class="flex items-center bg-surface-container-lowest rounded-lg ring-1 ring-outline-variant/20 p-1"
-          >
-            <button class="p-1.5 rounded bg-surface-container text-primary">
-              <span
-                class="material-symbols-outlined text-[20px]"
-                style="font-variation-settings: &quot;FILL&quot; 1"
-                >grid_view</span
+          class="absolute -top-24 -right-24 w-64 h-64 bg-primary-container opacity-5 rounded-full blur-3xl pointer-events-none"
+        ></div>
+        <form class="flex flex-col gap-10 relative z-10">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Academic Year -->
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-label font-medium text-on-surface-variant"
+                for="academic-year"
+                >Academic Year</label
               >
+              <div class="relative">
+                <select
+                  class="w-full appearance-none bg-surface-container-low text-on-surface rounded-[12px] px-4 py-3 border-none focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all duration-200"
+                  id="academic-year"
+                >
+                  <option disabled="" selected="" value="">
+                    Select year...
+                  </option>
+                  <option value="2024-2025">2024 - 2025</option>
+                  <option value="2023-2024">2023 - 2024</option>
+                </select>
+                <span
+                  class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+                  >expand_more</span
+                >
+              </div>
+            </div>
+            <!-- Academic Class -->
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-label font-medium text-on-surface-variant"
+                for="academic-class"
+                >Academic Class</label
+              >
+              <div class="relative">
+                <select
+                  class="w-full appearance-none bg-surface-container-low text-on-surface rounded-[12px] px-4 py-3 border-none focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all duration-200"
+                  id="academic-class"
+                >
+                  <option disabled="" selected="" value="">
+                    Select class...
+                  </option>
+                  <option value="freshman">Freshman</option>
+                  <option value="sophomore">Sophomore</option>
+                  <option value="junior">Junior</option>
+                  <option value="senior">Senior</option>
+                  <option value="graduate">Graduate</option>
+                </select>
+                <span
+                  class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+                  >expand_more</span
+                >
+              </div>
+            </div>
+            <!-- Student ID -->
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-label font-medium text-on-surface-variant"
+                for="student-id"
+                >Student ID</label
+              >
+              <div class="relative">
+                <span
+                  class="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-70"
+                  >badge</span
+                >
+                <input
+                  class="w-full bg-surface-container-low text-on-surface rounded-[12px] pl-12 pr-4 py-3 border-none focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all duration-200 placeholder:text-on-surface-variant/50"
+                  id="student-id"
+                  placeholder="Enter ID number"
+                  type="text"
+                />
+              </div>
+            </div>
+            <!-- Batch -->
+            <div class="flex flex-col gap-2">
+              <label
+                class="text-sm font-label font-medium text-on-surface-variant"
+                for="batch"
+                >Batch</label
+              >
+              <div class="relative">
+                <select
+                  class="w-full appearance-none bg-surface-container-low text-on-surface rounded-[12px] px-4 py-3 border-none focus:ring-2 focus:ring-primary/40 focus:outline-none transition-all duration-200"
+                  id="batch"
+                >
+                  <option disabled="" selected="" value="">
+                    Assign batch...
+                  </option>
+                  <option value="alpha">Alpha Cohort</option>
+                  <option value="beta">Beta Cohort</option>
+                  <option value="gamma">Gamma Cohort</option>
+                  <option value="delta">Delta Cohort</option>
+                </select>
+                <span
+                  class="material-symbols-outlined absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-variant pointer-events-none"
+                  >expand_more</span
+                >
+              </div>
+            </div>
+          </div>
+          <!-- Divider -->
+          <div class="w-full h-px bg-surface-variant my-2"></div>
+          <!-- Actions -->
+          <div class="flex items-center justify-end gap-4 mt-4">
+            <button
+              class="px-6 py-3 rounded-[12px] text-primary font-medium hover:bg-surface-container-low transition-colors duration-200"
+              type="button"
+            >
+              Save Draft
             </button>
             <button
-              class="p-1.5 rounded text-on-surface-variant hover:text-primary"
+              class="px-8 py-3 rounded-[12px] bg-primary text-on-primary font-medium hover:bg-signature-gradient transition-all duration-300 shadow-[0_4px_14px_rgba(0,108,73,0.2)] hover:shadow-[0_6px_20px_rgba(0,108,73,0.3)] flex items-center gap-2"
+              type="button"
             >
+              Continue to Step 2
               <span class="material-symbols-outlined text-[20px]"
-                >view_list</span
+                >arrow_forward</span
               >
             </button>
           </div>
-        </div>
-      </div>
-    </header>
-    <!-- Main Grid Content -->
-    <main class="px-8 pb-12 max-w-[1600px] mx-auto">
-      <div
-        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6"
+        </form>
+      </main>
+      <!-- Footer Injection -->
+      <footer
+        class="bg-slate-50 dark:bg-slate-950 docked full-width bottom-0 text-emerald-700 dark:text-emerald-400"
       >
-        <!-- Batch Card 1 -->
         <div
-          class="group bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col overflow-hidden"
+          class="bg-slate-100 dark:bg-slate-900 flat no shadows flex flex-col md:flex-row justify-between items-center w-full px-8 py-12 max-w-7xl mx-auto Headlines: Inter bold -0.02em letter-spacing. Body: Inter body-md text-slate-900 dark:text-slate-100. Labels: label-md font-medium."
         >
-          <div class="p-6 pb-4">
-            <div class="flex justify-between items-start mb-4">
-              <div class="bg-primary/5 p-3 rounded-lg text-primary">
-                <span class="material-symbols-outlined text-2xl">school</span>
-              </div>
-              <button class="text-on-surface-variant hover:text-primary p-1">
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </div>
-            <div class="mb-4">
-              <h3
-                class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Advanced Physics A
-              </h3>
-              <p
-                class="text-xs font-medium text-on-surface-variant tracking-wide"
-              >
-                SECTION 402
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >GRADE 12</span
-              >
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >2023 - 2024</span
-              >
-            </div>
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-on-surface-variant">CAPACITY</span>
-                <span class="text-on-surface"
-                  >28/30
-                  <span
-                    class="inline-block w-2 h-2 rounded-full bg-emerald-500 ml-1"
-                  ></span
-                ></span>
-              </div>
-              <div
-                class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"
-              >
-                <div class="bg-primary h-full w-[93%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
           <div
-            class="mt-auto bg-surface-container-low/30 p-6 pt-4 border-t border-outline-variant/5"
+            class="text-lg font-bold text-emerald-800 dark:text-emerald-300 mb-6 md:mb-0"
           >
-            <div class="flex justify-between items-center">
-              <div class="flex -space-x-2">
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Portrait of a male student with short hair smiling softly in a studio setting"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDV5V6rfugvA8O-SIZjQwrK2eM3J1U99hVKaXtiA9l9mZxlfrjGOrMAWa-8tkCGtRRfIDG45vxg3S-e_Fr7UlqRfxCoWqFI3KLVjfiMd6FwTI6iJ7j9S_5PDYUineN4gTY278jk30lUt0q9tR-rO4F7N3M4lnvEQz08H4_GcUTL5z5cVJPlC5wBgcTYGQdHt0Tu82ISURXAgjVZk9JmzFWoSVEVXZiL2BuoukdKO69Wlclz93tsPF6Ne_hwi-BPo24ECWe4sfk__Bbc"
-                />
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Close-up of a young woman with a friendly expression in professional attire"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBkYEX9aWvkmc8W8mOXqB0RIqQRObICZBAhknayMZWCwcRg9L4A__02V4Gn2SgnhcFIH8atYRKr-K4WtExEc5jFSPXcNdMAtkc-Ti9ce02JMvH0NMT5l6DwLLI1g4ytqEXxnswvzhntvhPbOFL3UoKtEVBh_Say6qVylZvLUm3oYM0PfaEHdcKciar6AwYux-04LIzB_vFToUmeXp_XdFhuxFHaY2ifGoH1w6hh-0k9Rp0Po6NO4nMCyU_Kt_UQgh4gKVEs4NVJ31J8"
-                />
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Young male student looking confident in an outdoor campus setting"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAWegfMKANXJQ7SmoEh9tqzPSwAMH_Zk7g7cMFJjX4t7X44ErfEylOZGLZzUHNz_iAMi7fbT7qhaNnU3BATuejg15gsZmhafp7uFSKNJWA4XG4KrRevnCunoHd7R25VsZQ6yRQjx-OeQcNp0TvWDCi85E2qj5LxkQdSRhcapjdqEzYFciLrRWVGmXaCz4HbgHhE6HmYyKbQ3NFe_i4Ltgu1j3SVUb21IPDE_XTu8SAmzsUBXVgK8Rsqn1ZbXNft_nmCHFyf1p78IYui"
-                />
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container/30 text-[10px] font-bold flex items-center justify-center text-on-primary-container"
-                >
-                  +25
-                </div>
-              </div>
-              <span
-                class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-black rounded-md"
-                >ACTIVE</span
-              >
-            </div>
-          </div>
-        </div>
-        <!-- Batch Card 2 -->
-        <div
-          class="group bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col overflow-hidden"
-        >
-          <div class="p-6 pb-4">
-            <div class="flex justify-between items-start mb-4">
-              <div class="bg-primary/5 p-3 rounded-lg text-primary">
-                <span class="material-symbols-outlined text-2xl"
-                  >menu_book</span
-                >
-              </div>
-              <button class="text-on-surface-variant hover:text-primary p-1">
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </div>
-            <div class="mb-4">
-              <h3
-                class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Organic Chemistry II
-              </h3>
-              <p
-                class="text-xs font-medium text-on-surface-variant tracking-wide"
-              >
-                SECTION 105
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >GRADE 12</span
-              >
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >2023 - 2024</span
-              >
-            </div>
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-on-surface-variant">CAPACITY</span>
-                <span class="text-on-surface"
-                  >30/30
-                  <span
-                    class="inline-block w-2 h-2 rounded-full bg-rose-500 ml-1"
-                  ></span
-                ></span>
-              </div>
-              <div
-                class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"
-              >
-                <div class="bg-rose-500 h-full w-[100%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="mt-auto bg-surface-container-low/30 p-6 pt-4 border-t border-outline-variant/5"
-          >
-            <div class="flex justify-between items-center">
-              <div class="flex -space-x-2">
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Modern professional woman with glasses and focused expression in a workspace"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAEYs5LE4RpvfexsBtxUh9P_5DhNWuLe0EdavmwhXA_K_uquU_1bqlyQ0ZBES5eowq4wHVWGSlc5aK4o-Ta-cDsvJRBgGco5oofKX58iT2FK-L8TCpxUJ2-eQaYsEZNzUTgPxPP4RLSSzB-uTjMpJqjv--JlPXa7pyFZbyfSIbMNg1giSbP2EgdhDKyPm4J9qUK3uBXppAruJHbuXl6e8dW4GYTbU1Xr9iBvA5hvN82o57arO_OCAn6DymgsGeMwuF-t2OflzZeLMHA"
-                />
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Headshot of a smiling young man in a casual denim shirt"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBxRd6SH_PQPgkdGVlUf57xLD_e47PnyjyH4dngWI3euGiIE102RaL6GymYQiH5I5kph_s_IVRg77VhZhObY610_oP4pqx1RE_Be4VNxvnC0EC62RpvK5TL-Z18MA610gXj_uD_W_Qw2FddsiWQ25piaeWT5UjK2yszfriUEGD83J7zkrd9iUSmj_GOxvt6cy51mckPkTqwb83ZC28yxAfjLZTGmNjFPEeZ_kTpaDHn11y70QZLbjeqmdYPAta32tESq6zJZfgexAsm"
-                />
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container/30 text-[10px] font-bold flex items-center justify-center text-on-primary-container"
-                >
-                  +28
-                </div>
-              </div>
-              <span
-                class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-black rounded-md"
-                >ACTIVE</span
-              >
-            </div>
-          </div>
-        </div>
-        <!-- Batch Card 3 -->
-        <div
-          class="group bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col overflow-hidden"
-        >
-          <div class="p-6 pb-4">
-            <div class="flex justify-between items-start mb-4">
-              <div class="bg-primary/5 p-3 rounded-lg text-primary">
-                <span class="material-symbols-outlined text-2xl"
-                  >functions</span
-                >
-              </div>
-              <button class="text-on-surface-variant hover:text-primary p-1">
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </div>
-            <div class="mb-4">
-              <h3
-                class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Calculus Fundamentals
-              </h3>
-              <p
-                class="text-xs font-medium text-on-surface-variant tracking-wide"
-              >
-                SECTION 301
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >GRADE 11</span
-              >
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >2023 - 2024</span
-              >
-            </div>
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-on-surface-variant">CAPACITY</span>
-                <span class="text-on-surface"
-                  >12/25
-                  <span
-                    class="inline-block w-2 h-2 rounded-full bg-emerald-500 ml-1"
-                  ></span
-                ></span>
-              </div>
-              <div
-                class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"
-              >
-                <div class="bg-primary h-full w-[48%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="mt-auto bg-surface-container-low/30 p-6 pt-4 border-t border-outline-variant/5"
-          >
-            <div class="flex justify-between items-center">
-              <div class="flex -space-x-2">
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Professional male portrait with direct gaze and neutral expression"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAs1EBepTP-i84qkKLJiuFh1ywAXOc3n3fWhRffx-ULP-IPrbwh5JEpvo81exNi7TykQZIQBYFTiSukrVVp1GTaDQOdUZktZWS6yN5uHCmuRZZ154-5AnGptBebLoedahs90uSHsi9sCG6J6EGjUdHdLeYt7o3cp7KxgI3Hxe4q204Zfd93BmojCK7wbKVQYvUwUxxf6f_O9d_ciUsYWYt_GbJNe1ttXWtqLCYNoszXyzUC-bN5L6pwdMdMkug2hY36cYMq126I99re"
-                />
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container/30 text-[10px] font-bold flex items-center justify-center text-on-primary-container"
-                >
-                  +11
-                </div>
-              </div>
-              <span
-                class="px-3 py-1 bg-surface-container text-on-surface-variant text-[10px] font-black rounded-md"
-                >SCHEDULED</span
-              >
-            </div>
-          </div>
-        </div>
-        <!-- Batch Card 4 -->
-        <div
-          class="group bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col overflow-hidden"
-        >
-          <div class="p-6 pb-4">
-            <div class="flex justify-between items-start mb-4">
-              <div class="bg-primary/5 p-3 rounded-lg text-primary">
-                <span class="material-symbols-outlined text-2xl"
-                  >history_edu</span
-                >
-              </div>
-              <button class="text-on-surface-variant hover:text-primary p-1">
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </div>
-            <div class="mb-4">
-              <h3
-                class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                World History: 19th Cent.
-              </h3>
-              <p
-                class="text-xs font-medium text-on-surface-variant tracking-wide"
-              >
-                SECTION 202
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >GRADE 12</span
-              >
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >2022 - 2023</span
-              >
-            </div>
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-on-surface-variant">CAPACITY</span>
-                <span class="text-on-surface"
-                  >25/25
-                  <span
-                    class="inline-block w-2 h-2 rounded-full bg-slate-400 ml-1"
-                  ></span
-                ></span>
-              </div>
-              <div
-                class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"
-              >
-                <div class="bg-slate-400 h-full w-[100%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="mt-auto bg-surface-container-low/30 p-6 pt-4 border-t border-outline-variant/5"
-          >
-            <div class="flex justify-between items-center">
-              <div class="flex -space-x-2">
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Candid portrait of a young woman laughing in an outdoor setting"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDTzg21gbS_UxcXyS9Ral9GxYYepo8MMxVuvay2MJTNbVAQCEHAMnog7SmvshNZD6qNJsvvKxcgUtf9FA-mF5i6pWG3W-kpbkcth8deMIsT3es8NapSIrXeNML0S1KBL7Jj0tPPxwdPNcGk0sT2mUCaMByJT2137suEbj2T0NzZ3QUzEDLE0BbDrvulARdSXdFutHZg59O082iEg2u34cmJAsRgDt2ojz4mGra6VVK2Cl8l_uX0iRXDvrSczFPTRAf9HMEc4naEOMHD"
-                />
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Portrait of a young man with a slight smile looking towards the camera"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuAbqlJ1h044YJug1fdKb1g5ToNnfF_9QcmzveHPhPAbQqk1BYPqSug_WOr9yv_FddWbXyvPZnr3wjzcbmZ7Axm4uuP8efq73CoZ7wLqQMZ4YkCY0oS4gHLe3gy_mmkqk2E0lfExa5hfuFFrGd8JEWqrJShoXiNLY9-aogN4sHa_Rw9UeLMGvasUsTEkMMUTUaXlTj3o9mLZZ39zQOgPfmuP2YL24E8xsgNjMIDhNdpIcQlby7ws12TWtfaURfFFVh5G2skdBo0lptVO"
-                />
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container/30 text-[10px] font-bold flex items-center justify-center text-on-primary-container"
-                >
-                  +23
-                </div>
-              </div>
-              <span
-                class="px-3 py-1 bg-surface-container-highest text-on-surface text-[10px] font-black rounded-md"
-                >COMPLETED</span
-              >
-            </div>
-          </div>
-        </div>
-        <!-- Repeated Card 5 -->
-        <div
-          class="group bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col overflow-hidden"
-        >
-          <div class="p-6 pb-4">
-            <div class="flex justify-between items-start mb-4">
-              <div class="bg-primary/5 p-3 rounded-lg text-primary">
-                <span class="material-symbols-outlined text-2xl">biotech</span>
-              </div>
-              <button class="text-on-surface-variant hover:text-primary p-1">
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </div>
-            <div class="mb-4">
-              <h3
-                class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Intro to Genetics
-              </h3>
-              <p
-                class="text-xs font-medium text-on-surface-variant tracking-wide"
-              >
-                SECTION 112
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >GRADE 10</span
-              >
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >2023 - 2024</span
-              >
-            </div>
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-on-surface-variant">CAPACITY</span>
-                <span class="text-on-surface"
-                  >15/30
-                  <span
-                    class="inline-block w-2 h-2 rounded-full bg-emerald-500 ml-1"
-                  ></span
-                ></span>
-              </div>
-              <div
-                class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"
-              >
-                <div class="bg-primary h-full w-[50%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="mt-auto bg-surface-container-low/30 p-6 pt-4 border-t border-outline-variant/5"
-          >
-            <div class="flex justify-between items-center">
-              <div class="flex -space-x-2">
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Cheerful young woman with dark hair in a casual bright top"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuDXbqJZDTLFHx5pZH3mT8ahI4JxVsctFubEu6wvAk9dXqJwZqHlnc9_oZNM8vmgJn87_3jnpC63vnYWNdkZVNIzRGde3Vc96cvdWqQKwQLGGBouMFxXSKBtVAzwxN3SDNA3ot_X0dGuPDA20LFtL1FXEg2P51LXPY0fYHpddGRONh0HjXAQyTc_uXpTTPB1Z5s86A0N0px5iYFpvGIIJhxq-bi_YYraSDW729JUhbYGIPH0GPwrYfAPuImsjsdes1gLjKaE0D-Oo5BT"
-                />
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container/30 text-[10px] font-bold flex items-center justify-center text-on-primary-container"
-                >
-                  +14
-                </div>
-              </div>
-              <span
-                class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-black rounded-md"
-                >ACTIVE</span
-              >
-            </div>
-          </div>
-        </div>
-        <!-- Repeated Card 6 -->
-        <div
-          class="group bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col overflow-hidden"
-        >
-          <div class="p-6 pb-4">
-            <div class="flex justify-between items-start mb-4">
-              <div class="bg-primary/5 p-3 rounded-lg text-primary">
-                <span class="material-symbols-outlined text-2xl">language</span>
-              </div>
-              <button class="text-on-surface-variant hover:text-primary p-1">
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </div>
-            <div class="mb-4">
-              <h3
-                class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Global Economics
-              </h3>
-              <p
-                class="text-xs font-medium text-on-surface-variant tracking-wide"
-              >
-                SECTION 501
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >GRADE 12</span
-              >
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >2023 - 2024</span
-              >
-            </div>
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-on-surface-variant">CAPACITY</span>
-                <span class="text-on-surface"
-                  >22/25
-                  <span
-                    class="inline-block w-2 h-2 rounded-full bg-emerald-500 ml-1"
-                  ></span
-                ></span>
-              </div>
-              <div
-                class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"
-              >
-                <div class="bg-primary h-full w-[88%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="mt-auto bg-surface-container-low/30 p-6 pt-4 border-t border-outline-variant/5"
-          >
-            <div class="flex justify-between items-center">
-              <div class="flex -space-x-2">
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Portrait of a young woman with a creative style and confident expression"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCFqGW56FyMRfjqmuWLH_a8Oa0t2UtIP1bTd6n05AoFZMm9KU_oyvhTK9-GOz4rtCRnD4I_zik0SFyg9iZaKLa2-rwPHGvBrzqZoiOB4YKzAJz6KgXpGuKdwllOJ1MhY8M-ufZDMJSrr7EOHVsbH2OQJXupcAkgZOkmE9CoHvv8Vwp2aXzoffsrKbq7W1zJ4xjDn1UNZc-j2kap7YB7AUIlT514Au9CLwvY8IcrMjAG-dwpi_z2Mlv3q3fhkNtQe2UdGpwmW7SH0ouE"
-                />
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Studio portrait of a young man with a gentle smile"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCe4gZ6Z9zjPgUPLUQccsc_JgxEEcacHqYihsG7TRSigyJcGdVWM7-mziYgGxesN5OOCCp6oKlLk18Uj-0IZnRD_7xXZu_gVeTBzDCfs4Cd9P9nuxczBTk4mEukwnuHIYgq_5aE-rHKioI6Gj_cT_T6CbwcHnRGK6Ls0B4duvhHWEnJqccvRzHRMDVFSNOuiMHD4LUX9meQUM53X7OyAOYl5Yu890b_QadyESns4cEf3cHS9dMsNuVujr2okcV5L1ZCv3sduAlriWse"
-                />
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container/30 text-[10px] font-bold flex items-center justify-center text-on-primary-container"
-                >
-                  +20
-                </div>
-              </div>
-              <span
-                class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-black rounded-md"
-                >ACTIVE</span
-              >
-            </div>
-          </div>
-        </div>
-        <!-- Repeated Card 7 -->
-        <div
-          class="group bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col overflow-hidden"
-        >
-          <div class="p-6 pb-4">
-            <div class="flex justify-between items-start mb-4">
-              <div class="bg-primary/5 p-3 rounded-lg text-primary">
-                <span class="material-symbols-outlined text-2xl">palette</span>
-              </div>
-              <button class="text-on-surface-variant hover:text-primary p-1">
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </div>
-            <div class="mb-4">
-              <h3
-                class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                Art History &amp; Theory
-              </h3>
-              <p
-                class="text-xs font-medium text-on-surface-variant tracking-wide"
-              >
-                SECTION 108
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >GRADE 10</span
-              >
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >2023 - 2024</span
-              >
-            </div>
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-on-surface-variant">CAPACITY</span>
-                <span class="text-on-surface"
-                  >5/20
-                  <span
-                    class="inline-block w-2 h-2 rounded-full bg-emerald-500 ml-1"
-                  ></span
-                ></span>
-              </div>
-              <div
-                class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"
-              >
-                <div class="bg-primary h-full w-[25%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="mt-auto bg-surface-container-low/30 p-6 pt-4 border-t border-outline-variant/5"
-          >
-            <div class="flex justify-between items-center">
-              <div class="flex -space-x-2">
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Portrait of a young black woman with a bright and welcoming smile"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuD_Bc40UoW93o5zGmQPs3pjBPQIspFxPFuqRjI49VTCPcdZ96dBcVeCSYVvW6sAfXhXECD_PJZFlmFKZiRhoqrLa-nKiXZvTTpkZWjP2TlqOO_QNTVmAE8bBgAR1sscC8o0x-Bff0OZY6cxM7-A1IxGo8yBrBsALCLZaarSRFZRqXv2pinfiQpjOeuD-68hDclfA0ZmDcXvvWgawtKS7p1ni9OSC70Hm1O318CdnMbxhwAN3O-aFyBCaH2ZwEqO3qvPEO0ejJbmbXo4"
-                />
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container/30 text-[10px] font-bold flex items-center justify-center text-on-primary-container"
-                >
-                  +4
-                </div>
-              </div>
-              <span
-                class="px-3 py-1 bg-surface-container text-on-surface-variant text-[10px] font-black rounded-md"
-                >SCHEDULED</span
-              >
-            </div>
-          </div>
-        </div>
-        <!-- Repeated Card 8 -->
-        <div
-          class="group bg-surface-container-lowest rounded-xl shadow-sm hover:shadow-xl transition-all duration-300 border border-outline-variant/10 flex flex-col overflow-hidden"
-        >
-          <div class="p-6 pb-4">
-            <div class="flex justify-between items-start mb-4">
-              <div class="bg-primary/5 p-3 rounded-lg text-primary">
-                <span class="material-symbols-outlined text-2xl">code</span>
-              </div>
-              <button class="text-on-surface-variant hover:text-primary p-1">
-                <span class="material-symbols-outlined">more_vert</span>
-              </button>
-            </div>
-            <div class="mb-4">
-              <h3
-                class="text-lg font-bold text-on-surface group-hover:text-primary transition-colors"
-              >
-                CS101: Python Basics
-              </h3>
-              <p
-                class="text-xs font-medium text-on-surface-variant tracking-wide"
-              >
-                SECTION 604
-              </p>
-            </div>
-            <div class="flex flex-wrap gap-2 mb-6">
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >GRADE 11</span
-              >
-              <span
-                class="px-2.5 py-1 bg-surface-container text-[10px] font-bold text-on-secondary-container rounded-full"
-                >2023 - 2024</span
-              >
-            </div>
-            <div class="space-y-2 mb-6">
-              <div class="flex justify-between items-center text-xs font-bold">
-                <span class="text-on-surface-variant">CAPACITY</span>
-                <span class="text-on-surface"
-                  >30/30
-                  <span
-                    class="inline-block w-2 h-2 rounded-full bg-rose-500 ml-1"
-                  ></span
-                ></span>
-              </div>
-              <div
-                class="w-full h-1.5 bg-surface-container rounded-full overflow-hidden"
-              >
-                <div class="bg-rose-500 h-full w-[100%] rounded-full"></div>
-              </div>
-            </div>
-          </div>
-          <div
-            class="mt-auto bg-surface-container-low/30 p-6 pt-4 border-t border-outline-variant/5"
-          >
-            <div class="flex justify-between items-center">
-              <div class="flex -space-x-2">
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Portrait of a young man with a modern hairstyle and a confident look"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuBfJRn1PEPIV5cfET7V3I1qntTsFdyXET2REQM4jwxKVeZK6pXwecT55rZLZcNuIvXpmTFBxXud-dF-5F32aqlgTAlhTx90_YSwR_zIqDOiJXq7Gk1W6L9dMdk8CmlhTn4CtVtmpMpnuu7HY1yWR0H0Q4y0U4pzsrLs7-WdK5aElhxja7dv32Uhi8nJFb02f1OU4jU8PF6YADnsOVaYvDlZ_hDKFoOaxbs5YT4DdRULMq0OCfTE213qD27Ls-UMhRAnmc4rO2Q9PWOc"
-                />
-                <img
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest"
-                  data-alt="Woman with a soft smile and warm lighting in a minimalist background"
-                  src="https://lh3.googleusercontent.com/aida-public/AB6AXuCYrZeLA8d0K1HDY4NVbAAxdOHZAcFQ0XqcLIXh0MkK3CzXptOjZcb9SjgW0f32AoZ_165czW1B3bFdU-zA37epRAEj4GJbgH4xZC5180v4Z3XLbq9SBrF2mO9AkSMEfCh35OUXdFrSAZCY8_JuphI9cc04_kEzcvp9gjunQGyPgP2r4pSIa5yzGgtWVCp6RN13mVO6arxiyO6NtCJahqRSn3MVvPuHftmUjupzQhhCiPfjEyrmv93C-lXJN5Z_Vy_HQziEbGBPQ9NO"
-                />
-                <div
-                  class="w-8 h-8 rounded-full border-2 border-surface-container-lowest bg-primary-container/30 text-[10px] font-bold flex items-center justify-center text-on-primary-container"
-                >
-                  +28
-                </div>
-              </div>
-              <span
-                class="px-3 py-1 bg-secondary-container text-on-secondary-container text-[10px] font-black rounded-md"
-                >ACTIVE</span
-              >
-            </div>
-          </div>
-        </div>
-      </div>
-    </main>
-    <!-- Pagination Section -->
-    <footer class="max-w-[1600px] mx-auto px-8 pb-12">
-      <div
-        class="flex flex-col sm:flex-row items-center justify-between bg-surface-container-low p-4 rounded-xl border border-outline-variant/10"
-      >
-        <p class="text-sm font-medium text-on-surface-variant mb-4 sm:mb-0">
-          Showing <span class="text-on-surface font-bold">1 to 8</span> of
-          <span class="text-on-surface font-bold">24</span> batches
-        </p>
-        <nav class="flex items-center gap-2">
-          <button
-            class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary transition-all ring-1 ring-outline-variant/10"
-          >
-            <span class="material-symbols-outlined">chevron_left</span>
-          </button>
-          <div
-            class="flex items-center bg-surface-container-lowest rounded-lg ring-1 ring-outline-variant/10 p-1"
-          >
-            <button
-              class="w-8 h-8 flex items-center justify-center rounded-md bg-primary text-on-primary text-sm font-bold shadow-sm"
+            <span class="material-symbols-outlined align-middle mr-2"
+              >token</span
             >
-              1
-            </button>
-            <button
-              class="w-8 h-8 flex items-center justify-center rounded-md text-on-surface-variant hover:text-primary text-sm font-bold"
-            >
-              2
-            </button>
-            <button
-              class="w-8 h-8 flex items-center justify-center rounded-md text-on-surface-variant hover:text-primary text-sm font-bold"
-            >
-              3
-            </button>
+            Veridian Academy
           </div>
-          <button
-            class="w-10 h-10 flex items-center justify-center rounded-lg bg-surface-container-lowest text-on-surface-variant hover:text-primary transition-all ring-1 ring-outline-variant/10"
-          >
-            <span class="material-symbols-outlined">chevron_right</span>
-          </button>
-        </nav>
-      </div>
-    </footer>
+          <nav class="flex flex-wrap justify-center gap-6">
+            <a
+              class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors duration-200 text-sm"
+              href="#"
+              >Privacy Policy</a
+            >
+            <a
+              class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors duration-200 text-sm"
+              href="#"
+              >Terms of Service</a
+            >
+            <a
+              class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors duration-200 text-sm"
+              href="#"
+              >Help Center</a
+            >
+            <a
+              class="text-slate-500 dark:text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-300 transition-colors duration-200 text-sm"
+              href="#"
+              >Accessibility</a
+            >
+          </nav>
+        </div>
+        <div
+          class="text-center py-4 text-xs text-slate-500 dark:text-slate-400"
+        >
+          © 2024 Veridian Academy. All rights reserved.
+        </div>
+      </footer>
+    </div>
   </body>
 </html>

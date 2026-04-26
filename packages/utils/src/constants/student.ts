@@ -8,6 +8,11 @@ export enum GENDER {
   OTHER = "OTHER",
 }
 
+export enum NATIONALITY {
+  BANGLADESHI = "BANGLADESHI",
+  OTHER = "OTHER",
+}
+
 export enum BLOOD_GROUP {
   A_POSITIVE = "A_POSITIVE",
   A_NEGATIVE = "A_NEGATIVE",

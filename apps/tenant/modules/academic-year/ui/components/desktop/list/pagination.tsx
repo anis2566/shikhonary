@@ -1,9 +1,7 @@
-"use client";
-
-import React from "react";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import { Button } from "@workspace/ui/components/button";
 import { useAcademicYearFilters } from "@workspace/api-client/filters";
-import { Card } from "@workspace/ui/components/card";
+import { cn } from "@workspace/ui/lib/utils";
 
 interface PaginationProps {
   total: number;
@@ -12,11 +10,9 @@ interface PaginationProps {
 export function Pagination({ total }: PaginationProps) {
   const [filters, setFilters] = useAcademicYearFilters();
 
-  const currentPage = filters.page;
-  const pageSize = filters.limit;
+  const currentPage = filters.page || 1;
+  const pageSize = filters.limit || 10;
   const totalPages = Math.ceil(total / pageSize);
-
-  console.log(totalPages);
 
   const handlePageChange = (page: number) => {
     setFilters({ ...filters, page });
@@ -28,40 +24,39 @@ export function Pagination({ total }: PaginationProps) {
   if (total === 0) return null;
 
   return (
-    <Card className="rounded-xl shadow-sm border-slate-100 overflow-hidden">
-      <div className="px-8 py-5 flex items-center justify-between border-t border-slate-100 bg-white">
-        <p className="text-[13px] font-medium text-slate-500">
-          Showing{" "}
-          <span className="font-bold text-slate-900">
-            {startRange} - {endRange}
-          </span>{" "}
-          of <span className="font-bold text-slate-900">{total}</span>
-        </p>
-        <div className="flex items-center gap-1.5">
-          <Button
-            variant="outline"
-            disabled={currentPage <= 1}
-            onClick={() => handlePageChange(currentPage - 1)}
-            className="px-3 py-2 bg-white border-slate-200 text-xs font-bold text-slate-400 font-bold transition-all hover:bg-slate-50 active:scale-95 flex items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
+    <div className="p-4 border-t border-surface-container flex flex-col md:flex-row justify-between items-center bg-surface-container-lowest rounded-b-xl gap-4">
+      <span className="text-sm font-semibold text-on-surface-variant tracking-tight">
+        Showing {startRange} to {endRange} of {total} entries
+      </span>
+      <div className="flex items-center gap-1.5">
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={currentPage <= 1}
+          onClick={() => handlePageChange(currentPage - 1)}
+          className="p-2 rounded-lg hover:bg-surface-container-low text-on-surface-variant h-10 w-10 disabled:opacity-30 transition-all active:scale-95"
+        >
+          <ChevronLeft size={20} strokeWidth={2.5} />
+        </Button>
+        <div className="flex gap-1.5">
+          <button
+            className={cn(
+              "w-10 h-10 rounded-xl font-bold text-[13px] flex items-center justify-center transition-all active:scale-90 bg-primary-container text-on-primary-container shadow-sm",
+            )}
           >
-            Previous
-          </Button>
-          <div className="flex items-center gap-1 mx-2">
-            {/* Simple version: just current page, could be expanded to show more */}
-            <Button className="w-9 h-9 flex items-center justify-center rounded-lg bg-emerald-600 text-white text-xs font-bold shadow-sm shadow-emerald-600/20 active:scale-95 transition-all">
-              {currentPage}
-            </Button>
-          </div>
-          <Button
-            variant="outline"
-            disabled={currentPage >= totalPages}
-            onClick={() => handlePageChange(currentPage + 1)}
-            className="px-3 py-2 bg-white border-slate-200 text-xs font-bold text-slate-400 font-bold transition-all hover:bg-slate-50 active:scale-95 flex items-center gap-2 group disabled:opacity-50 disabled:cursor-not-allowed"
-          >
-            Next
-          </Button>
+            {currentPage}
+          </button>
         </div>
+        <Button
+          variant="ghost"
+          size="icon"
+          disabled={currentPage >= totalPages}
+          onClick={() => handlePageChange(currentPage + 1)}
+          className="p-2 rounded-lg hover:bg-surface-container-low text-on-surface-variant h-10 w-10 active:scale-90 disabled:opacity-30 transition-all"
+        >
+          <ChevronRight size={20} strokeWidth={2.5} />
+        </Button>
       </div>
-    </Card>
+    </div>
   );
 }

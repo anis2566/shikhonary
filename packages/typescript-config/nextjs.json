@@ -8,6 +8,8 @@
     "moduleResolution": "Bundler",
     "allowJs": true,
     "jsx": "preserve",
+    "jsxImportSource": "react",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "noEmit": true
   }
 }

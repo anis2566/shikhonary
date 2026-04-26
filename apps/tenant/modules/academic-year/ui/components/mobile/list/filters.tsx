@@ -180,7 +180,7 @@ export const Filters = () => {
           </Button>
           <DrawerClose asChild>
             <Button className="flex-[2] h-10 rounded-2xl bg-primary text-on-primary font-bold hover:bg-primary/90 transition-all shadow-lg shadow-primary/20 border-none">
-              Close
+              Apply Filters
             </Button>
           </DrawerClose>
         </DrawerFooter>
