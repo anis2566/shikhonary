@@ -128,11 +128,18 @@ const navSections: NavSection[] = [
     ],
   },
   {
-    label: "Fees & Payments",
+    label: "Payments",
     items: [
-      { title: "Fee Structure", url: "/fee-structure", icon: DollarSign },
-      { title: "Payments", url: "/payments", icon: CreditCard },
-      { title: "Reminders", url: "/fee-reminders", icon: SendHorizonal },
+      {
+        title: "Monthly Fees",
+        url: "/monthly-payments",
+        icon: CreditCard,
+      },
+      {
+        title: "Admission Fees",
+        url: "/admission-payments",
+        icon: CreditCard,
+      },
     ],
   },
   {

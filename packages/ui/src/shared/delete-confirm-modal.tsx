@@ -36,6 +36,8 @@ const entityLabels: Record<
   admissionFee: { singular: "Admission Fee", icon: "💰" },
   monthlyFee: { singular: "Monthly Fee", icon: "💰" },
   student: { singular: "Student", icon: "📚" },
+  admissionPayment: { singular: "Admission Payment", icon: "💰" },
+  monthlyPayment: { singular: "Monthly Payment", icon: "💰" },
 };
 
 export function DeleteConfirmModal() {

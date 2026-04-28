@@ -65,7 +65,9 @@ export const ModelName = {
   AcademicYear: 'AcademicYear',
   Counter: 'Counter',
   AdmissionFee: 'AdmissionFee',
-  MonthlyFee: 'MonthlyFee'
+  MonthlyFee: 'MonthlyFee',
+  AdmissionPayment: 'AdmissionPayment',
+  MonthlyPayment: 'MonthlyPayment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -417,6 +419,48 @@ export const MonthlyFeeScalarFieldEnum = {
 } as const
 
 export type MonthlyFeeScalarFieldEnum = (typeof MonthlyFeeScalarFieldEnum)[keyof typeof MonthlyFeeScalarFieldEnum]
+
+
+export const AdmissionPaymentScalarFieldEnum = {
+  id: 'id',
+  studentIndexId: 'studentIndexId',
+  studentId: 'studentId',
+  academicYearId: 'academicYearId',
+  amount: 'amount',
+  discount: 'discount',
+  paidAmount: 'paidAmount',
+  paymentDate: 'paymentDate',
+  paymentMethod: 'paymentMethod',
+  transactionId: 'transactionId',
+  status: 'status',
+  remarks: 'remarks',
+  collectedById: 'collectedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdmissionPaymentScalarFieldEnum = (typeof AdmissionPaymentScalarFieldEnum)[keyof typeof AdmissionPaymentScalarFieldEnum]
+
+
+export const MonthlyPaymentScalarFieldEnum = {
+  id: 'id',
+  academicYearId: 'academicYearId',
+  studentId: 'studentId',
+  batchId: 'batchId',
+  month: 'month',
+  year: 'year',
+  baseAmount: 'baseAmount',
+  fine: 'fine',
+  discount: 'discount',
+  totalPaid: 'totalPaid',
+  paymentDate: 'paymentDate',
+  status: 'status',
+  paymentMethod: 'paymentMethod',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyPaymentScalarFieldEnum = (typeof MonthlyPaymentScalarFieldEnum)[keyof typeof MonthlyPaymentScalarFieldEnum]
 
 
 export const SortOrder = {

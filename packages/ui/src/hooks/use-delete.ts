@@ -17,7 +17,9 @@ export type DeleteEntityType =
   | "counter"
   | "admissionFee"
   | "monthlyFee"
-  | "student";
+  | "student"
+  | "admissionPayment"
+  | "monthlyPayment";
 
 interface DeleteModalState {
   isOpen: boolean;

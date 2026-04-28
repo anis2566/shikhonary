@@ -234,3 +234,17 @@ export const monthlyFeeFilterSchema = {
   academicYearId: parseAsString.withOptions({ clearOnDefault: true }),
   academicClassId: parseAsString.withOptions({ clearOnDefault: true }),
 };
+
+/**
+ * Admission Payment Filters
+ */
+export const admissionPaymentFilterSchema = {
+  ...baseFilterSchema,
+  studentSearch: parseAsString.withOptions({ clearOnDefault: true }),
+  transactionSearch: parseAsString.withOptions({ clearOnDefault: true }),
+  studentId: parseAsString.withOptions({ clearOnDefault: true }),
+  academicYearId: parseAsString.withOptions({ clearOnDefault: true }),
+  status: parseAsString.withOptions({ clearOnDefault: true }),
+  paymentMethod: parseAsString.withOptions({ clearOnDefault: true }),
+  paymentDate: parseAsString.withOptions({ clearOnDefault: true }),
+};

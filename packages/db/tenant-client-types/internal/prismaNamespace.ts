@@ -398,7 +398,9 @@ export const ModelName = {
   AcademicYear: 'AcademicYear',
   Counter: 'Counter',
   AdmissionFee: 'AdmissionFee',
-  MonthlyFee: 'MonthlyFee'
+  MonthlyFee: 'MonthlyFee',
+  AdmissionPayment: 'AdmissionPayment',
+  MonthlyPayment: 'MonthlyPayment'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -414,7 +416,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "student" | "batch" | "teacher" | "exam" | "examAttempt" | "answerHistory" | "attendance" | "announcement" | "notification" | "examAnalytics" | "studentAnalytics" | "academicYear" | "counter" | "admissionFee" | "monthlyFee"
+    modelProps: "student" | "batch" | "teacher" | "exam" | "examAttempt" | "answerHistory" | "attendance" | "announcement" | "notification" | "examAnalytics" | "studentAnalytics" | "academicYear" | "counter" | "admissionFee" | "monthlyFee" | "admissionPayment" | "monthlyPayment"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1528,6 +1530,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    AdmissionPayment: {
+      payload: Prisma.$AdmissionPaymentPayload<ExtArgs>
+      fields: Prisma.AdmissionPaymentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.AdmissionPaymentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.AdmissionPaymentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>
+        }
+        findFirst: {
+          args: Prisma.AdmissionPaymentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.AdmissionPaymentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>
+        }
+        findMany: {
+          args: Prisma.AdmissionPaymentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>[]
+        }
+        create: {
+          args: Prisma.AdmissionPaymentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>
+        }
+        createMany: {
+          args: Prisma.AdmissionPaymentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.AdmissionPaymentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>[]
+        }
+        delete: {
+          args: Prisma.AdmissionPaymentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>
+        }
+        update: {
+          args: Prisma.AdmissionPaymentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>
+        }
+        deleteMany: {
+          args: Prisma.AdmissionPaymentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.AdmissionPaymentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.AdmissionPaymentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>[]
+        }
+        upsert: {
+          args: Prisma.AdmissionPaymentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AdmissionPaymentPayload>
+        }
+        aggregate: {
+          args: Prisma.AdmissionPaymentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAdmissionPayment>
+        }
+        groupBy: {
+          args: Prisma.AdmissionPaymentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdmissionPaymentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.AdmissionPaymentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AdmissionPaymentCountAggregateOutputType> | number
+        }
+      }
+    }
+    MonthlyPayment: {
+      payload: Prisma.$MonthlyPaymentPayload<ExtArgs>
+      fields: Prisma.MonthlyPaymentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.MonthlyPaymentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.MonthlyPaymentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>
+        }
+        findFirst: {
+          args: Prisma.MonthlyPaymentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.MonthlyPaymentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>
+        }
+        findMany: {
+          args: Prisma.MonthlyPaymentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>[]
+        }
+        create: {
+          args: Prisma.MonthlyPaymentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>
+        }
+        createMany: {
+          args: Prisma.MonthlyPaymentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.MonthlyPaymentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>[]
+        }
+        delete: {
+          args: Prisma.MonthlyPaymentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>
+        }
+        update: {
+          args: Prisma.MonthlyPaymentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>
+        }
+        deleteMany: {
+          args: Prisma.MonthlyPaymentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.MonthlyPaymentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.MonthlyPaymentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>[]
+        }
+        upsert: {
+          args: Prisma.MonthlyPaymentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$MonthlyPaymentPayload>
+        }
+        aggregate: {
+          args: Prisma.MonthlyPaymentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateMonthlyPayment>
+        }
+        groupBy: {
+          args: Prisma.MonthlyPaymentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthlyPaymentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.MonthlyPaymentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.MonthlyPaymentCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -1902,6 +2052,48 @@ export const MonthlyFeeScalarFieldEnum = {
 export type MonthlyFeeScalarFieldEnum = (typeof MonthlyFeeScalarFieldEnum)[keyof typeof MonthlyFeeScalarFieldEnum]
 
 
+export const AdmissionPaymentScalarFieldEnum = {
+  id: 'id',
+  studentIndexId: 'studentIndexId',
+  studentId: 'studentId',
+  academicYearId: 'academicYearId',
+  amount: 'amount',
+  discount: 'discount',
+  paidAmount: 'paidAmount',
+  paymentDate: 'paymentDate',
+  paymentMethod: 'paymentMethod',
+  transactionId: 'transactionId',
+  status: 'status',
+  remarks: 'remarks',
+  collectedById: 'collectedById',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type AdmissionPaymentScalarFieldEnum = (typeof AdmissionPaymentScalarFieldEnum)[keyof typeof AdmissionPaymentScalarFieldEnum]
+
+
+export const MonthlyPaymentScalarFieldEnum = {
+  id: 'id',
+  academicYearId: 'academicYearId',
+  studentId: 'studentId',
+  batchId: 'batchId',
+  month: 'month',
+  year: 'year',
+  baseAmount: 'baseAmount',
+  fine: 'fine',
+  discount: 'discount',
+  totalPaid: 'totalPaid',
+  paymentDate: 'paymentDate',
+  status: 'status',
+  paymentMethod: 'paymentMethod',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type MonthlyPaymentScalarFieldEnum = (typeof MonthlyPaymentScalarFieldEnum)[keyof typeof MonthlyPaymentScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2031,6 +2223,20 @@ export type JsonFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'J
 export type EnumQueryModeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'QueryMode'>
     
 
+
+/**
+ * Reference to a field of type 'Decimal'
+ */
+export type DecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal'>
+    
+
+
+/**
+ * Reference to a field of type 'Decimal[]'
+ */
+export type ListDecimalFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Decimal[]'>
+    
+
 /**
  * Batch Payload for updateMany & deleteMany & createMany
  */
@@ -2141,6 +2347,8 @@ export type GlobalOmitConfig = {
   counter?: Prisma.CounterOmit
   admissionFee?: Prisma.AdmissionFeeOmit
   monthlyFee?: Prisma.MonthlyFeeOmit
+  admissionPayment?: Prisma.AdmissionPaymentOmit
+  monthlyPayment?: Prisma.MonthlyPaymentOmit
 }
 
 /* Types for Logging */

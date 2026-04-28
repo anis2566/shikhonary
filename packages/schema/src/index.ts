@@ -29,6 +29,7 @@ export * from "./announcement";
 export * from "./counter";
 export * from "./admission-fee";
 export * from "./monthly-fee";
+export * from "./admission-payment";
 
 // Business Schemas
 export * from "./subscription-plan";

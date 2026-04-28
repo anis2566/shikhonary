@@ -20,6 +20,7 @@ import { academicYearRouter } from "../routers/academic-year";
 import { counterRouter } from "../routers/counter";
 import { admissionFeeRouter } from "../routers/admission-fee";
 import { monthlyFeeRouter } from "../routers/monthly-fee";
+import { admissionPaymentRouter } from "../routers/admission-payment";
 
 // Explicitly import branded types to ensure they are available for inference in this module
 import type { TRPCContext, PrismaClient, TenantPrismaClient } from "./context";
@@ -51,6 +52,7 @@ export const appRouter = t.router({
   counter: counterRouter,
   admissionFee: admissionFeeRouter,
   monthlyFee: monthlyFeeRouter,
+  admissionPayment: admissionPaymentRouter,
 });
 
 /**

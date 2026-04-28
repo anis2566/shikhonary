@@ -9,3 +9,4 @@ export * from "./exam";
 export * from "./attendance";
 export * from "./notification";
 export * from "./invoice";
+export * from "./admission-payments";

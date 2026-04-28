@@ -11,6 +11,7 @@ export * from "./hooks/use-academic-year";
 export * from "./hooks/use-counter";
 export * from "./hooks/use-admission-fee";
 export * from "./hooks/use-monthly-fee";
+export * from "./hooks/use-admission-payment";
 export * from "./hooks/use-mcq";
 export * from "./hooks/use-cq";
 export * from "./hooks/use-student";

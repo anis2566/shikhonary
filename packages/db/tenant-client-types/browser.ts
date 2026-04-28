@@ -92,3 +92,13 @@ export type AdmissionFee = Prisma.AdmissionFeeModel
  * 
  */
 export type MonthlyFee = Prisma.MonthlyFeeModel
+/**
+ * Model AdmissionPayment
+ * 
+ */
+export type AdmissionPayment = Prisma.AdmissionPaymentModel
+/**
+ * Model MonthlyPayment
+ * 
+ */
+export type MonthlyPayment = Prisma.MonthlyPaymentModel
